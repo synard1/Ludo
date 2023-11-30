@@ -55,8 +55,8 @@ protected static function boot()
         'last_login_at',
         'last_login_ip',
         'profile_photo_path',
-        'access_level',
-        'member_level',
+        'level_access',
+        'subscription',
     ];
 
     /**

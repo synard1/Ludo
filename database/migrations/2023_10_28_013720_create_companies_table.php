@@ -19,8 +19,9 @@ return new class extends Migration
             // $table->uuid('user_id');
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('cid')->nullable();
-            $table->string('username', 190)->unique();
-            $table->string('userlink')->unique();
+            $table->string('username', 190)->unique()->nullable();
+            $table->string('userlink')->unique()->nullable();
+            $table->string('userlink2')->unique()->nullable();
             $table->string('customlink')->nullable();
             $table->string('name')->nullable();
             $table->string('address')->nullable();

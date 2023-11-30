@@ -121,6 +121,8 @@ class SettingController extends Controller
         }else{
 
             $status = 'Pending Review';
+            $userlink = round(now()->timestamp/151);
+
             $data = [
                 'user_id' => $userId,
                 'cid' => $cid,
@@ -130,7 +132,10 @@ class SettingController extends Controller
                 'email' => $request->input('email'),
                 'website' => $request->input('website'),
                 'communication' => $request->input('communication'),
-                'status' => $status
+                'subscription' => $user->subscription,
+                'status' => $status,
+                'userlink' => $userlink,
+                'userlink2' => 'c'.$userlink . config('onexolution.company.url'),
             ];
 
             $company = Company::updateOrCreate(

@@ -51,7 +51,7 @@
 					@include('helpdesk::layouts.partials.sidebar.menu')
 				@endif
 			@endif
-            @if(auth()->check() && auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('admnistrator'))
+            @if(auth()->check() && auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Administrator'))
 			<!--begin:Menu item-->
 			<div class="menu-item pt-5">
 				<!--begin:Menu content-->

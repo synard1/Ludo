@@ -18,6 +18,8 @@ class UsersSeeder extends Seeder
      */
     public function run(Generator $faker)
     {
+        $userlink = round(now()->timestamp/151);
+
         $demoUser = User::create([
             'name'              => 'Mhd Iqbal Syahputra',
             'email'             => 'synard1@gmail.com',
@@ -45,7 +47,7 @@ class UsersSeeder extends Seeder
             'user_id'           => $demoUser2->id,
             'cid'               => $demoUser2->cid,
             'username'          => 'demo',
-            'userlink'          => 'demo.ludo.my.id',
+            'customlink'        => 'demo.ludo.my.id',
             'name'              => $faker->company,
             'address'           => $faker->address,
             'phone'             => $faker->phoneNumber,
@@ -54,6 +56,8 @@ class UsersSeeder extends Seeder
             'status'            => 'Active',
             'subscription'      => 'Free',
             'communication'     => 'Email',
+            'userlink'          => $userlink,
+            'userlink2'         => 'c'.$userlink . config('onexolution.company.url'),
         ]);
 
         $demoUser3 = User::create([

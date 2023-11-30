@@ -50,19 +50,13 @@ class RolesPermissionsSeeder extends Seeder
                 'user sign helpdesk',
 
             ],
-            'administrator' => [
+            'Administrator' => [
                 'user management',
                 'reporting',
                 'setting management',
-                'audit log',
-                'hotspot',
                 'helpdesk',
                 'ticket',
                 'workorder',
-                'user sign',
-                'user sign workorder',
-                'user sign ticket',
-                'user sign helpdesk',
             ],
             'developer' => [
                 'api controls',
@@ -75,16 +69,12 @@ class RolesPermissionsSeeder extends Seeder
                 'reporting',
                 'payroll',
             ],
-            'support' => [
+            'Support' => [
                 'helpdesk',
                 'ticket',
                 'workorder',
-                'user sign',
-                'user sign workorder',
-                'user sign ticket',
-                'user sign helpdesk',
             ],
-            'trial' => [
+            'Trial' => [
                 'setting management',
             ],
         ];
@@ -95,7 +85,7 @@ class RolesPermissionsSeeder extends Seeder
             }
         }
 
-        foreach ($permissions_by_role['support'] as $permission) {
+        foreach ($permissions_by_role['Support'] as $permission) {
             foreach ($abilities as $ability) {
                 Permission::updateOrCreate(['name' => $ability . ' ' . $permission]);
             }
@@ -118,13 +108,13 @@ class RolesPermissionsSeeder extends Seeder
         $user->assignRole('Super Admin');
 
         $user1 = User::where('email', 'admin@demo.com')->first();
-        $user1->assignRole('administrator');
+        $user1->assignRole('Administrator');
 
         $user2 = User::where('email', 'support@demo.com')->first();
-        $user2->assignRole('support');
+        $user2->assignRole('Support');
 
         $user2 = User::where('email', 'supervisor@demo.com')->first();
-        $user2->assignRole('support');
+        $user2->assignRole('Support');
     }
 
 }

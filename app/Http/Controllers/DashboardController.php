@@ -11,7 +11,7 @@ class DashboardController extends Controller
             addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']);
 
             return view('pages.dashboards.index');
-        }else if(auth()->user()->hasRole('administrator')){
+        }else if(auth()->user()->hasRole('Administrator')){
             return view('pages.dashboards.indexNewUser');
         }
 

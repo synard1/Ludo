@@ -42,15 +42,17 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'account_id'        => 'ID-'.generateRandomString(8),
-            'cid'               => generateRandomString(6),
+            'name'          => $request->name,
+            'email'         => $request->email,
+            'password'      => Hash::make($request->password),
+            'account_id'    => 'ID-'.generateRandomString(8),
+            'cid'           => generateRandomString(6),
+            'level_access'  => 'Owner',
+            'subscription'  => 'Free',
         ]);
 
         // Assign default role "trial" to the user
-        $user->assignRole('trial');
+        $user->assignRole('Administrator');
 
         event(new Registered($user));
 
@@ -58,5 +60,5 @@ class RegisteredUserController extends Controller
 
         return redirect(RouteServiceProvider::HOME);
     }
-    
+
 }

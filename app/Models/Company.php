@@ -27,6 +27,8 @@ class Company extends Model
         'communication',
         'status',
         'subscription',
+        'userlink',
+        'userlink2',
     ];
 
     protected static function boot()
