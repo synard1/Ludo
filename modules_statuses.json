@@ -1,0 +1,9 @@
+{
+    "UserInfo": true,
+    "LoginSession": true,
+    "LoginLog": true,
+    "AdsPortal": false,
+    "Hotspot": true,
+    "Helpdesk": true,
+    "UserSign": false
+}

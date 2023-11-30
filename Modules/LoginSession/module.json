@@ -1,0 +1,11 @@
+{
+    "name": "LoginSession",
+    "alias": "loginsession",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\LoginSession\\Providers\\LoginSessionServiceProvider"
+    ],
+    "files": []
+}

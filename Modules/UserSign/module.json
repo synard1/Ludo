@@ -1,0 +1,11 @@
+{
+    "name": "UserSign",
+    "alias": "usersign",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\UserSign\\Providers\\UserSignServiceProvider"
+    ],
+    "files": []
+}

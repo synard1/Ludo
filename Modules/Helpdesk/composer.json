@@ -1,0 +1,23 @@
+{
+    "name": "ludo.my.id/helpdesk",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mhd Iqbal Syahputra",
+            "email": "synard1@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Helpdesk\\": ""
+        }
+    }
+}

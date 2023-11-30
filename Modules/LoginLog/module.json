@@ -1,0 +1,11 @@
+{
+    "name": "LoginLog",
+    "alias": "loginlog",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\LoginLog\\Providers\\LoginLogServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,31 @@
+{
+    "name": "ludo.my.id/usersign",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mhd Iqbal Syahputra",
+            "email": "synard1@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\UserSign\\": "",
+            "Modules\\UserSign\\App\\": "app/",
+            "Modules\\UserSign\\Database\\Factories\\": "database/factories/",
+            "Modules\\UserSign\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\UserSign\\Tests\\": "tests/"
+        }
+    }
+}

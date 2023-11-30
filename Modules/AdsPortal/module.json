@@ -1,0 +1,11 @@
+{
+    "name": "AdsPortal",
+    "alias": "adsportal",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AdsPortal\\Providers\\AdsPortalServiceProvider"
+    ],
+    "files": []
+}

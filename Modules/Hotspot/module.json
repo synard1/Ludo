@@ -1,0 +1,11 @@
+{
+    "name": "Hotspot",
+    "alias": "hotspot",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Hotspot\\Providers\\HotspotServiceProvider"
+    ],
+    "files": []
+}

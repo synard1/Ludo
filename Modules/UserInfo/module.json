@@ -1,0 +1,11 @@
+{
+    "name": "UserInfo",
+    "alias": "userinfo",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\UserInfo\\Providers\\UserInfoServiceProvider"
+    ],
+    "files": []
+}

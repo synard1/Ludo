@@ -1,0 +1,92 @@
+<?php
+use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Router;
+use Modules\Helpdesk\Http\Controllers\TicketController;
+use Modules\Helpdesk\Http\Controllers\WorkOrderController;
+use Modules\Helpdesk\Http\Controllers\WorkOrderResponseController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::prefix('helpdesk')->group(function() {
+    Route::get('/', 'HelpdeskController@index');
+});
+
+Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolution.route.middleware'))->group(function () {
+
+    // Main Routes
+    Route::get('/ticket', [TicketController::class, 'index'])->name('tickets');
+    Route::get('/workorder', [WorkOrderController::class, 'index'])->name('workorder');
+    Route::get('/print/wo/{id}', [TicketController::class, 'woPrint'])->name('woPrint');
+
+    // API
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/ticket', [TicketController::class, 'getTicketData'])->name('getTicket');
+        Route::post('/ticket', [TicketController::class, 'saveTicket'])->name('postTicket');
+        Route::delete('/deleteTicket/{id}', [TicketController::class, 'deleteTicket'])->name('deleteTicket');
+        Route::get('/woresponse/{id}', [WorkOrderResponseController::class, 'getData'])->name('getWoResponse');
+        Route::get('/workorder/staff', [WorkOrderController::class, 'getWorkOrderStaff'])->name('getWorkOrderStaff');
+        Route::post('/workorder/response', [WorkOrderController::class, 'saveWorkOrderResponse'])->name('postWorkOrderResponse');
+        Route::get('/workorder', [WorkOrderController::class, 'getWorkOrderData'])->name('getWorkOrder');
+        Route::post('/workorder', [WorkOrderController::class, 'saveWorkOrder'])->name('postWorkOrder');
+        Route::delete('/deleteWorkOrder/{id}', [WorkOrderController::class, 'deleteWorkOrder'])->name('deleteWorkOrder');
+
+    });
+
+});
+
+// Route::group([
+//     'prefix'        => 'apps/helpdesk',
+//     'name'          => 'helpdesk.',
+//     // 'namespace'     => config('onexolution.route.namespace'),
+//     'middleware'    => config('onexolution.route.middleware'),
+// ], function (Router $router) {
+
+//     // Main Routes
+//     Route::get('/ticket', 'TicketController@index')->name('tickets');
+//     Route::get('/workorder', 'WorkOrderController@index')->name('workorder');
+//     Route::get('/print/wo/{id}', 'TicketController@woPrint')->name('woPrint');
+
+//     // API
+//     Route::prefix('/api')->group(function () {
+//         Route::get('/ticket', 'TicketController@getTicketData')->name('getTicket');
+//         Route::post('/ticket', 'TicketController@saveTicket')->name('postTicket');
+//         Route::get('/workorder/staff', 'WorkOrderController@getWorkOrderStaff')->name('getWorkOrderStaff');
+//         Route::post('/workorder/response', 'WorkOrderController@saveWorkOrderResponse')->name('postWorkOrderResponse');
+//         Route::get('/workorder', 'WorkOrderController@getWorkOrderData')->name('getWorkOrder');
+//         Route::post('/workorder', 'WorkOrderController@saveWorkOrder')->name('postWorkOrder');
+//         Route::delete('/deleteWorkOrder/{id}', 'WorkOrderController@deleteWorkOrder')->name('deleteWorkOrder');
+//     });
+
+// });
+// Route::prefix('apps/helpdesk')
+//     // ->middleware('auth')
+//     ->name('helpdesk.')
+//     ->group($attributes, function () {
+
+//     // Main Routes
+//     // Route::get('/ticket', 'TicketController@index')->name('tickets');
+//     // Route::get('/workorder', 'WorkOrderController@index')->name('workorder');
+//     // Route::get('/print/wo/{id}', 'TicketController@woPrint')->name('woPrint');
+
+//     // API
+//     Route::prefix('/api')->group(function () {
+//         Route::get('/ticket', 'TicketController@getTicketData')->name('getTicket');
+//         Route::post('/ticket', 'TicketController@saveTicket')->name('postTicket');
+//         Route::get('/workorder/staff', 'WorkOrderController@getWorkOrderStaff')->name('getWorkOrderStaff');
+//         Route::post('/workorder/response', 'WorkOrderController@saveWorkOrderResponse')->name('postWorkOrderResponse');
+//         Route::get('/workorder', 'WorkOrderController@getWorkOrderData')->name('getWorkOrder');
+//         Route::post('/workorder', 'WorkOrderController@saveWorkOrder')->name('postWorkOrder');
+//         Route::delete('/deleteWorkOrder/{id}', 'WorkOrderController@deleteWorkOrder')->name('deleteWorkOrder');
+//     });
+
+
+// });
