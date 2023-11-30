@@ -9,7 +9,6 @@
 /storage/*.key
 /stubs
 /vendor
-/resources/_keenthemes
 .env
 .env.backup
 .phpunit.result.cache
