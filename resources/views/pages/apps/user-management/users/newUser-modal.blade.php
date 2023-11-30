@@ -90,21 +90,21 @@
                         <!--begin::Input group-->
                         <div class="mb-5">
                             <!--begin::Label-->
-                            <label class="required fw-semibold fs-6 mb-5">Role</label>
+                            <label class="required fw-semibold fs-6 mb-5">Level Access</label>
                             <!--end::Label-->
 
-                            <!--begin::Roles-->
+                            <!--begin::LevelAccess-->
                                                             <!--begin::Input row-->
                                 <div class="d-flex fv-row">
                                     <!--begin::Radio-->
                                     <div class="form-check form-check-custom form-check-solid">
                                         <!--begin::Input-->
-                                        <input class="form-check-input me-3" name="user_role" id="user_role" type="radio" value="administrator" id="kt_modal_update_role_option_0" checked="checked">
+                                        <input class="form-check-input me-3" name="user_role"  type="radio" value="Supervisor" id="kt_modal_update_role_option_0" checked="checked">
                                         <!--end::Input-->
 
                                         <!--begin::Label-->
                                         <label class="form-check-label" for="kt_modal_update_role_option_0">
-                                            <div class="fw-bold text-gray-800">Administrator</div>
+                                            <div class="fw-bold text-gray-800">Supervisor</div>
                                             <div class="text-gray-600">Best for business owners and company administrators</div>
                                         </label>
                                         <!--end::Label-->
@@ -118,50 +118,12 @@
                                     <!--begin::Radio-->
                                     <div class="form-check form-check-custom form-check-solid">
                                         <!--begin::Input-->
-                                        <input class="form-check-input me-3" name="user_role" id="user_role" type="radio" value="developer" id="kt_modal_update_role_option_1">
-                                        <!--end::Input-->
-
-                                        <!--begin::Label-->
-                                        <label class="form-check-label" for="kt_modal_update_role_option_1">
-                                            <div class="fw-bold text-gray-800">Developer</div>
-                                            <div class="text-gray-600">Best for developers or people primarily using the API</div>
-                                        </label>
-                                        <!--end::Label-->
-                                    </div>
-                                    <!--end::Radio-->
-                                </div>
-                                <!--end::Input row-->
-
-                                <div class="separator separator-dashed my-5"></div>                                                            <!--begin::Input row-->
-                                <div class="d-flex fv-row">
-                                    <!--begin::Radio-->
-                                    <div class="form-check form-check-custom form-check-solid">
-                                        <!--begin::Input-->
-                                        <input class="form-check-input me-3" name="user_role" id="user_role" type="radio" value="analyst" id="kt_modal_update_role_option_2">
-                                        <!--end::Input-->
-
-                                        <!--begin::Label-->
-                                        <label class="form-check-label" for="kt_modal_update_role_option_2">
-                                            <div class="fw-bold text-gray-800">Analyst</div>
-                                            <div class="text-gray-600">Best for people who need full access to analytics data, but don't need to update business settings</div>
-                                        </label>
-                                        <!--end::Label-->
-                                    </div>
-                                    <!--end::Radio-->
-                                </div>
-                                <!--end::Input row-->
-
-                                <div class="separator separator-dashed my-5"></div>                                                            <!--begin::Input row-->
-                                <div class="d-flex fv-row">
-                                    <!--begin::Radio-->
-                                    <div class="form-check form-check-custom form-check-solid">
-                                        <!--begin::Input-->
-                                        <input class="form-check-input me-3" name="user_role" id="user_role" type="radio" value="support" id="kt_modal_update_role_option_3">
+                                        <input class="form-check-input me-3" name="user_role"  type="radio" value="Staff" id="kt_modal_update_role_option_3">
                                         <!--end::Input-->
 
                                         <!--begin::Label-->
                                         <label class="form-check-label" for="kt_modal_update_role_option_3">
-                                            <div class="fw-bold text-gray-800">Support</div>
+                                            <div class="fw-bold text-gray-800">Staff</div>
                                             <div class="text-gray-600">Best for employees who regularly handle tech issue.</div>
                                         </label>
                                         <!--end::Label-->
@@ -170,7 +132,7 @@
                                 </div>
                                 <!--end::Input row-->
 
-                    <!--end::Roles-->
+                    <!--end::LevelAccess-->
                         </div>
                         <!--end::Input group-->
                     </div>

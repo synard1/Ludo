@@ -95,10 +95,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('/user-management/permissions', PermissionManagementController::class);
 
         // API
-        // Route::prefix('/user-management/api')->group(function () {
-        //     Route::post('/users', [UserManagementController::class, 'saveUser'])->name('postUser');
+        Route::prefix('/user-management/api')->group(function () {
+            Route::post('/users', [UserManagementController::class, 'saveUser'])->name('postUser');
 
-        // });
+        });
     });
 
     Route::name('apps.')->group(function () {

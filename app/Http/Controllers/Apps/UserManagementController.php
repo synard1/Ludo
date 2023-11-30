@@ -75,7 +75,6 @@ class UserManagementController extends Controller
     public function saveUser(Request $request)
     {
         $user = auth()->user(); // Get the authenticated user's ID
-        $cid = $user->cid; // Assuming 'cid' is provided in the request
 
         // $user = User::create([
         //     'name'          => Uc($request->input('name')),
@@ -100,12 +99,14 @@ class UserManagementController extends Controller
                 'email'         => $request->input('email'),
                 'password'      => Hash::make($request->input('password')),
                 'account_id'    => 'ID-'.generateRandomString(8),
-                'cid'           => $cid,
+                'cid'           => $user->cid,
                 'parent_id'     => $user->id,
+                'level_access'     => $request->input('access'),
+                'subscription'     => $user->subscription,
             ]);
 
             // Assign default role "trial" to the user
-            $user->assignRole('support');
+            $user->assignRole('Support');
 
             event(new Registered($request->roles));
 
