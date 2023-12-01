@@ -148,6 +148,7 @@ Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']
 
 require __DIR__ . '/auth.php';
 require __DIR__.'/superadmin.php';
+require __DIR__.'/client.php';
 
 
 

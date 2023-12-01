@@ -260,4 +260,10 @@ public function clearCache($cacheType = 'all')
         // Print the result in JSON format
         return json_encode($result, JSON_PRETTY_PRINT);
     }
+
+    public function domainCheck($client_id)
+    {
+        // Access the client_id wildcard here
+        return "Client ID: $client_id";
+    }
 }
