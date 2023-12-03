@@ -119,9 +119,9 @@
                     <thead>
                         <tr class="fw-semibold fs-6 text-gray-800">
                             <th class="w-25px">#</th>
+                            <th class="min-w-100px">Subject</th>
                             <th class="min-w-140px">Staff Assign</th>
                             <th class="min-w-120px">Reporter</th>
-                            <th class="min-w-100px">Subject</th>
                             <th class="min-w-100px">Status</th>
                             <th class="min-w-160px">Description</th>
                             <th class="min-w-100px">Due Date</th>
@@ -442,6 +442,27 @@
                     },
                 },
                 {
+                    data: 'subject',
+                    render: function (data, type, row) {
+                        var statusText = row.priority;
+
+                        // Define status information
+                        var status = {
+                            'High': {"state": "warning"},
+                            'Medium': {"state": "primary"},
+                            'Low': {"state": "info"},
+                            'Normal': {"state": "success"},
+                            'Emergency': {"state": "danger"},
+                        };
+
+                        // Generate the span based on the status text
+                        var statusSpan = '<span class="badge badge-light-' + status[statusText]['state'] + ' fw-semibold">' + statusText + '</span>';
+
+                        // Concatenate the status span with the subject
+                        return data + ' ' + statusSpan;
+                    }
+                },
+                {
                     data: 'staff',
                     class: 'text-gray-900 fw-bold text-hover-primary fs-6',
                     // title: 'Reporter',
@@ -463,10 +484,6 @@
 
                     }
                 },
-                // {
-                //     class: 'text-gray-900 fw-bold text-hover-primary fs-6',
-                //     data: 'staff',
-                // },
                 {
                     data: 'user',
                     title: 'Reporter',
@@ -485,27 +502,6 @@
 
                         }
                         return data; // For sorting and other types
-                    }
-                },
-                {
-                    data: 'subject',
-                    render: function (data, type, row) {
-                        var statusText = row.priority;
-
-                        // Define status information
-                        var status = {
-                            'High': {"state": "warning"},
-                            'Medium': {"state": "primary"},
-                            'Low': {"state": "info"},
-                            'Normal': {"state": "success"},
-                            'Emergency': {"state": "danger"},
-                        };
-
-                        // Generate the span based on the status text
-                        var statusSpan = '<span class="badge badge-light-' + status[statusText]['state'] + ' fw-semibold">' + statusText + '</span>';
-
-                        // Concatenate the status span with the subject
-                        return data + ' ' + statusSpan;
                     }
                 },
                 { data: 'status' },

@@ -103,6 +103,7 @@ class UserManagementController extends Controller
                 'parent_id'     => $user->id,
                 'level_access'     => $request->input('access'),
                 'subscription'     => $user->subscription,
+                'status'        => 'Active',
             ]);
 
             // Assign default role "trial" to the user

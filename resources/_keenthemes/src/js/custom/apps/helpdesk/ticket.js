@@ -46,8 +46,8 @@ var KTTicket = function () {
                         return meta.row + 1;
                     },
                 },
-                { data: 'user_name' },
                 { data: 'subject' },
+                { data: 'user_name' },
                 { data: 'description' },
                 { data: 'origin_unit' },
                 { data: 'source_report' },

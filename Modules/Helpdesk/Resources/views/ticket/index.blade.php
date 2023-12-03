@@ -22,8 +22,8 @@
                     <thead>
                         <tr class="fw-semibold fs-6 text-gray-800">
                             <th>#</th>
-                            <th>Operator</th>
                             <th>Subject</th>
+                            <th>Operator</th>
                             <th>Description</th>
                             <th>Unit</th>
                             <th>Sources</th>
