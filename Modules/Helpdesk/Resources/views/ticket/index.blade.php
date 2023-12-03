@@ -39,6 +39,7 @@
             </div>
         </div>
     </div>
+    @if($canCreateTicket)
     <div class="card shadow-sm mb-5">
         <div class="card-header collapsible cursor-pointer rotate">
             <h3 class="card-title">New Ticket</h3>
@@ -266,6 +267,7 @@
             <!--end::Form-->
         </div>
     </div>
+    @endif
 
     @include('helpdesk::ticket/work_order')
 
@@ -398,7 +400,7 @@
                                 // Enable button
                                 submitButtonWO.disabled = false;
 
-                                table.ajax.reload();
+                                $('#ticketTable').DataTable().ajax.reload();
 
                             });
                         },

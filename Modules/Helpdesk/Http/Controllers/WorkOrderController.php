@@ -26,6 +26,7 @@ class WorkOrderController extends Controller
 
         // addVendors(['datatables','tinymce','signpad']);
         addVendors(['datatables','tinymce']);
+        addJavascriptFile('assets/js/custom/apps/helpdesk/workorder.js');
         // Get the original status array
         $statusWorkOrder = Config::get('onexolution.statusWorkOrder');
 

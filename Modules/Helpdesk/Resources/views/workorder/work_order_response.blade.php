@@ -96,7 +96,7 @@
 
                     <!--begin::Input group-->
                     <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
-                        <label class="fs-6 fw-semibold mb-2">Description</label>
+                        <label class="required fs-6 fw-semibold mb-2">Description</label>
 
                         <textarea class="form-control form-control-solid" rows="2" name="description_response" id="description_response"> </textarea>
                     <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
@@ -105,7 +105,7 @@
 
                     <!--begin::Actions-->
                     <div class="text-center">
-                        <button type="reset" id="kt_modal_new_ticket_cancel" class="btn btn-light me-3" data-bs-dismiss="modal">
+                        <button type="reset" id="kt_modal_work_order_response_cancel" class="btn btn-light me-3" data-bs-dismiss="modal">
                             Cancel
                         </button>
 

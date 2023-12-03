@@ -1,9 +1,10 @@
 {{-- //TODO: Make Form Validation --}}
 <div class="modal fade" tabindex="-1" id="kt_modal_work_order">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-body">
                 <form id="kt_modal_new_work_order_form" class="form fv-plugins-bootstrap5 fv-plugins-framework" action="#" data-select2-id="select2-data-kt_modal_new_wordk_order_form">
+                    <input type="hidden" class="form-control form-control-solid" name="ticket_id" id="ticket_id" readonly>
                     <!--begin::Heading-->
                     <div class="mb-13 text-center">
                         <!--begin::Title-->
@@ -18,7 +19,7 @@
                     </div>
                     <!--end::Heading-->
 
-                    <!--begin::Input group-->
+                    {{-- <!--begin::Input group-->
                     <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
                         <!--begin::Label-->
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
@@ -28,7 +29,7 @@
 
                         <input type="text" class="form-control form-control-solid" name="ticket_id" id="ticket_id" readonly>
                     <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                    <!--end::Input group-->
+                    <!--end::Input group--> --}}
 
                     <!--begin::Input group-->
                     <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">

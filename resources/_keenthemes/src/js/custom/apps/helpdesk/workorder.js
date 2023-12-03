@@ -1,41 +1,38 @@
 "use strict";
 
 // Class definition
-var KTTicket = function () {
+var KTWorkorder = function () {
     // Shared variables
-    var tableTicket;
-    var dtTicket;
+    var tableWorkorder;
+    var dtWorkorder;
     var dtButtons;
-    var form, categoryField;
+    var form;
     var submitButton, cancelButton;
     var validator;
 
     // Private functions
     var initDatatable = function () {
 
-        dtButtons = ['copy', 'reload', 'print'];
+        dtButtons = ['reload', 'print',
+        {
+            extend: 'colvis'
+        }];
 
-        if(canCreateTicket){
-            dtButtons.push({
-                text: 'New Ticket',
-                action: function (e, dt, node, config) {
-                    $('#kt_docs_card_ticket_list').collapse('hide');
-                    $('#kt_docs_card_ticket_new').collapse('show');
-                }
-            });
+        $.fn.dataTable.ext.buttons.reload = {
+            text: 'Reload',
+            action: function ( e, dt, node, config ) {
+                dt.ajax.reload();
+            }
+        };
 
-        }
-
-
-        dtTicket = $("#ticketTable").DataTable({
+        dtWorkorder = $("#workOrderTable").DataTable({
             searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[5, 'desc']],
             stateSave: true,
             ajax: {
-                url: "/apps/helpdesk/api/ticket",
-                dataSrc: 'tickets'
+                url: '/apps/helpdesk/api/workorder',
+                dataSrc: 'workorders'
             },
             columns: [
                 {
@@ -46,59 +43,94 @@ var KTTicket = function () {
                         return meta.row + 1;
                     },
                 },
-                { data: 'subject' },
-                { data: 'user_name' },
-                { data: 'description' },
-                { data: 'origin_unit' },
-                { data: 'source_report' },
-                { data: 'priority' },
                 {
-                    data: 'issue_category',
+                    data: 'subject',
                     render: function (data, type, row) {
-                        // Handle array values
-                        if (Array.isArray(data)) {
-                            return data.join(', '); // Join array values with a comma and space
-                        }
+                        var statusText = row.priority;
 
-                        return data; // If not an array, return the original value
+                        // Define status information
+                        var status = {
+                            'High': {"state": "warning"},
+                            'Medium': {"state": "primary"},
+                            'Low': {"state": "info"},
+                            'Normal': {"state": "success"},
+                            'Emergency': {"state": "danger"},
+                        };
+
+                        // Generate the span based on the status text
+                        var statusSpan = '<span class="badge badge-light-' + status[statusText]['state'] + ' fw-semibold">' + statusText + '</span>';
+
+                        // Concatenate the status span with the subject
+                        return data + ' ' + statusSpan;
                     }
                 },
                 {
-                    targets: 10,
-                    data: 'status',
+                    data: 'staff',
+                    class: 'text-gray-900 fw-bold text-hover-primary fs-6',
+                    // title: 'Reporter',
                     render: function (data, type, row) {
-                        switch (data.toLowerCase()) {
-                            case 'open':
-                                return '<span class="badge badge-success">Open</span>';
-                            case 'pending':
-                                return '<span class="badge badge-warning">Pending</span>';
-                            case 'closed':
-                                return '<span class="badge badge-secondary">Closed</span>';
-                            case 'resolved':
-                                return '<span class="badge badge-primary">Resolved</span>';
-                            default:
-                                return data;
+                        if(canSign){
+                            if (type === 'display' || type === 'filter') {
+                                return '<a href="#" class="text-gray-900 fw-bold text-hover-primary d-block mb-1 fs-6">'+data+'</a>'+
+                                    '<a href="#" class="open-signpad" data-bs-toggle="modal" data-bs-target="#kt_modal_signaturepad" data-id="'+row.id+'" data-access="Staff"><i class="ki-duotone ki-feather fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+                            }
+                            return data; // For sorting and other types
+
+                        }else{
+                            if (type === 'display' || type === 'filter') {
+                                return '<a href="#" class="text-gray-900 fw-bold text-hover-primary d-block mb-1 fs-6">'+data+'</a>';
+                            }
+                            return data; // For sorting and other types
+
                         }
-                    },
+
+                    }
                 },
                 {
-                    targets: 12,
-                    data: 'work_order', // Assuming the attribute is named 'work_order'
+                    data: 'user',
+                    title: 'Reporter',
                     render: function (data, type, row) {
-                            if(data){
-                                // If work_order exists, show "View" button
-                            return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' + row.work_order + '" target="_blank" class="text-info view-work-order" data-id="' + row.id + '">View</a></span>';
+                        if (type === 'display' || type === 'filter') {
+                            // Format the date as "YYYY-MM-DD HH:MM:SS"
+                            var date = new Date(data);
+                            var origin_unit = row.origin_unit;
+                            if(canSign){
+                                return '<a href="#" class="text-gray-900 fw-bold text-hover-primary d-block mb-1 fs-6">'+data+'</a>'+
+                                '<span class="text-muted fw-semibold text-muted d-block fs-7">Unit: '+origin_unit+'</span>'+
+                                '<i class="ki-duotone ki-feather fs-2"><span class="path1"></span><span class="path2"></span></i>';
                             }else{
-                                if(isSupervisor){
-                                    // If work_order does not exist, show "Generate Work Order" button
-                            return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' + row.id + '">Generate Work Order</a>';
-                                }else{
-                                    return '<a href="#">N/A</a>';
-                                }
-
+                                return '<a href="#" class="text-gray-900 fw-bold text-hover-primary d-block mb-1 fs-6">'+data+'</a>';
                             }
 
-                    },
+                        }
+                        return data; // For sorting and other types
+                    }
+                },
+                { data: 'status' },
+                { data: 'description' },
+                {
+                    data: 'due_date',
+                    title: 'Due Date',
+                    render: function (data, type, row) {
+                        if (type === 'display' || type === 'filter') {
+                            // Format the date as "YYYY-MM-DD HH:MM:SS"
+                            return data.toLocaleString();
+                        }
+                        return data; // For sorting and other types
+                    }
+                },
+                {
+                    data: 'created_at',
+                    title: 'Created',
+                    render: function (data, type, row) {
+                        if (type === 'display' || type === 'filter') {
+                            // Format the date as "YYYY-MM-DD HH:MM:SS"
+                            var date = new Date(data);
+                            var created_by = row.created_by;
+                            return created_by +'<br>'+ date.toLocaleString();
+                        }
+                        return data; // For sorting and other types
+                    }
                 },
                 {
                     class: 'text-end',
@@ -107,6 +139,12 @@ var KTTicket = function () {
                 },
             ],
             dom: 'Bfrtip',
+            columnDefs: [
+                    {
+                        targets: 5,
+                        visible: false
+                    }
+                ],
             buttons: dtButtons,
             // Use the passed data
 
@@ -114,124 +152,28 @@ var KTTicket = function () {
 
 
 
-        tableTicket = dtTicket.$;
+        tableWorkorder = dtWorkorder.$;
         // Refresh the DataTable to reflect the changes
-        dtTicket.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
+        dtWorkorder.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
-        dtTicket.on('draw', function () {
-            handleDeleteRows();
+        dtWorkorder.on('draw', function () {
             KTMenu.init(); // reinit KTMenu instances
         });
     }
 
-    // Delete ticket
-    var handleDeleteRows = () => {
-        // Select all delete buttons
-        const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
+    // Editor functions
+    var initEditor = function() {
+        var options = {selector: "#description_response", height : "480"};
 
-        deleteButtons.forEach(d => {
-            // Delete button on click
-            d.addEventListener('click', function (e) {
-                e.preventDefault();
+            if ( KTThemeMode.getMode() === "dark" ) {
+                options["skin"] = "oxide-dark";
+                options["content_css"] = "dark";
+            }
 
-                // Select parent row
-                const parent = e.target.closest('tr');
-
-                // Get subject name
-                const ticketSubject = parent.querySelectorAll('td')[2].innerText;
-                const ticketId = $(this).data('id');
-                console.log(ticketId);
-
-                // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-                Swal.fire({
-                    text: "Are you sure you want to delete " + ticketSubject + "?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    buttonsStyling: false,
-                    confirmButtonText: "Yes, delete!",
-                    cancelButtonText: "No, cancel",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-danger",
-                        cancelButton: "btn fw-bold btn-active-light-primary"
-                    }
-                }).then(function (result) {
-                    if (result.value) {
-                        // Simulate delete request -- for demo purpose only
-                        Swal.fire({
-                            text: "Deleting " + ticketSubject,
-                            icon: "info",
-                            buttonsStyling: false,
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(function () {
-                            $.ajax({
-                                url: '/apps/helpdesk/api/deleteTicket/' + ticketId,
-                                type: 'DELETE',
-                                success: function(response) {
-                                    // Refresh the DataTable or remove the row from the table
-                                    // depending on your implementation
-                                    swal.fire({
-                                        text: response.message,
-                                        icon: "success",
-                                        buttonsStyling: false,
-                                        confirmButtonText: "Ok, got it!",
-                                        customClass: {
-                                            confirmButton: "btn font-weight-bold btn-light-primary"
-                                        }
-                                    }).then(function(){
-                                        dtTicket.draw();
-                                    });
-                                },
-                                error: function (error) {
-                                    let errorMessage = "Sorry, looks like there are some errors detected, please try again.";
-
-                                    if (error.responseJSON && error.responseJSON.message) {
-                                        errorMessage = error.responseJSON.message;
-                                    }
-
-                                    Swal.fire({
-                                        text: errorMessage,
-                                        icon: "error",
-                                        buttonsStyling: false,
-                                        confirmButtonText: "Ok, got it!",
-                                        customClass: {
-                                            confirmButton: "btn btn-primary"
-                                        }
-                                    });
-
-                                    console.error('Error deleting ticket:', error);
-                                }
-                            });
-
-                            // Swal.fire({
-                            //     text: "You have deleted " + ticketSubject + "!.",
-                            //     icon: "success",
-                            //     buttonsStyling: false,
-                            //     confirmButtonText: "Ok, got it!",
-                            //     customClass: {
-                            //         confirmButton: "btn fw-bold btn-primary",
-                            //     }
-                            // }).then(function () {
-                            //     // delete row data from server and re-draw datatable
-                            //     dtTicket.draw();
-                            // });
-                        });
-                    } else if (result.dismiss === 'cancel') {
-                        Swal.fire({
-                            text: ticketSubject + " was not deleted.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
-                        });
-                    }
-                });
-            })
-        });
+            tinymce.init(options);
     }
+
 
     // Handle form
     var handleForm = function (e) {
@@ -240,62 +182,41 @@ var KTTicket = function () {
             form,
             {
                 fields: {
-                    'subject': {
+                    'workorder_subject': {
                         validators: {
                             notEmpty: {
                                 message: 'Subject is required'
                             }
                         }
                     },
-                    'kt_td_picker_time_only_input': {
+                    'description_response': {
                         validators: {
                             notEmpty: {
-                                message: 'Report Time is required'
+                                message: 'Description is required'
                             }
                         }
                     },
-                    'report_time': {
+                    'start_date': {
                         validators: {
                             notEmpty: {
-                                message: 'Report Time is required'
+                                message: 'Start Time is required'
                             }
                         }
                     },
-                    'unit-dropdown': {
+                    'finish_date': {
                         validators: {
                             notEmpty: {
-                                message: 'Unit is required'
+                                message: 'Finish Time is required'
                             }
                         }
                     },
-                    'sourcesReport': {
+                    'status': {
                         validators: {
                             notEmpty: {
-                                message: 'Sources of Report is required'
+                                message: 'Status is required'
                             }
                         }
                     },
-                    'issuecategory[]': {
-                        validators: {
-                            choice: {
-                                min: 1,
-                                max: 5,
-                                message: 'Please check minimum 1 category'
-                            }
-                        }
-                    },
-                    'category-dropdown': {
-                        validators: {
-                            callback: {
-                                message: 'Please choose 2-4 color you like most',
-                                callback: function (input) {
-                                    // Get the selected options
-                                    const options = categoryField.select2('data');
-                                    return options != null && options.length >= 1;
-                                },
-                            },
-                        }
-                    }
                 },
                 plugins: {
                     trigger: new FormValidation.plugins.Trigger({
@@ -314,11 +235,19 @@ var KTTicket = function () {
 
         // Add a click event listener to the "Cancel" button
         cancelButton.addEventListener('click', function () {
-            // Close kt_docs_card_ticket_new
-            $('#kt_docs_card_ticket_new').collapse('hide');
-            // Show kt_docs_card_ticket_list
-            $('#kt_docs_card_ticket_list').collapse('show');
-            dtTicket.ajax.reload();
+            // Close the modal
+            $('#kt_modal_work_order_response').modal('hide');
+            dtWorkorder.ajax.reload();
+        });
+
+        $("#start_date").flatpickr({
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+        });
+
+        $("#finish_date").flatpickr({
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
         });
 
         // Handle form submit
@@ -333,32 +262,32 @@ var KTTicket = function () {
                         }
                     });
 
+                    // Get the data-id attribute value from the clicked row
+                    var rowId = $(this).closest('tr').data('id');
+
+                    var formData = {
+                        // Assuming your textarea has an ID, replace 'yourTextareaId' with the actual ID
+                        'workorder_response': tinymce.get('description_response').getContent(),
+                        'workorder_id': $('#workorder_id').val(),
+                        'workorder_subject': $('#workorder_subject').val(),
+                        'tickets_id': $('#ticket_id').val(),
+                        'status': $('#status').val(),
+                        'start_date': $('#start_date').val(),
+                        'finish_date': $('#finish_date').val(),
+                        // Add other form fields if needed
+                    };
+
                     // Show loading indication
                     submitButton.setAttribute('data-kt-indicator', 'on');
 
                     // Disable button to avoid multiple click
                     submitButton.disabled = true;
 
-                    // Get the selected issuecategory options
-                    var issuecategoryOptions = [];
-                    $("input[name='issuecategory[]']:checked").each(function () {
-                        issuecategoryOptions.push($(this).val());
-                    });
 
                     $.ajax({
-                        url: '/apps/helpdesk/api/ticket',
+                        url: '/apps/helpdesk/api/workorder/response',
                         type: 'POST',
-                        data: {
-                            subject: $('#subject').val(),
-                            description: $('#description').val(),
-                            report_time: $('#report_time').val(),
-                            reporter_name: $('#reporter-dropdown').val(),
-                            origin_unit: $('#unit-dropdown').val(),
-                            issue_category: issuecategoryOptions,
-                            source_report: $('#sourcesReport').val(),
-                            // Include other fields here
-                            // _token: '{{ csrf_token() }}', // CSRF token for Laravel
-                        },
+                        data: formData,
                         success: function (response) {
                             // alert(response.message);
                             // Hide loading indication
@@ -366,6 +295,13 @@ var KTTicket = function () {
 
                             // Enable button
                             submitButton.disabled = false;
+
+                            // Reset the form and Select2 tags after submission (if needed)
+                            $('#kt_modal_work_order_response_form')[0].reset();
+
+                            // Close the modal
+                            $('#kt_modal_work_order_response').modal('hide');
+                            
 
                             swal.fire({
                                 text: response.message,
@@ -384,9 +320,10 @@ var KTTicket = function () {
 
                                 // Enable button
                                 submitButton.disabled = false;
-                                $('#kt_docs_card_ticket_list').collapse('show');
-                                $('#kt_docs_card_ticket_new').collapse('hide');
-                                dtTicket.ajax.reload();
+
+                                dtWorkorder.ajax.reload();
+
+                                
                             });
                         },
                         error: function (xhr) {
@@ -561,23 +498,22 @@ var KTTicket = function () {
         // Initialization
         init: function () {
             initDatatable();
-            handleDeleteRows();
+            initEditor();
             // Elements
-            form = document.querySelector('#kt_new_ticket_form');
-            submitButton = document.querySelector('#kt_new_ticket_submit');
-            cancelButton = document.querySelector('#kt_new_ticket_cancel');
-            categoryField = document.querySelector('[name="category-dropdown"]');
+            form = document.querySelector('#kt_modal_work_order_response_form');
+            submitButton = document.querySelector('#kt_modal_work_order_response_submit');
+            cancelButton = document.querySelector('#kt_modal_work_order_response_cancel');
 
-            // if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
-            //     handleFormAjax();
-            // } else {
-            //     handleForm();
-            // }
+            if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
+                handleFormAjax();
+            } else {
+                handleForm();
+            }
         }
     };
 }();
 
 // On document ready
 KTUtil.onDOMContentLoaded(function () {
-    KTTicket.init();
+    KTWorkorder.init();
 });
