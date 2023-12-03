@@ -14,9 +14,7 @@ return [
      |
      */
 
-    'enabled' => true,
-    // 'enabled' => env('DEBUGBAR_ENABLED', null),
-    // 'enabled' => auth()->check() && auth()->user()->hasRole('Super Admin'),
+    'enabled' => env('DEBUGBAR_ENABLED', null),
     'except' => [
         'telescope*',
         'horizon*',

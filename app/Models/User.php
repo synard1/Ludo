@@ -57,6 +57,7 @@ protected static function boot()
         'profile_photo_path',
         'level_access',
         'subscription',
+        'status',
     ];
 
     /**

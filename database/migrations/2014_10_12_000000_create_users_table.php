@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('level_access');
             $table->string('subscription');
+            $table->string('status')->nullable();
+
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

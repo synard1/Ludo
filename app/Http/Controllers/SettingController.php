@@ -181,13 +181,15 @@ public function updateStatus(Request $request, $id)
             ['status' => $status]
         );
 
+        $users = User::where('cid', $company->cid)->update(['status' => $status]);
+
         //code...
         $comp = Company::where('id', $id)->first();
         $user = User::where('id', $comp->user_id)->first();
 
         // Assign default role "administrator" to the user
-        $user->removeRole('trial');
-        $user->assignRole('administrator');
+        $user->removeRole('Trial');
+        $user->assignRole('Administrator');
 
         // Update the status in the database for the specified ID
         // You can use the Company model or your relevant model

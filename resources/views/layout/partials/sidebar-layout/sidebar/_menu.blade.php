@@ -5,6 +5,12 @@
 			$roleId	=	$role->id;
 		}
 
+		if($user->status == "Active"){
+			$isActive = true;
+		}else{
+			$isActive = false;
+		}
+
     @endphp
 @endif
 
@@ -16,41 +22,45 @@
 		<div class="menu menu-column menu-rounded menu-sub-indention px-3 fw-semibold fs-6" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
 			<!--begin:Menu item-->
             <a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-			<div class="menu-item {{ request()->routeIs('dashboard') ? 'here show' : '' }}">
-				<!--begin:Menu link-->
-				<span class="menu-link">
-					<span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
-					<span class="menu-title">Dashboards</span>
-				</span>
+				<div class="menu-item {{ request()->routeIs('dashboard') ? 'here show' : '' }}">
+					<!--begin:Menu link-->
+					<span class="menu-link">
+						<span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+						<span class="menu-title">Dashboards</span>
+					</span>
 
-				<!--end:Menu link-->
-			</div>
-        </a>
-			<!--end:Menu item-->
-			<!--begin:Menu item-->
-			<div class="menu-item pt-5">
-				<!--begin:Menu content-->
-				<div class="menu-content">
-					<span class="menu-heading fw-bold text-uppercase fs-7">Apps</span>
+					<!--end:Menu link-->
 				</div>
-				<!--end:Menu content-->
-			</div>
+			</a>
 			<!--end:Menu item-->
-			@if(App\Helpers\ModuleHelper::isModuleActive('AdsPortal'))
-				@if(auth()->user()->can('access ads portal'))
-					@include('adsportal::layouts.partials.sidebar.menu')
+
+			@if($isActive)
+				<!--begin:Menu item-->
+				<div class="menu-item pt-5">
+					<!--begin:Menu content-->
+					<div class="menu-content">
+						<span class="menu-heading fw-bold text-uppercase fs-7">Apps</span>
+					</div>
+					<!--end:Menu content-->
+				</div>
+				<!--end:Menu item-->
+				@if(App\Helpers\ModuleHelper::isModuleActive('AdsPortal'))
+					@if(auth()->user()->can('access ads portal'))
+						@include('adsportal::layouts.partials.sidebar.menu')
+					@endif
+				@endif
+				@if(App\Helpers\ModuleHelper::isModuleActive('Hotspot'))
+					@if(auth()->user()->can('access hotspot'))
+						@include('hotspot::layouts.partials.sidebar.menu')
+					@endif
+				@endif
+				@if(App\Helpers\ModuleHelper::isModuleActive('Helpdesk'))
+					@if(auth()->user()->can('access helpdesk') || auth()->user()->can('read helpdesk'))
+						@include('helpdesk::layouts.partials.sidebar.menu')
+					@endif
 				@endif
 			@endif
-			@if(App\Helpers\ModuleHelper::isModuleActive('Hotspot'))
-				@if(auth()->user()->can('access hotspot'))
-					@include('hotspot::layouts.partials.sidebar.menu')
-				@endif
-			@endif
-			@if(App\Helpers\ModuleHelper::isModuleActive('Helpdesk'))
-				@if(auth()->user()->can('access helpdesk') || auth()->user()->can('read helpdesk'))
-					@include('helpdesk::layouts.partials.sidebar.menu')
-				@endif
-			@endif
+
             @if(auth()->check() && auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Administrator'))
 			<!--begin:Menu item-->
 			<div class="menu-item pt-5">
@@ -61,6 +71,8 @@
 				<!--end:Menu content-->
 			</div>
 			<!--end:Menu item-->
+
+			@if($isActive)
 			<!--begin:Menu item-->
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('user-management.*') ? 'here show' : '' }}">
 				<!--begin:Menu link-->
@@ -212,6 +224,8 @@
 				<!--end:Menu sub-->
 			</div>
 			<!--end:Menu item-->
+			@endif
+			
 			<!--begin:Menu item-->
 			<div class="menu-item {{ request()->routeIs('settings.*') ? 'here show' : '' }}">
                 <a class="menu-link {{ request()->routeIs('settings.index') ? 'active' : '' }}" href="{{ route('settings.index') }}">

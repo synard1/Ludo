@@ -30,6 +30,7 @@ class UsersSeeder extends Seeder
             'email_verified_at' => now(),
             'level_access'      => 'Super Admin',
             'subscription'      => 'Owner',
+            'status'            => 'Active',
         ]);
 
         $demoUser2 = User::create([
@@ -41,6 +42,7 @@ class UsersSeeder extends Seeder
             'email_verified_at' => now(),
             'level_access'      => 'Owner',
             'subscription'      => 'Free',
+            'status'            => 'Active',
         ]);
 
         $demoCompany = Company::create([
@@ -70,6 +72,7 @@ class UsersSeeder extends Seeder
             'email_verified_at' => now(),
             'level_access'      => 'Staff',
             'subscription'      => 'Free',
+            'status'            => 'Active',
         ]);
 
         $demoUser4 = User::create([
@@ -82,6 +85,7 @@ class UsersSeeder extends Seeder
             'email_verified_at' => now(),
             'level_access'      => 'Supervisor',
             'subscription'      => 'Free',
+            'status'            => 'Active',
         ]);
     }
 }

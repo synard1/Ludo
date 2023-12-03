@@ -131,14 +131,14 @@ var KTCompany = function () {
                                     confirmButton: "btn font-weight-bold btn-light-primary"
                                 }
                             }).then(function(){
-                                // settingCompanyForm.reset();
-                                validation.resetForm(); // Reset formvalidation --- more info: https://formvalidation.io/guide/api/reset-form/
-                                // toggleChangeEmail();
                                 // Hide loading indication
                                 submitButton.removeAttribute('data-kt-indicator');
 
                                 // Enable button
                                 submitButton.disabled = false;
+
+                                // Reload the page after a successful response
+                                location.reload();
                             });
                         },
                         error: function (xhr) {

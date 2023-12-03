@@ -49,6 +49,7 @@ class RegisteredUserController extends Controller
             'cid'           => generateRandomString(6),
             'level_access'  => 'Owner',
             'subscription'  => 'Free',
+            'status'        => 'Pending',
         ]);
 
         // Assign default role "trial" to the user
