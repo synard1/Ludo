@@ -40,7 +40,7 @@
                                 novalidate="novalidate">
                                 <!--begin::Card body-->
                                 <div class="card-body p-9">
-                                    <!--begin::Input group-->
+                                    {{-- <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
                                         <label class="col-lg-4 col-form-label fw-semibold fs-6">Logo</label>
@@ -102,7 +102,7 @@
                                         </div>
                                         <!--end::Col-->
                                     </div>
-                                    <!--end::Input group-->
+                                    <!--end::Input group--> --}}
 
                                     <!--begin::Input group-->
                                     <div class="row mb-6">
