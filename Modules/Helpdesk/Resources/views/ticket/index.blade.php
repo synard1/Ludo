@@ -270,6 +270,7 @@
     @endif
 
     @include('helpdesk::ticket/work_order')
+    @include('helpdesk::ticket/work_order_note')
 
 
     @push('styles')
@@ -323,7 +324,6 @@
             $('#kt_modal_new_ticket_cancel').click(function () {
                 $('#kt_modal_new_work_order_form')[0].reset();
                 staffSelect.val(null).trigger('change'); // Reset Select2 tags
-
             });
 
             $('.generate-work-order').click(function () {
@@ -342,6 +342,13 @@
         });
 
             submitButtonWO = document.querySelector('#kt_modal_new_work_order_submit');
+
+            submitButtonNotes = document.querySelector('#kt_modal_work_order_note_submit');
+             // Reset the form when "Cancel" button is clicked
+             $('#kt_modal_work_order_note_cancel').click(function () {
+                $('#kt_modal_work_order_note_form')[0].reset();
+                $('#kt_modal_work_order_note').modal('hide');
+            });
 
             // Handle form submission
             $('#kt_modal_new_work_order_form').submit(function (e) {
@@ -440,6 +447,87 @@
 
 
             });
+
+            // Handle notes form submission
+            $('#kt_modal_work_order_note_form').submit(function (e) {
+                e.preventDefault();
+
+                // Get the data-id attribute value from the clicked row
+                var rowId = $(this).closest('tr').data('id');
+                // Get the selected issuecategory options
+                var categoryOptions = [];
+                    $("input[name='category[]']:checked").each(function () {
+                        categoryOptions.push($(this).val());
+                    });
+
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    $.ajax({
+                        url: '/apps/helpdesk/api/workorder/notes',
+                        type: 'POST',
+                        data: {
+                            ticket_id: $('#ticket_id').val(),
+                            notes: $('#notes').val(),
+                            category: categoryOptions,
+                        },
+                        success: function (response) {
+                            // Hide loading indication
+                            submitButtonNotes.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonNotes.disabled = false;
+
+                            // Reset the form and Select2 tags after submission (if needed)
+                            $('#kt_modal_work_order_note_form')[0].reset();
+                            // staffSelect.val(null).trigger('change');
+
+                            // Close the modal
+                            $('#kt_modal_work_order_note').modal('hide');
+
+                            swal.fire({
+                                text: response.message,
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            }).then(function(){
+                                // Hide loading indication
+                                submitButtonNotes.removeAttribute('data-kt-indicator');
+
+                                // Enable button
+                                submitButtonNotes.disabled = false;
+
+                                $('#ticketTable').DataTable().ajax.reload();
+
+                            });
+                        },
+                        error: function (xhr) {
+                            // Handle errors here
+                            // Hide loading indication
+                            submitButtonNotes.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonNotes.disabled = false;
+
+                            Swal.fire({
+                                text: "Sorry, looks like there are some errors detected, please try again.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        }
+                    });
+
+            });
     });
         // submitButton = document.querySelector('#kt_new_ticket_submit');
 
@@ -525,7 +613,19 @@
 
         // Assuming you want to set the data-id value to an input field in the modal form
         $('#ticket_id').val(rowId);
-        console.log(rowId);
+        // console.log(rowId);
+    });
+
+    $('#ticketTable').on('click', '.generate-notes', function () {
+        var id = $(this).data('id');
+        // Implement logic to handle "Generate Notes" button click
+        console.log('Generate Notes for ID: ' + id);
+        // Get the data-id attribute value from the clicked link
+        var rowId = $(this).data('id');
+
+        // Assuming you want to set the data-id value to an input field in the modal form
+        $('#ticket_id').val(rowId);
+        // console.log(rowId);
     });
 
         // Get all collapsible elements with data-bs-toggle attribute

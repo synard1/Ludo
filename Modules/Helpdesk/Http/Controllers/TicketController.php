@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\Helpdesk\Entities\Ticket;
 use Modules\Helpdesk\Entities\WorkOrder;
 use Modules\Helpdesk\Entities\WorkOrderResponse;
+use Modules\Helpdesk\Entities\WorkOrderNote;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
@@ -90,7 +91,9 @@ class TicketController extends Controller
         $company = Company::where('cid',$cid)->first();
         $ticket = Ticket::where('work_order_id',$id)->first();
         $woResponse = WorkOrderResponse::where('work_order_id',$workorder->id)->first();
-        return view('helpdesk::ticket.wo_print3', compact(['workorder','company','ticket','woResponse']));
+        $woResponse = WorkOrderResponse::where('work_order_id',$workorder->id)->first();
+        $woNotes = WorkOrderNote::where('ticket_id',$ticket->id)->where('work_order_id',$workorder->id)->orderBy('created_at','DESC')->first();
+        return view('helpdesk::ticket.wo_print3', compact(['workorder','company','ticket','woResponse','woNotes']));
     }
 
     /**
@@ -267,11 +270,11 @@ class TicketController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('Super Admin') || $user->hasRole('administrator') ) {
+        if ($user->hasRole('Super Admin') || $user->hasRole('Administrator') ) {
             return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-switch fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
                 '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
                 '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-button" data-id="' . $ticket->id . '"><i class="ki-duotone ki-trash fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a>';
-        } elseif ($user->hasRole('support')  && $user->can('delete ticket')) {
+        } elseif ($user->hasRole('Support')  && $user->can('delete ticket')) {
             // return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-button" data-id="' . $ticket->id . '" data-subject="' . $ticket->subject . '"><i class="ki-duotone ki-trash fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a>';
             return '<a href="#" class="btn btn-light btn-active-light-primary btn-sm" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
                                 Actions
@@ -304,7 +307,7 @@ class TicketController extends Controller
                                 <div class="separator mt-3 opacity-75"></div>
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-docs-table-filter="notes">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_note" class="menu-link px-3 generate-notes" data-kt-docs-table-filter="notes" data-id="' . $ticket->id . '">
                                         Notes
                                     </a>
                                 </div>

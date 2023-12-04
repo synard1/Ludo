@@ -4,6 +4,7 @@ use Illuminate\Routing\Router;
 use Modules\Helpdesk\Http\Controllers\TicketController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderResponseController;
+use Modules\Helpdesk\Http\Controllers\WorkOrderNoteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,8 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
         Route::get('/woresponse/{id}', [WorkOrderResponseController::class, 'getData'])->name('getWoResponse');
         Route::get('/workorder/staff', [WorkOrderController::class, 'getWorkOrderStaff'])->name('getWorkOrderStaff');
         Route::post('/workorder/response', [WorkOrderController::class, 'saveWorkOrderResponse'])->name('postWorkOrderResponse');
+        Route::get('/workorder/notes', [WorkOrderNoteController::class, 'getWorkOrderNotes'])->name('getWorkOrderNotes');
+        Route::post('/workorder/notes', [WorkOrderNoteController::class, 'saveWorkOrderNotes'])->name('postWorkOrderNotes');
         Route::get('/workorder', [WorkOrderController::class, 'getWorkOrderData'])->name('getWorkOrder');
         Route::post('/workorder', [WorkOrderController::class, 'saveWorkOrder'])->name('postWorkOrder');
         Route::delete('/deleteWorkOrder/{id}', [WorkOrderController::class, 'deleteWorkOrder'])->name('deleteWorkOrder');

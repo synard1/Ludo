@@ -2,13 +2,13 @@
 
 namespace Modules\Helpdesk\Entities;
 
-use App\Traits\UserTrackingTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\UserTrackingTrait;
 
-class WorkOrderResponse extends Model
+class WorkOrderNote extends Model
 {
     use HasFactory, SoftDeletes;
     use UserTrackingTrait;
@@ -21,23 +21,13 @@ class WorkOrderResponse extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'no',
-        'no_workorder',
-        'no_workorder_custom',
         'work_order_id',
-        'work_order_subject',
-        'work_order_description',
-        'user',
+        'ticket_id',
         'response',
+        'issue_category',
         'status',
-        'start_time',
-        'end_time',
-        'staff',
-        'ticket_payload',
-        'workorder_payload',
-        'work_order_notes_id',
-        'work_order_notes_response',
     ];
+    
 
     protected static function boot()
     {
@@ -46,6 +36,16 @@ class WorkOrderResponse extends Model
         static::creating(function ($model) {
             $model->{$model->getKeyName()} = Uuid::uuid4()->toString();
         });
+    }
+
+    public function setIssueCategoryAttribute($value)
+    {
+        $this->attributes['issue_category'] = json_encode($value);
+    }
+
+    public function getIssueCategoryAttribute($value)
+    {
+        return json_decode($value, true);
     }
 
 }

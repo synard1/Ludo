@@ -151,7 +151,7 @@
         <!-- Additional Information Section -->
         <div class="section">
             <h3>Additional Information</h3>
-            <p><strong>Notes:</strong> {!! $woResponse->notes ?? '-' !!}</p>
+            <p><strong>Notes:</strong> {{ $woNotes->response ?? '-' }}</p>
             <p><strong>Attachments:</strong> <!-- List of attachments or links to attachments -->
             </p>
         </div>
