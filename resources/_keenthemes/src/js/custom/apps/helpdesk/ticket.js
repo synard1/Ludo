@@ -7,7 +7,7 @@ var KTTicket = function () {
     var dtTicket;
     var dtButtons;
     var form, categoryField;
-    var submitButton, cancelButton;
+    var submitButton, xButton;
     var validator;
 
     // Private functions
@@ -312,14 +312,15 @@ var KTTicket = function () {
             }
         );
 
-        // Add a click event listener to the "Cancel" button
-        cancelButton.addEventListener('click', function () {
-            // Close kt_docs_card_ticket_new
-            $('#kt_docs_card_ticket_new').collapse('hide');
-            // Show kt_docs_card_ticket_list
-            $('#kt_docs_card_ticket_list').collapse('show');
-            dtTicket.ajax.reload();
-        });
+        // // Add a click event listener to the "Cancel" button
+        // xButton.addEventListener('click', function () {
+        //     e.preventDefault();
+        //     // Close kt_docs_card_ticket_new
+        //     $('#kt_docs_card_ticket_new').collapse('hide');
+        //     // Show kt_docs_card_ticket_list
+        //     $('#kt_docs_card_ticket_list').collapse('show');
+        //     dtTicket.ajax.reload();
+        // });
 
         // Handle form submit
         submitButton.addEventListener('click', function (e) {
@@ -565,7 +566,7 @@ var KTTicket = function () {
             // Elements
             form = document.querySelector('#kt_new_ticket_form');
             submitButton = document.querySelector('#kt_new_ticket_submit');
-            cancelButton = document.querySelector('#kt_new_ticket_cancel');
+            // xButton = document.querySelector('#kt_new_ticket_cancel');
             categoryField = document.querySelector('[name="category-dropdown"]');
 
             if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {

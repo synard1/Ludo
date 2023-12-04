@@ -107,87 +107,51 @@
                     <!--end::Input group-->
 
                     <!--begin::Input group-->
-                    <div class="row mb-6">
-                        <div class="col">
-                        <!--begin::Label-->
-                        <label
-                            class="col-lg-4 col-form-label required fw-semibold fs-6">Category</label>
-                        <!--end::Label-->
+<div class="row mb-4">
+    <div class="col-12">
+        <!-- Category -->
+        <div class="mb-3">
+            <label class="form-label required fw-semibold fs-6">Category</label>
+            <div class="d-flex flex-column">
+                <!-- Options -->
+                <div class="form-check form-check-custom mb-2">
+                    <input class="form-check-input" name="issuecategory[]" type="checkbox" value="Hardware">
+                    <label class="form-check-label fw-semibold ps-2 fs-6">Hardware</label>
+                </div>
+                <div class="form-check form-check-custom mb-2">
+                    <input class="form-check-input" name="issuecategory[]" type="checkbox" value="Software">
+                    <label class="form-check-label fw-semibold ps-2 fs-6">Software</label>
+                </div>
+                <div class="form-check form-check-custom mb-2">
+                    <input class="form-check-input" name="issuecategory[]" type="checkbox" value="Disaster">
+                    <label class="form-check-label fw-semibold ps-2 fs-6">Disaster</label>
+                </div>
+                <div class="form-check form-check-custom mb-2">
+                    <input class="form-check-input" name="issuecategory[]" type="checkbox" value="Network">
+                    <label class="form-check-label fw-semibold ps-2 fs-6">Network</label>
+                </div>
+                <div class="form-check form-check-custom mb-2">
+                    <input class="form-check-input" name="issuecategory[]" type="checkbox" value="User">
+                    <label class="form-check-label fw-semibold ps-2 fs-6">User</label>
+                </div>
+                <!-- End Options -->
+            </div>
+            <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+        </div>
+    </div>
 
-                        <!--begin::Col-->
-                        <div class="col-lg-8 fv-row fv-plugins-icon-container">
-                            <!--begin::Options-->
-                            <div class="d-flex align-items-center mt-3">
-                                <!--begin::Option-->
-                                <label
-                                    class="form-check form-check-custom form-check-inline form-check-solid me-5">
-                                    <input class="form-check-input" name="issuecategory[]"
-                                        type="checkbox" value="Hardware" >
-                                                                                                <span class="fw-semibold ps-2 fs-6">
-                                                                                                    Hardware
-                                    </span>
-                                </label>
-                                <!--end::Option-->
+    <div class="col-12">
+        <!-- Source Report -->
+        <div class="mb-3">
+            <label class="form-label">Source Report:</label>
+            <div class="input-group">
+                <livewire:helpdesk::source-report />
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Input group-->
 
-                                <!--begin::Option-->
-                                <label
-                                    class="form-check form-check-custom form-check-inline form-check-solid">
-                                    <input class="form-check-input" name="issuecategory[]"
-                                        type="checkbox" value="Software" >
-                                                                                                <span class="fw-semibold ps-2 fs-6">
-                                        Software
-                                    </span>
-                                </label>
-                                <!--end::Option-->
-
-                                <!--begin::Option-->
-                                <label
-                                    class="form-check form-check-custom form-check-inline form-check-solid">
-                                    <input class="form-check-input" name="issuecategory[]"
-                                        type="checkbox" value="Disaster" >
-                                                                                                <span class="fw-semibold ps-2 fs-6">
-                                                                                                    Disaster
-                                    </span>
-                                </label>
-                                <!--end::Option-->
-
-                                <!--begin::Option-->
-                                <label
-                                    class="form-check form-check-custom form-check-inline form-check-solid">
-                                    <input class="form-check-input" name="issuecategory[]"
-                                        type="checkbox" value="Network" >
-                                                                                                <span class="fw-semibold ps-2 fs-6">
-                                                                                                    Network
-                                    </span>
-                                </label>
-                                <!--end::Option-->
-
-                                <!--begin::Option-->
-                                <label
-                                    class="form-check form-check-custom form-check-inline form-check-solid">
-                                    <input class="form-check-input" name="issuecategory[]"
-                                        type="checkbox" value="User" >
-                                                                                                <span class="fw-semibold ps-2 fs-6">
-                                                                                                    User
-                                    </span>
-                                </label>
-                                <!--end::Option-->
-                            </div>
-                            <!--end::Options-->
-                            <div
-                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                            </div>
-                        </div>
-                        <!--end::Col-->
-                        </div>
-                        <div class="col">
-                            <label for="" class="form-label">Source Report:</label>
-                            <div class="input-group">
-                                <livewire:helpdesk::source-report />
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Input group-->
 
                     <!--begin::Input group-->
                 <div class="row g-9 mb-8">
@@ -255,7 +219,7 @@
 
                 <!--begin::Actions-->
                 <div class="card-footer d-flex justify-content-end py-6 px-9">
-                    <button type="reset" class="btn btn-light btn-active-light-primary me-2"
+                    <button type="reset" class="btn btn-light btn-active-light-primary me-2 btn-cancel"
                         id="kt_new_ticket_cancel">Discard</button>
                     <button type="submit" id="kt_new_ticket_submit" class="btn btn-primary">
                         @include('partials/general/_button-indicator', ['label' => 'Save Changes'])
@@ -294,6 +258,19 @@
 
     $(document).ready(function() {
 
+        // var xButton = document.getElementById('kt_new_ticket_cancel');
+        // if (xButton) {
+        //     // Add your click event listener here
+        //     xButton.addEventListener('click', function () {
+        //         e.preventDefault();
+        //         // Close kt_docs_card_ticket_new
+        //         $('#kt_docs_card_ticket_new').collapse('hide');
+        //         // Show kt_docs_card_ticket_list
+        //         $('#kt_docs_card_ticket_list').collapse('show');
+        //         // dtTicket.ajax.reload();
+        //     });
+        // }
+
         var options = {selector: "#description_wo", height : "480"};
 
         if ( KTThemeMode.getMode() === "dark" ) {
@@ -306,6 +283,7 @@
         $("#report_time").flatpickr({
             enableTime: true,
             dateFormat: "Y-m-d H:i",
+            maxDate: new Date(), 
         });
 
             // $('.js-staff-tags').select2({
@@ -321,9 +299,13 @@
             // });
 
             // Reset the form when "Cancel" button is clicked
-            $('#kt_modal_new_ticket_cancel').click(function () {
-                $('#kt_modal_new_work_order_form')[0].reset();
-                staffSelect.val(null).trigger('change'); // Reset Select2 tags
+            $('#kt_new_ticket_cancel').click(function () {
+                // $('#kt_modal_new_work_order_form')[0].reset();
+                // Close kt_docs_card_ticket_new
+                $('#kt_docs_card_ticket_new').collapse('hide');
+                // Show kt_docs_card_ticket_list
+                $('#kt_docs_card_ticket_list').collapse('show');
+                // staffSelect.val(null).trigger('change'); // Reset Select2 tags
             });
 
             $('.generate-work-order').click(function () {
