@@ -1,0 +1,31 @@
+{
+    "name": "ludo.my.id/usermedia",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mhd Iqbal Syahputra",
+            "email": "synard1@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\UserMedia\\": "",
+            "Modules\\UserMedia\\App\\": "app/",
+            "Modules\\UserMedia\\Database\\Factories\\": "database/factories/",
+            "Modules\\UserMedia\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\UserMedia\\Tests\\": "tests/"
+        }
+    }
+}

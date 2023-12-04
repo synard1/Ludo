@@ -1,9 +1,15 @@
 @php
     if (App\Helpers\ModuleHelper::isModuleActive('UserSign')) {
-            $signActive = true;
-        }else{
-            $signActive = false;
-        }
+        $signActive = true;
+    }else{
+        $signActive = false;
+    }
+
+    if (App\Helpers\ModuleHelper::isModuleActive('UserMedia')) {
+        $mediaActive = true;
+    }else{
+        $mediaActive = false;
+    }
 @endphp
 
 <x-default-layout>
@@ -176,7 +182,8 @@
 <script type="text/javascript">
     // Pass data to JavaScript
     var canSign = @json($signActive);
-    console.log(canSign);
+    var canUpload = @json($mediaActive);
+    // console.log(canSign);
 
     let signaturePad;
     $('#kt_modal_signaturepad').on('shown.bs.modal',function(e){

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Models\SignaturePad;
+use App\Helpers\ModuleHelper;
 
 class WorkOrderController extends Controller
 {
@@ -244,6 +245,11 @@ class WorkOrderController extends Controller
     private function getActionButtons($workOrder)
     {
         $user = Auth::user();
+        if (ModuleHelper::isModuleActive('UserMedia')) {
+            $mediaActive = true;
+        }else{
+            $mediaActive = false;
+        }
 
         if ($user->hasRole('Super Admin') || $user->hasRole('administrator') ) {
             return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-switch fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
@@ -252,15 +258,28 @@ class WorkOrderController extends Controller
         } elseif ($user->hasRole('support')  && $user->can('edit workorder')) {
             return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-button" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a>';
         } else {
-            if($workOrder->status == 'Resolved' || $workOrder->status == 'Closed'){
-                return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
-                '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" data-bs-toggle="modal" data-bs-target="#kt_modal_wo_response_image" ><i class="ki-duotone ki-file-up fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+            if($mediaActive){
+                if($workOrder->status == 'Resolved' || $workOrder->status == 'Closed'){
+                    return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
+                    '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" data-bs-toggle="modal" data-bs-target="#kt_modal_wo_response_image" ><i class="ki-duotone ki-file-up fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+                }else{
+                    return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
+                    '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 generate-work-order-response" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_response" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
+                    '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" data-bs-toggle="modal" data-bs-target="#kt_modal_wo_response_image" ><i class="ki-duotone ki-file-up fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+    
+                }
+
             }else{
-                return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
-                '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 generate-work-order-response" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_response" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
-                '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" data-bs-toggle="modal" data-bs-target="#kt_modal_wo_response_image" ><i class="ki-duotone ki-file-up fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+                if($workOrder->status == 'Resolved' || $workOrder->status == 'Closed'){
+                    return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+                }else{
+                    return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
+                    '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 generate-work-order-response" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_response" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+    
+                }
 
             }
+            
             // Handle other roles or default behavior
             // return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm generate-work-order-response" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_response" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a><a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm generate-work-order-response" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_response" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-scroll fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a>';
 

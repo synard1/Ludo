@@ -142,6 +142,7 @@
     </div>
     <div>
         <h3>Technician's Signature</h3>
+        <p>{!! QrCode::generate('Make me into a QrCode!'); !!}</p>
         <p>______________________</p>
     </div>
 </div>

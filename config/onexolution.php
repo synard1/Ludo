@@ -91,6 +91,12 @@ return [
             'custom_link' => 'No',
             'max_user' => '10',
         ],
+        'Owner' => [
+            'image_upload' => "-1",
+            'image_size' => "-1",
+            'custom_link' => 'Yes',
+            'max_user' => '-1',
+        ],
     ],
 
     'version' => [

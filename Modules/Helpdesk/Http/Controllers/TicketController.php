@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StatusHistory;
 use App\Helpers\ModuleHelper;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 
 class TicketController extends Controller
 {

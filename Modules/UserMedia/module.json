@@ -1,0 +1,11 @@
+{
+    "name": "UserMedia",
+    "alias": "usermedia",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\UserMedia\\Providers\\UserMediaServiceProvider"
+    ],
+    "files": []
+}

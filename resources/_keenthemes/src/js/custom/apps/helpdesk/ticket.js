@@ -568,11 +568,11 @@ var KTTicket = function () {
             cancelButton = document.querySelector('#kt_new_ticket_cancel');
             categoryField = document.querySelector('[name="category-dropdown"]');
 
-            // if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
-            //     handleFormAjax();
-            // } else {
-            //     handleForm();
-            // }
+            if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
+                handleFormAjax();
+            } else {
+                handleForm();
+            }
         }
     };
 }();
