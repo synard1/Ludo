@@ -190,6 +190,7 @@ return [
          InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
          Barryvdh\Debugbar\ServiceProvider::class,
          App\Providers\BladeDirectivesServiceProvider::class,
+         Jenssegers\Agent\AgentServiceProvider::class,
 
 
 
@@ -219,6 +220,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
     ])->toArray(),
 

@@ -578,3 +578,13 @@ if (!function_exists('statusHistory')) {
         return theme()->getIcon($id, $class, $type);
     }
 }
+
+if (!function_exists('isMobileBrowser')) {
+    function isMobileBrowser()
+    {
+        $userAgent = request()->header('User-Agent');
+
+        // Check if the user agent contains keywords commonly found in mobile browsers
+        return preg_match('/(iPhone|iPod|Android|webOS|BlackBerry|Windows Phone)/i', $userAgent);
+    }
+}

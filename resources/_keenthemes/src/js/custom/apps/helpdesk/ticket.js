@@ -139,7 +139,7 @@ var KTTicket = function () {
                 const parent = e.target.closest('tr');
 
                 // Get subject name
-                const ticketSubject = parent.querySelectorAll('td')[2].innerText;
+                const ticketSubject = parent.querySelectorAll('td')[1].innerText;
                 const ticketId = $(this).data('id');
                 console.log(ticketId);
 
