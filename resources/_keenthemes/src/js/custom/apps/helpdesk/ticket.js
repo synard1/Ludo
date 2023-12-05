@@ -6,13 +6,21 @@ var KTTicket = function () {
     var tableTicket;
     var dtTicket;
     var dtButtons;
-    var form, categoryField;
-    var submitButton, xButton;
-    var validator;
+    var form, formWO, categoryField;
+    var submitButton, xButton, submitButtonWO;
+    var validator, validatorWO;
 
     // Private functions
     var initDatatable = function() {
-        dtButtons = ['copy', 'reload', 'print'];
+        dtButtons = ['reload', 'print'];
+
+        $.fn.dataTable.ext.buttons.reload = {
+            text: 'Reload',
+            action: function ( e, dt, node, config ) {
+                dt.ajax.reload();
+            }
+        };
+        
         if (canCreateTicket) {
             dtButtons.push({
                 text: 'New Ticket',
@@ -104,8 +112,7 @@ var KTTicket = function () {
                         } else {
                             if (isSupervisor) {
                                 // If work_order does not exist, show "Generate Work Order" button
-                                return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' +
-                                    row.id + '">Generate Work Order</a>';
+                                return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' + row.id + '" data-report-time="' + row.report_time + '">Generate Work Order</a>';
                             } else {
                                 return '<a href="#">N/A</a>';
                             }
@@ -227,6 +234,190 @@ var KTTicket = function () {
                 });
             })
         });
+    }
+
+    // Handle form
+    var handleFormWO = function (e) {
+        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+        validatorWO = FormValidation.formValidation(
+            formWO,
+            {
+                fields: {
+                    'subject_wo': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Subject is required'
+                            }
+                        }
+                    },
+                    'due_date': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Due Date is required'
+                            }
+                        }
+                    },
+                    'description_wo': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Description is required'
+                            }
+                        }
+                    },
+                    'staffSelect': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please Assign A Staff'
+                            }
+                        }
+                    },
+                    'priority': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Priority is required'
+                            }
+                        }
+                    },
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger({
+                        event: {
+                            password: false
+                        }
+                    }),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',  // comment to enable invalid state icons
+                        eleValidClass: '' // comment to enable valid state icons
+                    })
+                }
+            }
+        );
+
+        // Handle form submit
+        submitButtonWO.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            validatorWO.validate().then(function (status) {
+                if (status == 'Valid') {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    // Show loading indication
+                    submitButtonWO.setAttribute('data-kt-indicator', 'on');
+
+                    // Disable button to avoid multiple click
+                    submitButtonWO.disabled = true;
+
+                    $.ajax({
+                        url: '/apps/helpdesk/api/workorder',
+                        type: 'POST',
+                        data: {
+                            ticket_id: $('#ticket_id').val(),
+                            subject: $('#subject_wo').val(),
+                            description: $('#description_wo').val(),
+                            due_date: $('#due_date').val(),
+                            staff: $('#staffSelect').val(),
+                            priority: $('#priority').val(),
+                        },
+                        success: function (response) {
+                            // alert(response.message);
+                            // Hide loading indication
+                            submitButtonWO.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonWO.disabled = false;
+
+                            // Reset the form and Select2 tags after submission (if needed)
+                            $('#kt_modal_new_work_order_form')[0].reset();
+                            // staffSelect.val(null).trigger('change');
+
+                            // Close the modal
+                            $('#kt_modal_work_order').modal('hide');
+
+                            swal.fire({
+                                text: response.message,
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            }).then(function(){
+                                // toggleChangeEmail();
+                                // Hide loading indication
+                                submitButtonWO.removeAttribute('data-kt-indicator');
+
+                                // Enable button
+                                submitButtonWO.disabled = false;
+
+                                $('#ticketTable').DataTable().ajax.reload();
+
+                            });
+                        },
+                        error: function (xhr) {
+                            // Handle errors here
+                            // Hide loading indication
+                            submitButtonWO.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonWO.disabled = false;
+
+                            Swal.fire({
+                                text: "Sorry, looks like there are some errors detected, please try again.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
+                    Swal.fire({
+                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        });
+
+        $('#ticketTable').on('click', '.generate-work-order', function() {
+            var id = $(this).data('id');
+            // Implement logic to handle "Generate Work Order" button click
+            console.log('Generate work order for ID: ' + id);
+            // Get the data-id attribute value from the clicked link
+            var rowId = $(this).data('id');
+
+            fetchStaffData();
+
+            // Assuming you want to set the data-id value to an input field in the modal form
+            $('#ticket_id').val(rowId);
+        });
+
+        var options = {
+            selector: "#description_wo",
+            height: "480"
+        };
+
+        if (KTThemeMode.getMode() === "dark") {
+            options["skin"] = "oxide-dark";
+            options["content_css"] = "dark";
+        }
+
+        tinymce.init(options);
+
     }
 
     // Handle form
@@ -406,6 +597,40 @@ var KTTicket = function () {
 
     }
 
+    // Function to fetch staff data and populate the dropdown
+    var fetchStaffData = function (e) {
+    // function fetchStaffData() {
+        // Replace this URL with your actual API endpoint
+        const apiUrl = '/apps/helpdesk/api/workorder/staff';
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Get the Select2 instance
+                const staffSelect = $('#staffSelect');
+
+                // Clear existing options
+                staffSelect.empty();
+
+                // Add new options based on the fetched data
+                data.forEach(staff => {
+                    const option = new Option(staff, staff);
+                    staffSelect.append(option);
+                });
+
+                // Trigger Select2 to update the UI
+                staffSelect.trigger('change');
+            })
+            .catch(error => {
+                console.error('Fetch error:', error.message);
+            });
+    }
+
     var isValidUrl = function(url) {
         try {
             new URL(url);
@@ -421,22 +646,51 @@ var KTTicket = function () {
         maxDate: new Date(),
     });
 
+    $("#due_date").flatpickr({
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        maxDate: new Date(),
+    });
+
+    
+
+    // Initialize Select2 with tag support
+    $('#staffSelect').select2({
+        tags: true,
+        tokenSeparators: [',', ' '],
+        createTag: function(params) {
+            return {
+                id: params.term,
+                text: params.term,
+                newTag: true
+            };
+        }
+    });
+
     // Public functions
     return {
         // Initialization
         init: function () {
             initDatatable();
             handleDeleteRows();
+            fetchStaffData();
             // Elements
             form = document.querySelector('#kt_new_ticket_form');
             submitButton = document.querySelector('#kt_new_ticket_submit');
             xButton = document.querySelector('#kt_new_ticket_cancel');
-            // categoryField = document.querySelector('[name="category-dropdown"]');
+            formWO = document.querySelector('#kt_modal_new_work_order_form');
+            submitButtonWO = document.querySelector('#kt_modal_new_work_order_submit');
 
             if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
                 handleForm();
             } else {
                 handleForm();
+            }
+
+            if (isValidUrl(submitButtonWO.closest('form').getAttribute('action'))) {
+                handleFormWO();
+            } else {
+                handleFormWO();
             }
         }
     };
