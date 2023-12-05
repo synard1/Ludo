@@ -113,6 +113,7 @@
     "rtlcss": "^3.5.0",
     "sass": "1.55.0",
     "sass-loader": "13.2.0",
+    "thread-loader": "^4.0.2",
     "webpack-rtl-plugin": "^2.0.0"
   },
   "name": "dev.ludo.my.id",

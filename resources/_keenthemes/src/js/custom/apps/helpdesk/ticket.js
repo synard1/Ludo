@@ -6,9 +6,9 @@ var KTTicket = function () {
     var tableTicket;
     var dtTicket;
     var dtButtons;
-    var form, formWO, formNotes, categoryField;
-    var submitButton, xButton, submitButtonWO, submitButtonNotes;
-    var validator, validatorWO, validatorNotes;
+    var form, formWO, formNotes, formStatus, categoryField;
+    var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus;
+    var validator, validatorWO, validatorNotes, validatorStatus;
 
     // Private functions
     var initDatatable = function() {
@@ -35,10 +35,10 @@ var KTTicket = function () {
         }
 
         dtTicket = $("#ticketTable").DataTable({
-            searchDelay: 500,
-            processing: true,
+            // searchDelay: 500,
+            // processing: true,
             serverSide: true,
-            stateSave: true,
+            // stateSave: true,
             ajax: {
                 url: "/apps/helpdesk/api/ticket",
                 dataSrc: 'tickets'
@@ -85,15 +85,18 @@ var KTTicket = function () {
                     targets: 10,
                     data: 'status',
                     render: function(data, type, row) {
+                        var  statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i></a>';
                         switch (data.toLowerCase()) {
                             case 'open':
-                                return '<span class="badge badge-success">Open</span>';
+                                return '<span class="badge badge-success">Open</span> ' + statusLink;
                             case 'pending':
-                                return '<span class="badge badge-warning">Pending</span>';
+                                return '<span class="badge badge-warning">Pending</span> ' + statusLink;
                             case 'closed':
-                                return '<span class="badge badge-secondary">Closed</span>';
+                                return '<span class="badge badge-secondary">Closed</span> ' + statusLink;
                             case 'resolved':
-                                return '<span class="badge badge-primary">Resolved</span>';
+                                return '<span class="badge badge-primary">Resolved</span> ' + statusLink;
+                            case 'in progress':
+                                return '<span class="badge badge-info">In Progress</span> ' + statusLink;
                             default:
                                 return data;
                         }
@@ -581,6 +584,149 @@ var KTTicket = function () {
 
     }
 
+    // Handle form Work Order
+    var handleFormStatus = function (e) {
+        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+        validatorStatus = FormValidation.formValidation(
+            formStatus,
+            {
+                fields: {
+                    'status': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Status is required'
+                            }
+                        }
+                    },
+                    'reason': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Reason is required'
+                            }
+                        }
+                    },
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger({
+                        event: {
+                            password: false
+                        }
+                    }),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',  // comment to enable invalid state icons
+                        eleValidClass: '' // comment to enable valid state icons
+                    })
+                }
+            }
+        );
+
+        // Handle form submit
+        submitButtonStatus.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            validatorStatus.validate().then(function (status) {
+                if (status == 'Valid') {
+
+                    // Get the data-id attribute value from the clicked row
+                    var rowId = $(this).closest('tr').data('id');
+
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    // Show loading indication
+                    submitButtonStatus.setAttribute('data-kt-indicator', 'on');
+
+                    // Disable button to avoid multiple click
+                    submitButtonStatus.disabled = true;
+
+                    $.ajax({
+                        url: '/apps/helpdesk/api/ticket/status',
+                        type: 'POST',
+                        data: {
+                            ticket_id: $('#ticket_id').val(),
+                            status: $('#status').val(),
+                            reason: $('#reason').val(),
+                        },
+                        success: function (response) {
+                            // Hide loading indication
+                            submitButtonStatus.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonStatus.disabled = false;
+
+                            // Close the modal
+                            $('#kt_modal_change_status').modal('hide');
+
+                            swal.fire({
+                                text: response.message,
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            }).then(function(){
+                                // Hide loading indication
+                                submitButtonStatus.removeAttribute('data-kt-indicator');
+
+                                // Enable button
+                                submitButtonStatus.disabled = false;
+
+                                formStatus.reset();
+
+                                $('#ticketTable').DataTable().ajax.reload();
+
+                            });
+                        },
+                        error: function (xhr) {
+                            // Handle errors here
+                            // Hide loading indication
+                            submitButtonStatus.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonStatus.disabled = false;
+
+                            Swal.fire({
+                                text: "Sorry, looks like there are some errors detected, please try again.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
+                    Swal.fire({
+                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        });
+
+        $('#ticketTable').on('click', '.status-change', function() {
+            var id = $(this).data('id');
+            var status = $(this).data('status');
+
+            $('#ticket_id').val(id);
+            $('#old_status').val(status);
+        });
+
+    }
+
     // Handle form
     var handleForm = function (e) {
         // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
@@ -756,6 +902,8 @@ var KTTicket = function () {
             });
         });
 
+        
+
     }
 
     // Function to fetch staff data and populate the dropdown
@@ -846,6 +994,9 @@ var KTTicket = function () {
             formNotes = document.querySelector('#kt_modal_work_order_note_form');
             submitButtonNotes = document.querySelector('#kt_modal_work_order_note_submit');
 
+            formStatus = document.querySelector('#kt_modal_change_status_form');
+            submitButtonStatus = document.querySelector('#kt_modal_change_status_submit');
+
             if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
                 handleForm();
             } else {
@@ -862,6 +1013,12 @@ var KTTicket = function () {
                 handleFormNotes();
             } else {
                 handleFormNotes();
+            }
+
+            if (isValidUrl(submitButtonStatus.closest('form').getAttribute('action'))) {
+                handleFormStatus();
+            } else {
+                handleFormStatus();
             }
         }
     };

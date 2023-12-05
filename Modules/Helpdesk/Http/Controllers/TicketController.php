@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StatusHistory;
 use App\Helpers\ModuleHelper;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
+use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
@@ -68,8 +68,9 @@ class TicketController extends Controller
         //                                 ->toArray();
 
         $priorities = Config::get('onexolution.priorityWorkOrder');
+        $statusTicket = Config::get('onexolution.statusTicket');
 
-        return view('helpdesk::ticket.index', compact(['sourceReport','distinctStaff', 'priorities']));
+        return view('helpdesk::ticket.index', compact(['sourceReport','distinctStaff', 'priorities', 'statusTicket']));
     }
 
     /**
@@ -183,6 +184,54 @@ class TicketController extends Controller
             return response()->json(['tickets' => '']);
             // return response()->json(['message' => 'Ticket not found'], 404);
         }
+    }
+
+    public function saveStatus(Request $request)
+    {
+        $user = auth()->user();
+        // Retrieve the ticket data based on user_id and cid
+        $ticket = Ticket::where('user_cid', $user->cid)->where('id', $request->input('ticket_id'))
+            ->first(); // Use 'first' to get a single result or null if not found
+
+        // Start a database transaction
+        DB::beginTransaction();
+
+        try {
+            $statusHistory = StatusHistory::create([
+                'data_id' => $request->input('ticket_id'),
+                'name' => Uc($ticket->subject),
+                'module' => 'Helpdesk',
+                'model' => 'Ticket',
+                'old_status' => $ticket->status,
+                'new_status' => $request->input('status'),
+                'status' => $request->input('status'),
+                'reason' => $request->input('reason'),
+            ]);
+
+            // Update the ticket with the new status
+            Ticket::where('id', $request->input('ticket_id'))
+                    ->update([
+                        'status' => $request->input('status'),
+                    ]);
+
+            // // Update the ticket with the new status
+            WorkOrder::where('ticket_id', $request->input('ticket_id'))
+                    ->update([
+                        'status' => $request->input('status'),
+                    ]);
+
+            // Commit the transaction
+            DB::commit();
+
+            // You can return a response, e.g., a success message
+            return response()->json(['message' => 'Status updated successfully']);
+        } catch (\Throwable $th) {
+            // An error occurred, rollback the transaction
+            DB::rollback();
+            //throw $th;
+            return response()->json(['message' => 'Failed']);
+        }
+
     }
 
     public function saveTicket(Request $request)

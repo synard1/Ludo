@@ -129,6 +129,18 @@ if (args.indexOf('rtl') !== -1) {
 
 mix.webpackConfig({
     plugins: plugins,
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: [
+                    'thread-loader',
+                    'babel-loader',
+                ],
+            },
+        ],
+    },
     ignoreWarnings: [{
         module: /esri-leaflet/,
         message: /version/,
