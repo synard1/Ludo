@@ -301,38 +301,6 @@ class WorkOrderController extends Controller
         $userId = $user->id;
         $cid = $user->cid;
 
-        // $input = $request->all();
-        // $input = $request->input('priority', 'High');
-
-        // dd($input);
-
-        // $workorder = WorkOrder::where('user_cid', $cid)->where('id', $request->input('workorder_id'))->first();
-        //     $ticket = Ticket::where('work_order_id', $request->input('workorder_id'))->first();
-
-        // $woResponse = WorkOrderResponse::updateOrCreate(
-        //     ['work_order_id' => $request->input('workorder_id'), 'user_cid' => $cid],
-        //     ['user' => $ticket->reporter_name,
-        //     'no' => $workorder->no,
-        //     'no_workorder' => $workorder->no_workorder,
-        //     'no_workorder_custom' => $workorder->no_workorder_custom,
-        //     'work_order_subject' => $workorder->subject,
-        //     'work_order_description' => $workorder->description,
-        //     'response' => $request->input('workorder_response'),
-        //     'status' => $request->input('status'),
-        //     'staff' => $user->name,
-        //     'ticket_payload' => json_encode($ticket),
-        //     'workorder_payload' => json_encode($workorder),
-        //     'start_time' => $request->input('start_date'),
-        //     'end_time' => $request->input('finish_date')
-        //     ]
-        // );
-
-        // // Update the work order with the response start and end time
-        // // WorkOrder::where('id', $workorder->id)
-        // //     ->update(['start_time' => $woResponse->start_time, 'end_time' => $woResponse->end_time]);
-
-        //     return response()->json(['message' => 'Work Order Response saved or updated successfully']);
-
         // Start a database transaction
         DB::beginTransaction();
 
@@ -348,7 +316,7 @@ class WorkOrderController extends Controller
                 'no_workorder' => $workorder->no_workorder,
                 'no_workorder_custom' => $workorder->no_workorder_custom,
                 'work_order_subject' => $workorder->subject,
-                'work_order_description' => $workorder->description,
+                'work_order_description' => $workorder->description ?? '',
                 'response' => $request->input('workorder_response'),
                 'status' => $request->input('status'),
                 'staff' => $user->name,
