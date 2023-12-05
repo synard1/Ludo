@@ -240,15 +240,7 @@ var KTWorkorder = function () {
             dtWorkorder.ajax.reload();
         });
 
-        $("#start_date").flatpickr({
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-        });
-
-        $("#finish_date").flatpickr({
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-        });
+        
 
         // Handle form submit
         submitButton.addEventListener('click', function (e) {

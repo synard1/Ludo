@@ -11,53 +11,63 @@ var KTTicket = function () {
     var validator;
 
     // Private functions
-    var initDatatable = function () {
-
+    var initDatatable = function() {
         dtButtons = ['copy', 'reload', 'print'];
-
-        if(canCreateTicket){
+        if (canCreateTicket) {
             dtButtons.push({
                 text: 'New Ticket',
-                action: function (e, dt, node, config) {
+                action: function(e, dt, node, config) {
                     $('#kt_docs_card_ticket_list').collapse('hide');
                     $('#kt_docs_card_ticket_new').collapse('show');
                 }
             });
-
         }
-
 
         dtTicket = $("#ticketTable").DataTable({
             searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[5, 'desc']],
+            order: [
+                [5, 'desc']
+            ],
             stateSave: true,
             ajax: {
                 url: "/apps/helpdesk/api/ticket",
                 dataSrc: 'tickets'
             },
-            columns: [
-                {
+            columns: [{
                     targets: 0,
                     data: null,
-                    render: function (data, type, row, meta) {
+                    render: function(data, type, row, meta) {
                         // 'meta.row' contains the row number
                         return meta.row + 1;
                     },
                 },
-                { data: 'subject' },
-                { data: 'user_name' },
-                { data: 'description' },
-                { data: 'origin_unit' },
-                { data: 'source_report' },
-                { data: 'priority' },
+                {
+                    data: 'subject'
+                },
+                {
+                    data: 'user_name'
+                },
+                {
+                    data: 'description'
+                },
+                {
+                    data: 'origin_unit'
+                },
+                {
+                    data: 'source_report'
+                },
+                {
+                    data: 'priority'
+                },
                 {
                     data: 'issue_category',
-                    render: function (data, type, row) {
+                    render: function(data, type, row) {
                         // Handle array values
                         if (Array.isArray(data)) {
-                            return data.join(', '); // Join array values with a comma and space
+                            return data.join(
+                            ', '); // Join array values with a comma and space
                         }
 
                         return data; // If not an array, return the original value
@@ -66,7 +76,7 @@ var KTTicket = function () {
                 {
                     targets: 10,
                     data: 'status',
-                    render: function (data, type, row) {
+                    render: function(data, type, row) {
                         switch (data.toLowerCase()) {
                             case 'open':
                                 return '<span class="badge badge-success">Open</span>';
@@ -84,20 +94,22 @@ var KTTicket = function () {
                 {
                     targets: 12,
                     data: 'work_order', // Assuming the attribute is named 'work_order'
-                    render: function (data, type, row) {
-                            if(data){
-                                // If work_order exists, show "View" button
-                            return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' + row.work_order + '" target="_blank" class="text-info view-work-order" data-id="' + row.id + '">View</a></span>';
-                            }else{
-                                if(isSupervisor){
-                                    // If work_order does not exist, show "Generate Work Order" button
-                            return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' + row.id + '">Generate Work Order</a>';
-                                }else{
-                                    return '<a href="#">N/A</a>';
-                                }
-
+                    render: function(data, type, row) {
+                        if (data) {
+                            // If work_order exists, show "View" button
+                            return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' +
+                                row.work_order +
+                                '" target="_blank" class="text-info view-work-order" data-id="' +
+                                row.id + '">View</a></span>';
+                        } else {
+                            if (isSupervisor) {
+                                // If work_order does not exist, show "Generate Work Order" button
+                                return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' +
+                                    row.id + '">Generate Work Order</a>';
+                            } else {
+                                return '<a href="#">N/A</a>';
                             }
-
+                        }
                     },
                 },
                 {
@@ -109,17 +121,14 @@ var KTTicket = function () {
             dom: 'Bfrtip',
             buttons: dtButtons,
             // Use the passed data
-
         });
-
-
 
         tableTicket = dtTicket.$;
         // Refresh the DataTable to reflect the changes
         dtTicket.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
-        dtTicket.on('draw', function () {
+        dtTicket.on('draw', function() {
             handleDeleteRows();
             KTMenu.init(); // reinit KTMenu instances
         });
@@ -203,19 +212,6 @@ var KTTicket = function () {
                                     console.error('Error deleting ticket:', error);
                                 }
                             });
-
-                            // Swal.fire({
-                            //     text: "You have deleted " + ticketSubject + "!.",
-                            //     icon: "success",
-                            //     buttonsStyling: false,
-                            //     confirmButtonText: "Ok, got it!",
-                            //     customClass: {
-                            //         confirmButton: "btn fw-bold btn-primary",
-                            //     }
-                            // }).then(function () {
-                            //     // delete row data from server and re-draw datatable
-                            //     dtTicket.draw();
-                            // });
                         });
                     } else if (result.dismiss === 'cancel') {
                         Swal.fire({
@@ -247,13 +243,6 @@ var KTTicket = function () {
                             }
                         }
                     },
-                    'kt_td_picker_time_only_input': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Report Time is required'
-                            }
-                        }
-                    },
                     'report_time': {
                         validators: {
                             notEmpty: {
@@ -261,17 +250,17 @@ var KTTicket = function () {
                             }
                         }
                     },
-                    'unit-dropdown': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Unit is required'
-                            }
-                        }
-                    },
                     'sourcesReport': {
                         validators: {
                             notEmpty: {
                                 message: 'Sources of Report is required'
+                            }
+                        }
+                    },
+                    'unit-dropdown': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Unit is required'
                             }
                         }
                     },
@@ -284,18 +273,6 @@ var KTTicket = function () {
                             }
                         }
                     },
-                    'category-dropdown': {
-                        validators: {
-                            callback: {
-                                message: 'Please choose 2-4 color you like most',
-                                callback: function (input) {
-                                    // Get the selected options
-                                    const options = categoryField.select2('data');
-                                    return options != null && options.length >= 1;
-                                },
-                            },
-                        }
-                    }
                 },
                 plugins: {
                     trigger: new FormValidation.plugins.Trigger({
@@ -313,14 +290,15 @@ var KTTicket = function () {
         );
 
         // // Add a click event listener to the "Cancel" button
-        // xButton.addEventListener('click', function () {
-        //     e.preventDefault();
-        //     // Close kt_docs_card_ticket_new
-        //     $('#kt_docs_card_ticket_new').collapse('hide');
-        //     // Show kt_docs_card_ticket_list
-        //     $('#kt_docs_card_ticket_list').collapse('show');
-        //     dtTicket.ajax.reload();
-        // });
+        xButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            form.reset();
+            // Close kt_docs_card_ticket_new
+            $('#kt_docs_card_ticket_new').collapse('hide');
+            // Show kt_docs_card_ticket_list
+            $('#kt_docs_card_ticket_list').collapse('show');
+            dtTicket.ajax.reload();
+        });
 
         // Handle form submit
         submitButton.addEventListener('click', function (e) {
@@ -388,6 +366,7 @@ var KTTicket = function () {
                                 $('#kt_docs_card_ticket_list').collapse('show');
                                 $('#kt_docs_card_ticket_new').collapse('hide');
                                 dtTicket.ajax.reload();
+                                form.reset();
                             });
                         },
                         error: function (xhr) {
@@ -427,127 +406,6 @@ var KTTicket = function () {
 
     }
 
-
-    // Handle form ajax
-    var handleFormAjax = function (e) {
-        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
-        validator = FormValidation.formValidation(
-            form,
-            {
-                fields: {
-                    'subject': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Subject is required'
-                            }
-                        }
-                    },
-                    'email': {
-                        validators: {
-                            regexp: {
-                                regexp: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                message: 'The value is not a valid email address',
-                            },
-                            notEmpty: {
-                                message: 'Email address is required'
-                            }
-                        }
-                    },
-                    'toc': {
-                        validators: {
-                            notEmpty: {
-                                message: 'You must accept the terms and conditions'
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger({
-                        event: {
-                            password: false
-                        }
-                    }),
-                    bootstrap: new FormValidation.plugins.Bootstrap5({
-                        rowSelector: '.fv-row',
-                        eleInvalidClass: '',  // comment to enable invalid state icons
-                        eleValidClass: '' // comment to enable valid state icons
-                    })
-                }
-            }
-        );
-
-        // Handle form submit
-        submitButton.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            // validator.revalidateField('password');
-
-            validator.validate().then(function (status) {
-                if (status == 'Valid') {
-                    // Show loading indication
-                    submitButton.setAttribute('data-kt-indicator', 'on');
-
-                    // Disable button to avoid multiple click
-                    submitButton.disabled = true;
-
-
-                    // Check axios library docs: https://axios-http.com/docs/intro
-                    axios.post(submitButton.closest('form').getAttribute('action'), new FormData(form)).then(function (response) {
-                        if (response) {
-                            form.reset();
-
-                            const redirectUrl = form.getAttribute('data-kt-redirect-url');
-
-                            if (redirectUrl) {
-                                location.href = redirectUrl;
-                            }
-                        } else {
-                            // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
-                            Swal.fire({
-                                text: "Sorry, looks like there are some errors detected, please try again.",
-                                icon: "error",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
-                                }
-                            });
-                        }
-                    }).catch(function (error) {
-                        Swal.fire({
-                            text: "Sorry, looks like there are some errors detected, please try again.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        });
-                    }).then(() => {
-                        // Hide loading indication
-                        submitButton.removeAttribute('data-kt-indicator');
-
-                        // Enable button
-                        submitButton.disabled = false;
-                    });
-
-                } else {
-                    // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
-                    Swal.fire({
-                        text: "Sorry, looks like there are some errors detected, please try again.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn btn-primary"
-                        }
-                    });
-                }
-            });
-        });
-
-    }
-
     var isValidUrl = function(url) {
         try {
             new URL(url);
@@ -556,6 +414,12 @@ var KTTicket = function () {
             return false;
         }
     }
+
+    $("#report_time").flatpickr({
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        maxDate: new Date(),
+    });
 
     // Public functions
     return {
@@ -566,11 +430,11 @@ var KTTicket = function () {
             // Elements
             form = document.querySelector('#kt_new_ticket_form');
             submitButton = document.querySelector('#kt_new_ticket_submit');
-            // xButton = document.querySelector('#kt_new_ticket_cancel');
-            categoryField = document.querySelector('[name="category-dropdown"]');
+            xButton = document.querySelector('#kt_new_ticket_cancel');
+            // categoryField = document.querySelector('[name="category-dropdown"]');
 
             if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
-                handleFormAjax();
+                handleForm();
             } else {
                 handleForm();
             }

@@ -197,26 +197,35 @@ class WorkOrderController extends Controller
         // $workorders = WorkOrder::where('cid', $cid)->orderBy('created_at','desc')
             // ->get(); // Use 'first' to get a single result or null if not found
 
-        $workorders = WorkOrder::all();
+        // $workorders = WorkOrder::where('user_cid', $user->cid)->get();
+        $workorders = DB::table('tickets')
+            ->join('work_orders', 'tickets.id', '=', 'work_orders.ticket_id')
+            ->select('tickets.report_time','tickets.issue_category', 'work_orders.*')
+            ->where('tickets.user_cid', $user->cid)
+            ->get();
+
+            // dd($workorders);
         if ($workorders->isNotEmpty()) {
             // Transform the ticket data to include user names
             $formattedWorkOrders = $workorders->map(function ($workorder) {
+                $ticket = Ticket::where('id', $workorder->ticket_id)->first();
                 return [
                     'id' => $workorder->id,
                     // 'user_name' => $workorder->user->name,
-                    'cid' => $workorder->cid,
+                    'cid' => $workorder->user_cid,
                     'subject' => $workorder->subject,
                     'description' => $workorder->description,
                     'description' => $workorder->description,
                     'origin_unit' => $workorder->origin_unit,
                     'priority' => $workorder->priority,
                     'user' => $workorder->user,
-                    'staff' => $workorder->staff,
+                    'staff' => json_decode($workorder->staff),
                     'due_date' => $workorder->due_date,
-                    'issue_category' => $workorder->issue_category,
+                    'issue_category' => json_decode($workorder->issue_category),
                     'status' => $workorder->status,
                     'created_by' => $workorder->created_by,
                     'created_at' => $workorder->created_at,
+                    'report_time' => $workorder->report_time,
                     'actionButtons' => $this->getActionButtons($workorder)
                     // Add other attributes as needed
                 ];
@@ -251,12 +260,12 @@ class WorkOrderController extends Controller
             $mediaActive = false;
         }
 
-        if ($user->hasRole('Super Admin') || $user->hasRole('administrator') ) {
+        if ($user->hasRole('Super Admin') || $user->hasRole('Administrator') ) {
             return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-switch fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
                 '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
                 '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-button" data-id="' . $workOrder->id . '"><i class="ki-duotone ki-trash fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a>';
-        } elseif ($user->hasRole('support')  && $user->can('edit workorder')) {
-            return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-button" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a>';
+        } elseif ($user->hasRole('Support')  && $user->can('edit workorder')) {
+            return '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-button" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '" data-report-time="' . $workOrder->report_time . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></a>';
         } else {
             if($mediaActive){
                 if($workOrder->status == 'Resolved' || $workOrder->status == 'Closed'){
@@ -274,7 +283,7 @@ class WorkOrderController extends Controller
                     return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
                 }else{
                     return '<a href="/apps/helpdesk/print/wo/' . $workOrder->id . '" target="_blank" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"><i class="ki-duotone ki-printer fs-2"><span class="path1"></span><span class="path2"></span></i></a>' .
-                    '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 generate-work-order-response" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_response" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+                    '<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 generate-work-order-response" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_response" data-id="' . $workOrder->id . '" data-subject="' . $workOrder->subject . '" data-report-time="' . $workOrder->report_time . '"><i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
     
                 }
 

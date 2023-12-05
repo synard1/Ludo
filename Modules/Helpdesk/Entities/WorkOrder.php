@@ -64,6 +64,16 @@ class WorkOrder extends Model
         return json_decode($value, true);
     }
 
+    public function setIssueCategoryAttribute($value)
+    {
+        $this->attributes['issue_category'] = json_encode($value);
+    }
+
+    public function getIssueCategoryAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

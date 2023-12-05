@@ -9,12 +9,9 @@
 
     @push('scripts')
     <script>
-    document.addEventListener('livewire:load', function () {
-        $('#sourcesReport').select2({
-            tags: true, // Enable tags for new values
-            // maximumSelectionLength: 2
-        });
-
+    $('#sourcesReport').select2({
+        tags: true, // Enable tags for new values
+        // maximumSelectionLength: 2
     });
     </script>
     @endpush

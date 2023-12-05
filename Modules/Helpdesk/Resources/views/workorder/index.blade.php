@@ -10,6 +10,7 @@
     }else{
         $mediaActive = false;
     }
+
 @endphp
 
 <x-default-layout>
@@ -183,48 +184,77 @@
     // Pass data to JavaScript
     var canSign = @json($signActive);
     var canUpload = @json($mediaActive);
-    // console.log(canSign);
 
-    let signaturePad;
-    $('#kt_modal_signaturepad').on('shown.bs.modal',function(e){
-        let canvas = $("#signature-pad canvas");
-        let parentWidth = $(canvas).parent().outerWidth();
-        let parentHeight = $(canvas).parent().outerHeight();
-        canvas.attr("width", parentWidth+'px')
-              .attr("height", parentHeight+'px');
-        signaturePad = new SignaturePad(canvas[0], {
-            backgroundColor: 'rgb(255, 255, 255)'
-        });
-
-        // Get the data-id attribute value from the clicked link
+    $('#workOrderTable').on('click', '.generate-work-order-response', function () {
+        var id = $(this).data('id');
+        var rowSubject = $(this).data('subject');
+        // var rowReportTime = $(this).data('report-time');
+        var reportTime = new Date($(this).data('report-time'));
         var rowId = $(this).data('id');
 
         // Assuming you want to set the data-id value to an input field in the modal form
         $('#ticket_id').val(rowId);
+        $('#workorder_subject').val(rowSubject);
+        $('#workorder_id').val(rowId);
+        
+        // Rest of your code
+        console.log('Generate work order response for ID: ' + id + ' ' + rowSubject + ' ' + reportTime);
+        getWoResponse(id);
 
-    })
+        $("#start_date").flatpickr({
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            minDate:reportTime
+        });
 
-    $('#kt_modal_signaturepad').on('hidden.bs.modal', function (e) {
-        signaturePad.clear();
+        $("#finish_date").flatpickr({
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            minDate:reportTime
+        });
+        
     });
-    $(document).on('click','#kt_modal_signaturepad .clear',function(){
-        signaturePad.clear();
-    });
 
-    $(document).on('click','#kt_modal_signaturepad .save',function(){
-        if (signaturePad.isEmpty()) {
-            alert("Please provide a signature first.");
-        } else {
-            let dataURL = signaturePad.toDataURL();
-            let signId = $('#modalIdInput').val();
-            let signAccess = $('#modalAccessInput').val();
+    // let signaturePad;
+    // $('#kt_modal_signaturepad').on('shown.bs.modal',function(e){
+    //     let canvas = $("#signature-pad canvas");
+    //     let parentWidth = $(canvas).parent().outerWidth();
+    //     let parentHeight = $(canvas).parent().outerHeight();
+    //     canvas.attr("width", parentWidth+'px')
+    //           .attr("height", parentHeight+'px');
+    //     signaturePad = new SignaturePad(canvas[0], {
+    //         backgroundColor: 'rgb(255, 255, 255)'
+    //     });
 
-            $('.signature').attr('src',dataURL);
-            $('textarea[name="signature"]').val(dataURL);
-            $('#kt_modal_signaturepad').modal('hide');
-            console.log('ID : ' + signId + ' Access : '+ signAccess +' Sign :'+dataURL);
-        }
-    });
+    //     // Get the data-id attribute value from the clicked link
+    //     var rowId = $(this).data('id');
+
+    //     // Assuming you want to set the data-id value to an input field in the modal form
+    //     $('#ticket_id').val(rowId);
+
+    // })
+
+    // $('#kt_modal_signaturepad').on('hidden.bs.modal', function (e) {
+    //     signaturePad.clear();
+    // });
+    // $(document).on('click','#kt_modal_signaturepad .clear',function(){
+    //     signaturePad.clear();
+    // });
+
+    // $(document).on('click','#kt_modal_signaturepad .save',function(){
+    //     if (signaturePad.isEmpty()) {
+    //         alert("Please provide a signature first.");
+    //     } else {
+    //         let dataURL = signaturePad.toDataURL();
+    //         let signId = $('#modalIdInput').val();
+    //         let signAccess = $('#modalAccessInput').val();
+
+    //         $('.signature').attr('src',dataURL);
+    //         $('textarea[name="signature"]').val(dataURL);
+    //         $('#kt_modal_signaturepad').modal('hide');
+    //         console.log('ID : ' + signId + ' Access : '+ signAccess +' Sign :'+dataURL);
+    //     }
+    // });
 </script>
 
     <script>
@@ -232,23 +262,7 @@
 
             
 
-            $('#workOrderTable').on('click', '.generate-work-order-response', function () {
-                var id = $(this).data('id');
-                var rowSubject = $(this).data('subject');
-                // Implement logic to handle "Generate Work Order" button click
-                console.log('Generate work order response for ID: ' + id +' '+ rowSubject);
-                // Get the data-id attribute value from the clicked link
-                var rowId = $(this).data('id');
-
-                // Assuming you want to set the data-id value to an input field in the modal form
-                $('#ticket_id').val(rowId);
-                $('#workorder_subject').val(rowSubject);
-                $('#workorder_id').val(rowId);
-                // console.log(rowId);
-
-                getWoResponse(id);
-
-            });
+            
 
             $('#workOrderTable').on('click', '.open-signpad', function () {
                 var id = $(this).data('id');
