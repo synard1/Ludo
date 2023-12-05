@@ -268,6 +268,7 @@
 
         <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
         <script src="/assets/js/custom/apps/helpdesk/ticket.js"></script>
 
         <script>

@@ -6,13 +6,16 @@ var KTTicket = function () {
     var tableTicket;
     var dtTicket;
     var dtButtons;
-    var form, formWO, categoryField;
-    var submitButton, xButton, submitButtonWO;
-    var validator, validatorWO;
+    var form, formWO, formNotes, categoryField;
+    var submitButton, xButton, submitButtonWO, submitButtonNotes;
+    var validator, validatorWO, validatorNotes;
 
     // Private functions
     var initDatatable = function() {
-        dtButtons = ['reload', 'print'];
+        dtButtons = ['reload', 'print',
+        {
+            extend: 'colvis'
+        }];
 
         $.fn.dataTable.ext.buttons.reload = {
             text: 'Reload',
@@ -35,9 +38,6 @@ var KTTicket = function () {
             searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [
-                [5, 'desc']
-            ],
             stateSave: true,
             ajax: {
                 url: "/apps/helpdesk/api/ticket",
@@ -126,7 +126,14 @@ var KTTicket = function () {
                 },
             ],
             dom: 'Bfrtip',
+            columnDefs: [
+                {
+                    targets: 3,
+                    visible: false
+                }
+            ],
             buttons: dtButtons,
+            
             // Use the passed data
         });
 
@@ -236,7 +243,7 @@ var KTTicket = function () {
         });
     }
 
-    // Handle form
+    // Handle form Work Order
     var handleFormWO = function (e) {
         // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
         validatorWO = FormValidation.formValidation(
@@ -417,6 +424,160 @@ var KTTicket = function () {
         }
 
         tinymce.init(options);
+
+    }
+
+    // Handle form Work Order
+    var handleFormNotes = function (e) {
+        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+        validatorNotes = FormValidation.formValidation(
+            formNotes,
+            {
+                fields: {
+                    'notes': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Note is required'
+                            }
+                        }
+                    },
+                    'category[]': {
+                        validators: {
+                            choice: {
+                                min: 1,
+                                max: 5,
+                                message: 'Please check minimum 1 category'
+                            }
+                        }
+                    },
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger({
+                        event: {
+                            password: false
+                        }
+                    }),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',  // comment to enable invalid state icons
+                        eleValidClass: '' // comment to enable valid state icons
+                    })
+                }
+            }
+        );
+
+        // Handle form submit
+        submitButtonNotes.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            validatorNotes.validate().then(function (status) {
+                if (status == 'Valid') {
+
+                    // Get the data-id attribute value from the clicked row
+                    var rowId = $(this).closest('tr').data('id');
+                    // Get the selected issuecategory options
+                    var categoryOptions = [];
+                        $("input[name='category[]']:checked").each(function () {
+                            categoryOptions.push($(this).val());
+                        });
+
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    // Show loading indication
+                    submitButtonNotes.setAttribute('data-kt-indicator', 'on');
+
+                    // Disable button to avoid multiple click
+                    submitButtonNotes.disabled = true;
+
+                    $.ajax({
+                        url: '/apps/helpdesk/api/workorder/notes',
+                        type: 'POST',
+                        data: {
+                            ticket_id: $('#ticket_id').val(),
+                            notes: $('#notes').val(),
+                            category: categoryOptions,
+                        },
+                        success: function (response) {
+                            // alert(response.message);
+                            // Hide loading indication
+                            submitButtonNotes.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonNotes.disabled = false;
+
+                            // Close the modal
+                            $('#kt_modal_work_order_note').modal('hide');
+
+                            swal.fire({
+                                text: response.message,
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            }).then(function(){
+                                // Hide loading indication
+                                submitButtonNotes.removeAttribute('data-kt-indicator');
+
+                                // Enable button
+                                submitButtonNotes.disabled = false;
+
+                                formNotes.reset();
+
+                                $('#ticketTable').DataTable().ajax.reload();
+
+                            });
+                        },
+                        error: function (xhr) {
+                            // Handle errors here
+                            // Hide loading indication
+                            submitButtonNotes.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonNotes.disabled = false;
+
+                            Swal.fire({
+                                text: "Sorry, looks like there are some errors detected, please try again.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
+                    Swal.fire({
+                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        });
+
+        $('#ticketTable').on('click', '.generate-notes', function() {
+            var id = $(this).data('id');
+            // Implement logic to handle "Generate Notes" button click
+            console.log('Generate Notes for ID: ' + id);
+            // Get the data-id attribute value from the clicked link
+            var rowId = $(this).data('id');
+
+            // Assuming you want to set the data-id value to an input field in the modal form
+            $('#ticket_id').val(rowId);
+        });
 
     }
 
@@ -678,8 +839,12 @@ var KTTicket = function () {
             form = document.querySelector('#kt_new_ticket_form');
             submitButton = document.querySelector('#kt_new_ticket_submit');
             xButton = document.querySelector('#kt_new_ticket_cancel');
+
             formWO = document.querySelector('#kt_modal_new_work_order_form');
             submitButtonWO = document.querySelector('#kt_modal_new_work_order_submit');
+
+            formNotes = document.querySelector('#kt_modal_work_order_note_form');
+            submitButtonNotes = document.querySelector('#kt_modal_work_order_note_submit');
 
             if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
                 handleForm();
@@ -691,6 +856,12 @@ var KTTicket = function () {
                 handleFormWO();
             } else {
                 handleFormWO();
+            }
+
+            if (isValidUrl(submitButtonNotes.closest('form').getAttribute('action'))) {
+                handleFormNotes();
+            } else {
+                handleFormNotes();
             }
         }
     };

@@ -333,7 +333,7 @@ class TicketController extends Controller
             </div>
             <!--end::Menu item-->';
 
-        if ($ticket->status == 'resolved' || $ticket->status == 'closed') {
+        if ($ticket->status == 'Resolved' || $ticket->status == 'Closed') {
             $buttons .= '
                 <div class="separator mt-3 opacity-75"></div>
                 <!--begin::Menu item-->
