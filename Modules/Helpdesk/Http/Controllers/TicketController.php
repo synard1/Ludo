@@ -178,7 +178,7 @@ class TicketController extends Controller
                 ];
             });
 
-                return response()->json(['tickets' => $formattedTickets]);
+                return response()->json(['data' => $formattedTickets]);
         } else {
             // Ticket not found
             return response()->json(['tickets' => '']);
@@ -191,36 +191,33 @@ class TicketController extends Controller
         $user = auth()->user(); // Get the authenticated user's ID
 
         // Retrieve the ticket data based on user_id and cid
-        $status = StatusHistory::where('user_cid', $user->cid)->where('data_id',$request->input('ticket_id'))->orderBy('created_at','desc')
-            ->get(); // Use 'first' to get a single result or null if not found
+        $query  = StatusHistory::where('user_cid', $user->cid)->where('data_id',$request->input('ticket_id')); // Use 'first' to get a single result or null if not found
 
-        if ($status->isNotEmpty()) {
-            // Transform the ticket data to include user names
-            // $formattedTickets = $tickets->map(function ($ticket) {
-            //     return [
-            //         'id' => $ticket->id,
-            //         'user_name' => $ticket->user->name,
-            //         'cid' => $ticket->user_cid,
-            //         'subject' => $ticket->subject,
-            //         'description' => $ticket->description,
-            //         'origin_unit' => $ticket->origin_unit,
-            //         'priority' => $ticket->priority,
-            //         'source_report' => $ticket->source_report,
-            //         'work_order' => $ticket->work_order_id,
-            //         'issue_category' => $ticket->issue_category,
-            //         'status' => $ticket->status,
-            //         'created_at' => $ticket->created_at,
-            //         'actionButtons' => $this->getActionButtons($ticket)
-            //         // Add other attributes as needed
-            //     ];
-            // });
+        try {
+            // Handle search query
+            if ($request->has('search') && !empty($request->input('search')['value'])) {
+                $search = $request->input('search')['value'];
 
-                return response()->json(['statushistory' => $status]);
-        } else {
-            // Ticket not found
-            return response()->json(['tickets' => '']);
-            // return response()->json(['message' => 'Ticket not found'], 404);
+                $query->where(function ($query) use ($search) {
+                    $query->where('status', 'like', "%$search%")
+                        ->orWhere('reason', 'like', "%$search%")
+                        ->orWhere('created_by', 'like', "%$search%")
+                        ->orWhere('created_at', 'like', "%$search%");
+                });
+            }
+
+            // Continue with other DataTables server-side processing logic
+            // ...
+
+            $data = $query->get();
+
+            return response()->json(['data' => $data]);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['message' => 'Failed']);
         }
+            
     }
 
     public function saveStatus(Request $request)

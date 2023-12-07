@@ -21,13 +21,9 @@ var KTTicket = function () {
             }
         };
 
-        dtStatus = $("#historyTable").DataTable({
-            processing: true,
-            serverSide: true,
-            
+        dtStatus = $("#historyTable").DataTable({            
             ajax: {
                 url: "/apps/helpdesk/api/ticket/statushistory",
-                dataSrc: 'statushistory',
                 data: {
                     ticket_id: id,
                 },
@@ -105,13 +101,8 @@ var KTTicket = function () {
         }
 
         dtTicket = $("#ticketTable").DataTable({
-            // searchDelay: 500,
-            // processing: true,
-            serverSide: true,
-            // stateSave: true,
             ajax: {
                 url: "/apps/helpdesk/api/ticket",
-                dataSrc: 'tickets'
             },
             columns: [{
                     targets: 0,
