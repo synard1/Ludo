@@ -31,6 +31,7 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
     // API
     Route::prefix('api')->name('api.')->group(function () {
         Route::get('/ticket', [TicketController::class, 'getTicketData'])->name('getTicket');
+        Route::get('/ticket/statushistory', [TicketController::class, 'getStatusHistory'])->name('getStatusHistory');
         Route::post('/ticket/status', [TicketController::class, 'saveStatus'])->name('postStatus');
         Route::post('/ticket', [TicketController::class, 'saveTicket'])->name('postTicket');
         Route::delete('/deleteTicket/{id}', [TicketController::class, 'deleteTicket'])->name('deleteTicket');

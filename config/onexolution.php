@@ -48,14 +48,13 @@ return [
     ],
 
     'statusTicket' => [
-        'Open' => 'Open',
+        'In Progress' => 'In Progress',
         'Pending' => 'Pending',
         'Resolved' => 'Resolved',
         'Closed' => 'Closed',
     ],
 
     'statusWorkOrder' => [
-        'Open' => 'Open',
         'In Progress' => 'In Progress',
         'Pending' => 'Pending',
         'Resolved' => 'Resolved',

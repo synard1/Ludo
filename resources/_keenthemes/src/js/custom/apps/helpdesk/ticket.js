@@ -3,12 +3,82 @@
 // Class definition
 var KTTicket = function () {
     // Shared variables
-    var tableTicket;
-    var dtTicket;
+    var tableTicket, tableStatus;
+    var dtTicket, dtStatus;
     var dtButtons;
-    var form, formWO, formNotes, formStatus, categoryField;
-    var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus;
+    var form, formWO, formNotes, formStatus, formHistory;
+    var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus, closeButtonHistory;
     var validator, validatorWO, validatorNotes, validatorStatus;
+
+    // Private functions
+    var initDatatableStatusHistory = function(id) {
+        dtButtons = ['reload', 'print'];
+
+        $.fn.dataTable.ext.buttons.reload = {
+            text: 'Reload',
+            action: function ( e, dt, node, config ) {
+                dt.ajax.reload();
+            }
+        };
+
+        dtStatus = $("#historyTable").DataTable({
+            processing: true,
+            serverSide: true,
+            
+            ajax: {
+                url: "/apps/helpdesk/api/ticket/statushistory",
+                dataSrc: 'statushistory',
+                data: {
+                    ticket_id: id,
+                },
+            },
+            columns: [{
+                    targets: 0,
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        // 'meta.row' contains the row number
+                        return meta.row + 1;
+                    },
+                },
+                {
+                    data: 'status'
+                },
+                {
+                    data: 'reason'
+                },
+                {
+                    data: 'created_by',
+                },
+                {
+                    data: 'created_at',
+                    title: 'Created Date',
+                    render: function (data, type, row) {
+                        if (type === 'display' || type === 'filter') {
+                            // Format the date as "YYYY-MM-DD HH:MM:SS"
+                            return data.toLocaleString();
+                        }
+                        return data; // For sorting and other types
+                    }
+                },
+                
+            ],
+            dom: 'Bfrtip',
+            buttons: dtButtons,
+            
+            // Use the passed data
+        });
+
+        tableTicket = dtStatus.$;
+        // Refresh the DataTable to reflect the changes
+        dtStatus.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
+
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        dtStatus.on('draw', function() {
+            KTMenu.init(); // reinit KTMenu instances
+        });
+
+        
+    }
 
     // Private functions
     var initDatatable = function() {
@@ -85,7 +155,7 @@ var KTTicket = function () {
                     targets: 10,
                     data: 'status',
                     render: function(data, type, row) {
-                        var  statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i></a>';
+                        var  statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' + row.id + '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
                         switch (data.toLowerCase()) {
                             case 'open':
                                 return '<span class="badge badge-success">Open</span> ' + statusLink;
@@ -148,6 +218,11 @@ var KTTicket = function () {
         dtTicket.on('draw', function() {
             handleDeleteRows();
             KTMenu.init(); // reinit KTMenu instances
+        });
+
+        $('#ticketTable').on('click', '.status-history', function() {
+            var id = $(this).data('id');
+            initDatatableStatusHistory(id);
         });
     }
 
@@ -402,6 +477,8 @@ var KTTicket = function () {
                 }
             });
         });
+
+        
 
         $('#ticketTable').on('click', '.generate-work-order', function() {
             var id = $(this).data('id');
@@ -902,6 +979,12 @@ var KTTicket = function () {
             });
         });
 
+        // Handle form close
+        closeButtonHistory.addEventListener('click', function (e) {
+            e.preventDefault();
+            dtStatus.destroy();
+        });
+
         
 
     }
@@ -939,6 +1022,8 @@ var KTTicket = function () {
                 console.error('Fetch error:', error.message);
             });
     }
+
+
 
     var isValidUrl = function(url) {
         try {
@@ -981,6 +1066,7 @@ var KTTicket = function () {
         // Initialization
         init: function () {
             initDatatable();
+            // initDatatableStatusHistory();
             handleDeleteRows();
             fetchStaffData();
             // Elements
@@ -996,6 +1082,9 @@ var KTTicket = function () {
 
             formStatus = document.querySelector('#kt_modal_change_status_form');
             submitButtonStatus = document.querySelector('#kt_modal_change_status_submit');
+
+            formHistory = document.querySelector('#kt_modal_change_status_form');
+            closeButtonHistory = document.querySelector('#kt_modal_history_status_close');
 
             if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
                 handleForm();

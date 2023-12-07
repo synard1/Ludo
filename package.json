@@ -8,7 +8,8 @@
     "hot": "mix watch --hot",
     "prod": "npm run production",
     "production": "mix --production",
-    "build": "webpack --max-workers 8"
+    "build": "webpack --max-workers 8",
+    "build:js": "node build-scripts/build-js.js"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-alignment": "^38.1.0",
@@ -113,6 +114,7 @@
     "rtlcss": "^3.5.0",
     "sass": "1.55.0",
     "sass-loader": "13.2.0",
+    "terser": "^5.25.0",
     "thread-loader": "^4.0.2",
     "webpack-rtl-plugin": "^2.0.0"
   },

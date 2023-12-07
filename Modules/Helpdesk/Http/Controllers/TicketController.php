@@ -186,6 +186,43 @@ class TicketController extends Controller
         }
     }
 
+    public function getStatusHistory(Request $request)
+    {
+        $user = auth()->user(); // Get the authenticated user's ID
+
+        // Retrieve the ticket data based on user_id and cid
+        $status = StatusHistory::where('user_cid', $user->cid)->where('data_id',$request->input('ticket_id'))->orderBy('created_at','desc')
+            ->get(); // Use 'first' to get a single result or null if not found
+
+        if ($status->isNotEmpty()) {
+            // Transform the ticket data to include user names
+            // $formattedTickets = $tickets->map(function ($ticket) {
+            //     return [
+            //         'id' => $ticket->id,
+            //         'user_name' => $ticket->user->name,
+            //         'cid' => $ticket->user_cid,
+            //         'subject' => $ticket->subject,
+            //         'description' => $ticket->description,
+            //         'origin_unit' => $ticket->origin_unit,
+            //         'priority' => $ticket->priority,
+            //         'source_report' => $ticket->source_report,
+            //         'work_order' => $ticket->work_order_id,
+            //         'issue_category' => $ticket->issue_category,
+            //         'status' => $ticket->status,
+            //         'created_at' => $ticket->created_at,
+            //         'actionButtons' => $this->getActionButtons($ticket)
+            //         // Add other attributes as needed
+            //     ];
+            // });
+
+                return response()->json(['statushistory' => $status]);
+        } else {
+            // Ticket not found
+            return response()->json(['tickets' => '']);
+            // return response()->json(['message' => 'Ticket not found'], 404);
+        }
+    }
+
     public function saveStatus(Request $request)
     {
         $user = auth()->user();

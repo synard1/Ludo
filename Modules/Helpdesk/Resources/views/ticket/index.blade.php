@@ -257,6 +257,7 @@
     @include('helpdesk::ticket/work_order')
     @include('helpdesk::ticket/work_order_note')
     @include('helpdesk::ticket/_status_change')
+    @include('helpdesk::ticket/_status_history')
 
 
     @push('styles')

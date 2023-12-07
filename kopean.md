@@ -16,3 +16,5 @@ php artisan make:model StatusHistory -mR
 php artisan make:controller Apps\\SignaturePadController --model=SignaturePad --resource
 
 /opt/alt/php81/usr/bin/php artisan module:make UserMedia
+
+cp -Rf /home/ludomyi/public_html/node_modules/@shopify /home/ludomyi/dev.ludo.my.id/node_modules/@shopify
