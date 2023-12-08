@@ -231,9 +231,9 @@ class WorkOrderController extends Controller
                 ];
             });
 
-                return response()->json(['workorders' => $formattedWorkOrders]);
+                return response()->json(['data' => $formattedWorkOrders]);
         } else {
-            return response()->json(['workorders' => '']);
+            return response()->json(['data' => '']);
         }
     }
 

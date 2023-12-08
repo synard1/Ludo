@@ -26,13 +26,8 @@ var KTWorkorder = function () {
         };
 
         dtWorkorder = $("#workOrderTable").DataTable({
-            searchDelay: 500,
-            processing: true,
-            serverSide: true,
-            stateSave: true,
             ajax: {
                 url: '/apps/helpdesk/api/workorder',
-                dataSrc: 'workorders'
             },
             columns: [
                 {

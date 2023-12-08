@@ -283,6 +283,7 @@
 			</div>
 			<!--end:Menu item-->
 			@endif
+			@if(auth()->check() && auth()->user()->hasRole('Super Admin'))
 			<!--begin:Menu item-->
 			<div class="menu-item pt-5">
 				<!--begin:Menu content-->
@@ -322,6 +323,7 @@
 				<!--end:Menu link-->
 			</div>
 			<!--end:Menu item-->
+			@endif
 		</div>
 		<!--end::Menu-->
 	</div>

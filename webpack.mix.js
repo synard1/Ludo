@@ -129,18 +129,39 @@ if (args.indexOf('rtl') !== -1) {
 
 mix.webpackConfig({
     plugins: plugins,
-    module: {
+    module:{
         rules: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: [
+            'thread-loader',
             {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: [
-                    'thread-loader',
-                    'babel-loader',
-                ],
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env'],
+                plugins: ['@babel/plugin-transform-runtime'],
+                targets: {
+                  browsers: ['last 2 versions'],
+                },
+              },
             },
-        ],
+          ],
+        },
+      ],
     },
+    // module: {
+    //     rules: [
+    //         {
+    //             test: /\.js$/,
+    //             exclude: /node_modules/,
+    //             use: [
+    //                 'thread-loader',
+    //                 'babel-loader',
+    //             ],
+    //         },
+    //     ],
+    // },
     ignoreWarnings: [{
         module: /esri-leaflet/,
         message: /version/,

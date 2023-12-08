@@ -116,6 +116,7 @@
     "sass-loader": "13.2.0",
     "terser": "^5.25.0",
     "thread-loader": "^4.0.2",
+    "webpack-bundle-analyzer": "^4.10.1",
     "webpack-rtl-plugin": "^2.0.0"
   },
   "name": "dev.ludo.my.id",
