@@ -261,28 +261,23 @@
 
 
     @push('styles')
-        <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" rel="stylesheet">
-        <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
+        {{-- <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet"> --}}
     @endpush
     @push('scripts')
         <!-- Load jQuery from a CDN -->
         {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
-        <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        {{-- <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
-        <script src="/assets/js/custom/apps/helpdesk/ticket.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script> --}}
+        {{-- <script src="/js/obfuscated/ticket.js"></script> --}}
+        <script src="/assets/js/custom/apps/helpdesk/obfuscated/ticket.obfuscated.js"></script>
 
         <script>
             // Pass data to JavaScript
             var canCreateTicket = @json($canCreateTicket);
             var isSupervisor = @json($isSupervisor);
-
-            $(document).ready(function() {
-                
-                
-
-            });
         </script>
     @endpush
 

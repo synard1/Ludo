@@ -146,23 +146,54 @@ var KTTicket = function () {
                     targets: 10,
                     data: 'status',
                     render: function(data, type, row) {
-                        var  statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' + row.id + '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
-                        switch (data.toLowerCase()) {
-                            case 'open':
-                                return '<span class="badge badge-success">Open</span> ' + statusLink;
-                            case 'pending':
-                                return '<span class="badge badge-warning">Pending</span> ' + statusLink;
-                            case 'closed':
-                                return '<span class="badge badge-secondary">Closed</span> ' + statusLink;
-                            case 'resolved':
-                                return '<span class="badge badge-primary">Resolved</span> ' + statusLink;
-                            case 'in progress':
-                                return '<span class="badge badge-info">In Progress</span> ' + statusLink;
-                            default:
-                                return data;
-                        }
+                        // var isSupervisor = /* your logic to determine if the user is a supervisor */;
+                        var statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' + row.id + '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
+                
+                        var statusBadge = getStatusBadge(data);
+                
+                        return isSupervisor ? statusBadge + ' ' + statusLink : statusBadge;
                     },
                 },
+                // {
+                //     targets: 10,
+                //     data: 'status',
+                //     render: function(data, type, row) {
+                //         var  statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' + row.id + '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
+
+                //         if(isSupervisor){
+                //             switch (data.toLowerCase()) {
+                //                 case 'open':
+                //                     return '<span class="badge badge-success">Open</span> ' + statusLink;
+                //                 case 'pending':
+                //                     return '<span class="badge badge-warning">Pending</span> ' + statusLink;
+                //                 case 'closed':
+                //                     return '<span class="badge badge-secondary">Closed</span> ' + statusLink;
+                //                 case 'resolved':
+                //                     return '<span class="badge badge-primary">Resolved</span> ' + statusLink;
+                //                 case 'in progress':
+                //                     return '<span class="badge badge-info">In Progress</span> ' + statusLink;
+                //                 default:
+                //                     return data;
+                //             }
+                //         }else{
+                //             switch (data.toLowerCase()) {
+                //                 case 'open':
+                //                     return '<span class="badge badge-success">Open</span> ';
+                //                 case 'pending':
+                //                     return '<span class="badge badge-warning">Pending</span> ';
+                //                 case 'closed':
+                //                     return '<span class="badge badge-secondary">Closed</span> ';
+                //                 case 'resolved':
+                //                     return '<span class="badge badge-primary">Resolved</span> ';
+                //                 case 'in progress':
+                //                     return '<span class="badge badge-info">In Progress</span> ';
+                //                 default:
+                //                     return data;
+                //             }
+                //         }
+                        
+                //     },
+                // },
                 {
                     targets: 12,
                     data: 'work_order', // Assuming the attribute is named 'work_order'
@@ -215,6 +246,32 @@ var KTTicket = function () {
             var id = $(this).data('id');
             initDatatableStatusHistory(id);
         });
+
+        // Function to get the status badge
+        function getStatusBadge(status) {
+            var badgeColor = '';
+            switch (status.toLowerCase()) {
+                case 'open':
+                    badgeColor = 'success';
+                    break;
+                case 'pending':
+                    badgeColor = 'warning';
+                    break;
+                case 'closed':
+                    badgeColor = 'secondary';
+                    break;
+                case 'resolved':
+                    badgeColor = 'primary';
+                    break;
+                case 'in progress':
+                    badgeColor = 'info';
+                    break;
+                default:
+                    return status; // return original data if status is not recognized
+            }
+
+            return '<span class="badge badge-' + badgeColor + '">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
+        }
     }
 
     // Delete ticket
@@ -1077,10 +1134,12 @@ var KTTicket = function () {
             formHistory = document.querySelector('#kt_modal_change_status_form');
             closeButtonHistory = document.querySelector('#kt_modal_history_status_close');
 
-            if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
-                handleForm();
-            } else {
-                handleForm();
+            if(isSupervisor){
+                if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
+                    handleForm();
+                } else {
+                    handleForm();
+                }
             }
 
             if (isValidUrl(submitButtonWO.closest('form').getAttribute('action'))) {

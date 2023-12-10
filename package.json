@@ -9,7 +9,12 @@
     "prod": "npm run production",
     "production": "mix --production",
     "build": "webpack --max-workers 8",
-    "build:js": "node build-scripts/build-js.js"
+    "build:js": "node build-scripts/build-js.js",
+    "minify-js": "find public/assets/js/custom/ -name '*.js' -exec sh -c 'mkdir -p $(dirname {})/minified/ && terser {} --compress --mangle --output $(dirname {})/minified/$(basename {} .js).min.js' \\;",
+    "obfuscate-js": "find public/assets/js/custom/apps/ -name '*.js' -exec sh -c 'mkdir -p $(dirname {})/obfuscated/ && terser {} --compress --mangle --output $(dirname {})/obfuscated/$(basename {} .js).min.js && javascript-obfuscator $(dirname {})/obfuscated/$(basename {} .js).min.js --output $(dirname {})/obfuscated/$(basename {} .js).obfuscated.js' \\;",
+    "minify": "terser public/assets/js/custom/*.js --compress --mangle --output public/js/minified",
+    "obfuscate": "javascript-obfuscator public/js/minified/*.js --output public/js/obfuscated",
+    "build:minify": "npm run minify && npm run obfuscate"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-alignment": "^38.1.0",
@@ -102,11 +107,14 @@
   "devDependencies": {
     "alpinejs": "^3.7.1",
     "autoprefixer": "^10.4.2",
+    "concurrently": "^8.2.2",
     "del": "^6.0.0",
+    "javascript-obfuscator": "^4.1.0",
     "laravel-datatables-vite": "^0.5.2",
     "laravel-mix": "^6.0.39",
     "laravel-mix-purgecss": "^6.0.0",
     "lodash": "^4.17.19",
+    "obfuscator": "^0.5.4",
     "postcss": "^8.4.5",
     "postcss-import": "^14.0.2",
     "replace-in-file-webpack-plugin": "^1.0.6",
@@ -114,8 +122,9 @@
     "rtlcss": "^3.5.0",
     "sass": "1.55.0",
     "sass-loader": "13.2.0",
-    "terser": "^5.25.0",
+    "terser": "^5.26.0",
     "thread-loader": "^4.0.2",
+    "uglify-js": "^3.17.4",
     "webpack-bundle-analyzer": "^4.10.1",
     "webpack-rtl-plugin": "^2.0.0"
   },

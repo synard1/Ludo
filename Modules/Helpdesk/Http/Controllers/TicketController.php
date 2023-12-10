@@ -91,8 +91,7 @@ class TicketController extends Controller
         $workorder = WorkOrder::where('id',$id)->first();
         $company = Company::where('cid',$cid)->first();
         $ticket = Ticket::where('work_order_id',$id)->first();
-        $woResponse = WorkOrderResponse::where('work_order_id',$workorder->id)->first();
-        $woResponse = WorkOrderResponse::where('work_order_id',$workorder->id)->first();
+        $woResponse = WorkOrderResponse::where('work_order_id',$workorder->id)->first() ?? '';
         $woNotes = WorkOrderNote::where('ticket_id',$ticket->id)->where('work_order_id',$workorder->id)->orderBy('created_at','DESC')->first();
         return view('helpdesk::ticket.wo_print3', compact(['workorder','company','ticket','woResponse','woNotes']));
     }
@@ -356,14 +355,17 @@ class TicketController extends Controller
         if ($user->hasAnyRole(['Super Admin', 'Administrator'])) {
             return $this->getAdminButtons($ticket);
         } elseif ($user->hasRole('Support') && $user->can('delete ticket')) {
-            if (isMobileBrowser()) {
-                // Do something for mobile devices
-                return $this->getSupportButtonsMobile($ticket, $user);
-            } else {
-                // Do something for non-mobile devices
-                return $this->getSupportButtons($ticket, $user);
+            if($user->level_access == 'Staff'){
+
+            }else{
+                if (isMobileBrowser()) {
+                    // Do something for mobile devices
+                    return $this->getSupportButtonsMobile($ticket, $user);
+                } else {
+                    // Do something for non-mobile devices
+                    return $this->getSupportButtons($ticket, $user);
+                }
             }
-            
         }
 
         return '';
