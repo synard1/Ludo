@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Storage;
 
 class Company extends Model
 {
@@ -23,6 +24,8 @@ class Company extends Model
         'email',
         'website',
         'logo',
+        'logo_url',
+        'image_path',
         'payload',
         'communication',
         'status',
@@ -45,13 +48,27 @@ class Company extends Model
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-    public function setCommunicationAttribute($value)
-    {
-        $this->attributes['communication'] = json_encode($value);
-    }
+    // public function setCommunicationAttribute($value)
+    // {
+    //     $this->attributes['communication'] = json_encode($value);
+    // }
 
     public function getCommunicationAttribute($value)
     {
         return json_decode($value, true);
     }
+
+    // public function setLogo($image)
+    // {
+    //     if ($image) {
+    //         $imagePath = $image->store('photos', 'contabo');
+    //         $this->logo = $imagePath;
+    //         $this->save();
+    //     }
+    // }
+
+    // public function getLogo()
+    // {
+    //     return Storage::disk('contabo')->url($this->logo);
+    // }
 }

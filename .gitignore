@@ -9,6 +9,7 @@
 /storage/*.key
 /stubs
 /vendor
+/Modules/FeedbackPortal
 .env
 .env.backup
 .phpunit.result.cache

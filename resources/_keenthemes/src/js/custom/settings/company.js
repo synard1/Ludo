@@ -96,24 +96,40 @@ var KTCompany = function () {
                     submitButton.disabled = true;
 
                     // Get the selected communication options
+                    // var communicationOptions = [];
+                    // $("input[name='communication[]']:checked").each(function () {
+                    //     communicationOptions.push($(this).val());
+                    // });
+
+                    // Your form data
+                    var formData = new FormData($('#kt_company_profile_form')[0]);
+
+                    // Get the selected communication options
                     var communicationOptions = [];
                     $("input[name='communication[]']:checked").each(function () {
                         communicationOptions.push($(this).val());
                     });
 
+                    // Add the communication options to the formData
+                    formData.append('communication', communicationOptions.join(','));
+
+
                     $.ajax({
                         url: '/setting/api/company',
                         type: 'POST',
-                        data: {
-                            name: $('#company').val(),
-                            address: $('#address').val(),
-                            phone: $('#phone').val(),
-                            email: $('#email').val(),
-                            website: $('#website').val(),
-                            communication: communicationOptions
-                            // Include other fields here
-                            // _token: '{{ csrf_token() }}', // CSRF token for Laravel
-                        },
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        // data: {
+                        //     name: $('#company').val(),
+                        //     address: $('#address').val(),
+                        //     phone: $('#phone').val(),
+                        //     email: $('#email').val(),
+                        //     website: $('#website').val(),
+                        //     communication: communicationOptions
+                        //     // Include other fields here
+                        //     // _token: '{{ csrf_token() }}', // CSRF token for Laravel
+                        // },
                         success: function (response) {
                             // alert(response.message);
                             // Hide loading indication

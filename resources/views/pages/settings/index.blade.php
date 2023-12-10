@@ -37,10 +37,10 @@
                         <div class="tab-pane fade show active" id="kt_tab_pane_7" role="tabpanel">
                             <!--begin::Form-->
                             <form id="kt_company_profile_form" class="form fv-plugins-bootstrap5 fv-plugins-framework"
-                                novalidate="novalidate">
+                                novalidate="novalidate" enctype="multipart/form-data">
                                 <!--begin::Card body-->
                                 <div class="card-body p-9">
-                                    {{-- <!--begin::Input group-->
+                                    <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
                                         <label class="col-lg-4 col-form-label fw-semibold fs-6">Logo</label>
@@ -52,9 +52,11 @@
                                             <div class="image-input image-input-outline" data-kt-image-input="true"
                                                 style="background-image: url('/assets/media/svg/avatars/blank.svg')">
                                                 <!--begin::Preview existing avatar-->
-                                                <div class="image-input-wrapper w-125px h-125px"
-                                                    style="background-image: url(/assets/media/avatars/300-1.jpg)">
+                                                <div class="image-input-wrapper w-125px h-125px" style="background-image: url({{ $company->logo_url ? $company->logo_url : '/assets/media/avatars/300-1.jpg' }})">
                                                 </div>
+                                                {{-- <div class="image-input-wrapper w-125px h-125px">
+                                                    <img src="{{ route('settings.showLogo', ['disk' => 'contabo', 'filename' => '5i7JHGih4IMWKcPDR9D7GFAtpqRgqGqfQbuOG5C3.jpg']) }}" alt="Contabo Image">
+                                                </div> --}}
                                                 <!--end::Preview existing avatar-->
 
                                                 <!--begin::Label-->
@@ -66,7 +68,7 @@
                                                     <i class="ki-duotone ki-pencil fs-7"><span
                                                             class="path1"></span><span class="path2"></span></i>
                                                     <!--begin::Inputs-->
-                                                    <input type="file" name="avatar" accept=".png, .jpg, .jpeg">
+                                                    <input type="file" name="logo" id="logo" accept=".png, .jpg, .jpeg, .txt">
                                                     <input type="hidden" name="avatar_remove">
                                                     <!--end::Inputs-->
                                                 </label>
@@ -102,7 +104,7 @@
                                         </div>
                                         <!--end::Col-->
                                     </div>
-                                    <!--end::Input group--> --}}
+                                    <!--end::Input group-->
 
                                     <!--begin::Input group-->
                                     <div class="row mb-6">
@@ -268,6 +270,23 @@
                                             </div>
                                         </div>
                                         <!--begin::Label-->
+                                    </div>
+                                    <!--end::Input group-->
+
+                                    <!--begin::Input group-->
+                                    <div class="row mb-6">
+                                        <!--begin::Label-->
+                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                                            <span class="">Your Access URL</span>
+                                        </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Col-->
+                                        <div class="col-lg-8 fv-row">
+                                            <input type="text" name="userlink2" id="userlink2"
+                                                class="form-control form-control-lg form-control-solid" value="https://{{ $company ? $company->userlink2 : '' }}" readonly>
+                                        </div>
+                                        <!--end::Col-->
                                     </div>
                                     <!--end::Input group-->
 

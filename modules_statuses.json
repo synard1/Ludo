@@ -6,5 +6,6 @@
     "Hotspot": true,
     "Helpdesk": true,
     "UserSign": false,
-    "UserMedia": false
+    "UserMedia": false,
+    "FeedbackPortal": true
 }

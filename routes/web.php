@@ -113,6 +113,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::name('settings.')->group(function () {
         Route::get('/settings', [SettingController::class, 'index'])->name('index');
+        Route::get('/image/{disk}/{filename}', [SettingController::class, 'showLogo'])->name('showLogo');
+
         Route::get('/settings/company', [CompanyController::class, 'index'])->name('company');
 
         // Route::resource('company', CompanyController::class,[

@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         // Other commands...
         \App\Console\Commands\CreateModuleCommand::class,
         \App\Console\Commands\ShowPermissions::class,
+        \App\Console\Commands\UploadFileCommand::class,
     ];
 
     protected function schedule(Schedule $schedule)

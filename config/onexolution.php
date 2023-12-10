@@ -165,4 +165,24 @@ return [
         'prefix_client' => 'c',
 
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | System settings
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+    'system' => [
+
+        'url' => '.ludo.my.id',
+
+        'prefix_client' => 'c',
+
+        'dev_disk' => 'contabo', // set system disk in filesystem.php
+        
+        'prod_disk' => 'contabo', // set system disk in filesystem.php
+
+
+    ],
 ];

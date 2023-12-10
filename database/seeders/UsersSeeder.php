@@ -57,7 +57,7 @@ class UsersSeeder extends Seeder
             'website'           => 'www.demo.com',
             'status'            => 'Active',
             'subscription'      => 'Free',
-            'communication'     => 'Email',
+            'communication'     => json_encode('Email'),
             'userlink'          => $userlink,
             'userlink2'         => 'c'.$userlink . config('onexolution.company.url'),
         ]);
