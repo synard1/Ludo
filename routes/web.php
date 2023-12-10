@@ -90,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('user-infos', App\Http\Controllers\UserInfoController::class);
 
     Route::name('user-management.')->group(function () {
+        Route::get('/user-management/my-profile', [UserManagementController::class, 'myProfile'])->name('myProfile');
         Route::resource('/user-management/users', UserManagementController::class);
         Route::resource('/user-management/roles', RoleManagementController::class);
         Route::resource('/user-management/permissions', PermissionManagementController::class);

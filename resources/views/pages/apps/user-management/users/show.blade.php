@@ -150,7 +150,8 @@
                     <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_user_view_overview_events_and_logs_tab">Events & Logs</a>
                 </li>
                 <!--end:::Tab item-->
-                <!--begin:::Tab item-->
+
+                {{-- <!--begin:::Tab item-->
                 <li class="nav-item ms-auto">
                     <!--begin::Action menu-->
                     <a href="#" class="btn btn-primary ps-7" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">Actions
@@ -247,7 +248,8 @@
                     <!--end::Menu-->
                     <!--end::Menu-->
                 </li>
-                <!--end:::Tab item-->
+                <!--end:::Tab item--> --}}
+
             </ul>
             <!--end:::Tabs-->
             <!--begin:::Tab content-->
@@ -1614,16 +1616,17 @@
                                 <!--begin::Table-->
                                 <table class="table align-middle table-row-dashed gy-5" id="kt_table_users_login_session">
                                     <tbody class="fs-6 fw-semibold text-gray-600">
+                                    @auth
                                     <tr>
                                         <td>Email</td>
-                                        <td>smith@kpmg.com</td>
+                                        <td>{{ auth()->user()->email }}</td>
                                         <td class="text-end">
-                                            <button type="button" class="btn btn-icon btn-active-light-primary w-30px h-30px ms-auto" data-bs-toggle="modal" data-bs-target="#kt_modal_update_email">
+                                            {{-- <button type="button" class="btn btn-icon btn-active-light-primary w-30px h-30px ms-auto" data-bs-toggle="modal" data-bs-target="#kt_modal_update_email">
                                                 <i class="ki-duotone ki-pencil fs-3">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
                                                 </i>
-                                            </button>
+                                            </button> --}}
                                         </td>
                                     </tr>
                                     <tr>
@@ -1640,16 +1643,23 @@
                                     </tr>
                                     <tr>
                                         <td>Role</td>
-                                        <td>Administrator</td>
+                                        <td>
+                                            
+                                                @foreach(auth()->user()->getRoleNames() as $role)
+                                                    {{ $role }}
+                                                @endforeach
+                                            
+                                        </td>
                                         <td class="text-end">
-                                            <button type="button" class="btn btn-icon btn-active-light-primary w-30px h-30px ms-auto" data-bs-toggle="modal" data-bs-target="#kt_modal_update_role">
+                                            {{-- <button type="button" class="btn btn-icon btn-active-light-primary w-30px h-30px ms-auto" data-bs-toggle="modal" data-bs-target="#kt_modal_update_role">
                                                 <i class="ki-duotone ki-pencil fs-3">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
                                                 </i>
-                                            </button>
+                                            </button> --}}
                                         </td>
                                     </tr>
+                                    @endauth
                                     </tbody>
                                 </table>
                                 <!--end::Table-->
@@ -1659,7 +1669,8 @@
                         <!--end::Card body-->
                     </div>
                     <!--end::Card-->
-                    <!--begin::Card-->
+
+                    {{-- <!--begin::Card-->
                     <div class="card pt-4 mb-6 mb-xl-9">
                         <!--begin::Card header-->
                         <div class="card-header border-0">
@@ -1946,7 +1957,8 @@
                         <!--begin::Card footer-->
                         <!--end::Card footer-->
                     </div>
-                    <!--end::Card-->
+                    <!--end::Card--> --}}
+
                 </div>
                 <!--end:::Tab pane-->
                 <!--begin:::Tab pane-->

@@ -17,7 +17,7 @@
             <!--begin::Username-->
             <div class="d-flex flex-column">
                 <div class="fw-bold d-flex align-items-center fs-5">{{ Auth::user()->name}}
-                    <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Pro</span>
+                    <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">{{ Auth::user()->subscription }}</span>
                 </div>
                 <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">{{ Auth::user()->email }}</a>
             </div>
@@ -30,10 +30,11 @@
     <!--end::Menu separator-->
     <!--begin::Menu item-->
     <div class="menu-item px-5">
-        <a href="#" class="menu-link px-5">My Profile</a>
+        <a href="{{ route('user-management.myProfile') }}" class="menu-link px-5">My Profile</a>
     </div>
     <!--end::Menu item-->
-    <!--begin::Menu item-->
+
+    {{-- <!--begin::Menu item-->
     <div class="menu-item px-5">
         <a href="#" class="menu-link px-5">
             <span class="menu-text">My Projects</span>
@@ -169,7 +170,8 @@
     <div class="menu-item px-5 my-1">
         <a href="#" class="menu-link px-5">Account Settings</a>
     </div>
-    <!--end::Menu item-->
+    <!--end::Menu item--> --}}
+
     <!--begin::Menu item-->
     <div class="menu-item px-5">
         <a class="button-ajax menu-link px-5" href="#" data-action="{{ route('logout') }}" data-method="post" data-csrf="{{ csrf_token() }}" data-reload="true">

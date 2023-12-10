@@ -116,7 +116,15 @@ class UserManagementController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['message' => 'Failed']);
         }
+    }
 
+    /**
+     * Display the specified resource.
+     */
+    public function myProfile(Request $request)
+    {
+        $user = auth()->user();
 
+        return view('pages.apps.user-management.users.show', compact('user'));
     }
 }
