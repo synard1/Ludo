@@ -121,7 +121,7 @@
         <div id="kt_docs_card_ticket_list" class="collapse show">
             <div class="card-body">
                 <table id="workOrderTable"
-                    class="display responsive nowrap table table-striped table-row-bordered gy-5 gs-7"
+                    class="display nowrap table table-striped table-row-bordered gy-5 gs-7"
                     style="width:100%">
                     <thead>
                         <tr class="fw-semibold fs-6 text-gray-800">

@@ -21,11 +21,12 @@ var KTWorkorder = function () {
         $.fn.dataTable.ext.buttons.reload = {
             text: 'Reload',
             action: function ( e, dt, node, config ) {
-                dt.ajax.reload();
+                $("#workOrderTable").DataTable().ajax.reload(null, false); 
             }
         };
 
         dtWorkorder = $("#workOrderTable").DataTable({
+            scrollX: true,
             ajax: {
                 url: '/apps/helpdesk/api/workorder',
             },

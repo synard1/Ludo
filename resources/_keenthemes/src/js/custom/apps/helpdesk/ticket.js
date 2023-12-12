@@ -21,7 +21,7 @@ var KTTicket = function () {
             }
         };
 
-        dtStatus = $("#historyTable").DataTable({            
+        dtStatus = $("#historyTable").DataTable({    
             ajax: {
                 url: "/apps/helpdesk/api/ticket/statushistory",
                 data: {
@@ -86,7 +86,8 @@ var KTTicket = function () {
         $.fn.dataTable.ext.buttons.reload = {
             text: 'Reload',
             action: function ( e, dt, node, config ) {
-                dt.ajax.reload();
+                $("#ticketTable").DataTable().ajax.reload(null, false); 
+                console.log('ticketTable Reloaded');
             }
         };
         
@@ -101,6 +102,7 @@ var KTTicket = function () {
         }
 
         dtTicket = $("#ticketTable").DataTable({
+            scrollX: true,
             ajax: {
                 url: "/apps/helpdesk/api/ticket",
             },
@@ -154,46 +156,6 @@ var KTTicket = function () {
                         return isSupervisor ? statusBadge + ' ' + statusLink : statusBadge;
                     },
                 },
-                // {
-                //     targets: 10,
-                //     data: 'status',
-                //     render: function(data, type, row) {
-                //         var  statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' + row.id + '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
-
-                //         if(isSupervisor){
-                //             switch (data.toLowerCase()) {
-                //                 case 'open':
-                //                     return '<span class="badge badge-success">Open</span> ' + statusLink;
-                //                 case 'pending':
-                //                     return '<span class="badge badge-warning">Pending</span> ' + statusLink;
-                //                 case 'closed':
-                //                     return '<span class="badge badge-secondary">Closed</span> ' + statusLink;
-                //                 case 'resolved':
-                //                     return '<span class="badge badge-primary">Resolved</span> ' + statusLink;
-                //                 case 'in progress':
-                //                     return '<span class="badge badge-info">In Progress</span> ' + statusLink;
-                //                 default:
-                //                     return data;
-                //             }
-                //         }else{
-                //             switch (data.toLowerCase()) {
-                //                 case 'open':
-                //                     return '<span class="badge badge-success">Open</span> ';
-                //                 case 'pending':
-                //                     return '<span class="badge badge-warning">Pending</span> ';
-                //                 case 'closed':
-                //                     return '<span class="badge badge-secondary">Closed</span> ';
-                //                 case 'resolved':
-                //                     return '<span class="badge badge-primary">Resolved</span> ';
-                //                 case 'in progress':
-                //                     return '<span class="badge badge-info">In Progress</span> ';
-                //                 default:
-                //                     return data;
-                //             }
-                //         }
-                        
-                //     },
-                // },
                 {
                     targets: 12,
                     data: 'work_order', // Assuming the attribute is named 'work_order'
@@ -222,6 +184,7 @@ var KTTicket = function () {
             ],
             dom: 'Bfrtip',
             columnDefs: [
+                { responsivePriority: 1, targets: 1 },
                 {
                     targets: 3,
                     visible: false
@@ -230,6 +193,16 @@ var KTTicket = function () {
             buttons: dtButtons,
             
             // Use the passed data
+        });
+
+        // Show loader on Ajax start
+        $('#ticketTable').on('xhr.dt', function (e, settings, json, xhr) {
+            $('#loader').show();
+        });
+
+        // Hide loader on Ajax complete
+        $('#ticketTable').on('xhr.dt', function (e, settings, json, xhr) {
+            $('#loader').hide();
         });
 
         tableTicket = dtTicket.$;
@@ -873,6 +846,13 @@ var KTTicket = function () {
                             }
                         }
                     },
+                    'respond_date': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Respond Time is required'
+                            }
+                        }
+                    },
                     'sourcesReport': {
                         validators: {
                             notEmpty: {
@@ -954,6 +934,7 @@ var KTTicket = function () {
                             subject: $('#subject').val(),
                             description: $('#description').val(),
                             report_time: $('#report_time').val(),
+                            respond_date: $('#respond_date').val(),
                             reporter_name: $('#reporter-dropdown').val(),
                             origin_unit: $('#unit-dropdown').val(),
                             issue_category: issuecategoryOptions,
@@ -1083,6 +1064,12 @@ var KTTicket = function () {
     }
 
     $("#report_time").flatpickr({
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        maxDate: new Date(),
+    });
+
+    $("#respond_date").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),

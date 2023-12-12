@@ -16,7 +16,7 @@
         </div>
         <div id="kt_docs_card_ticket_list" class="collapse show">
             <div class="card-body">
-                <table id="ticketTable" class="display responsive nowrap table table-striped table-row-bordered gy-5 gs-7"
+                <table id="ticketTable" class="display nowrap table table-striped table-row-bordered gy-5 gs-7"
                     style="width:100%">
                     <thead>
                         <tr class="fw-semibold fs-6 text-gray-800">
@@ -35,6 +35,7 @@
                         </tr>
                     </thead>
                 </table>
+                <div id="loader" class="loader"></div>
             </div>
         </div>
     </div>
@@ -188,10 +189,9 @@
                             </div>
                             <!--end::Col-->
 
-                            {{--
                         <!--begin::Col-->
                         <div class="col-md-6 fv-row fv-plugins-icon-container">
-                            <label class="required fs-6 fw-semibold mb-2">Finish Time</label>
+                            <label class="required fs-6 fw-semibold mb-2">Response Time</label>
 
                             <!--begin::Input-->
                             <div class="position-relative d-flex align-items-center">
@@ -206,8 +206,7 @@
 
                                 <!--begin::Datepicker-->
                                 <input class="form-control form-control-solid ps-12 flatpickr-input"
-                                    placeholder="Select a date" name="finish_date" id="finish_date" type="text"
-                                    readonly="readonly">
+                                    placeholder="Select a date" name="respond_date" id="respond_date" type="text">
                                 <!--end::Datepicker-->
                             </div>
                             <!--end::Input-->
@@ -215,7 +214,7 @@
                                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                             </div>
                         </div>
-                        <!--end::Col--> --}}
+                        <!--end::Col-->
                         </div>
                         <!--end::Input group-->
 
@@ -262,7 +261,25 @@
 
     @push('styles')
         {{-- <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" rel="stylesheet">
-        <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet"> --}}
+        <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet"> 
+        --}}
+        <style>
+            .loader {
+                border: 4px solid rgba(0, 0, 0, 0.1);
+                border-radius: 50%;
+                border-top: 4px solid #3498db;
+                width: 20px;
+                height: 20px;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+        </style>
+        
     @endpush
     @push('scripts')
         {{-- <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>

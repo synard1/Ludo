@@ -314,6 +314,7 @@ class TicketController extends Controller
                 'description' => Uc($request->input('description')),
                 'reporter_name' => Uc($request->input('reporter_name')),
                 'report_time' => $request->input('report_time'),
+                'response_time' => $request->input('respond_date'),
                 'origin_unit' => $request->input('origin_unit'),
                 'issue_category' => $request->input('issue_category'),
                 'source_report' => $request->input('source_report'),
