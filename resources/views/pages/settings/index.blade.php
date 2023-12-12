@@ -223,7 +223,7 @@
                                                     class="form-check form-check-custom form-check-inline form-check-solid me-5">
                                                     <input class="form-check-input" name="communication[]"
                                                         type="checkbox" value="Email"
-                                                        {{ in_array('Email', $company->communication ?? []) ? 'checked' : '' }}
+                                                        {{ in_array('Email', json_decode($company->communication) ?? []) ? 'checked' : '' }}
                                                         >
                                                                                                                 <span class="fw-semibold ps-2 fs-6">
                                                         Email
@@ -236,7 +236,7 @@
                                                     class="form-check form-check-custom form-check-inline form-check-solid">
                                                     <input class="form-check-input" name="communication[]"
                                                         type="checkbox" value="Phone"
-                                                        {{ in_array('Phone', $company->communication ?? []) ? 'checked' : '' }}
+                                                        {{ in_array('Phone', json_decode($company->communication) ?? []) ? 'checked' : '' }}
                                                         >
                                                                                                                 <span class="fw-semibold ps-2 fs-6">
                                                         Phone

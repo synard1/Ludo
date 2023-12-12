@@ -4,6 +4,7 @@
 <head>
     <base href=""/>
     <title>{{ config('app.name', 'Laravel') }}</title>
+    {{-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' fonts.googleapis.com fonts.gstatic.com; font-src 'self' 'unsafe-inline' fonts.googleapis.com fonts.gstatic.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com fonts.gstatic.com; img-src 'self' 'unsafe-inline'"> --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="utf-8"/>
     <meta name="description" content=""/>

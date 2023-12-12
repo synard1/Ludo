@@ -180,7 +180,7 @@ class TicketController extends Controller
                 return response()->json(['data' => $formattedTickets]);
         } else {
             // Ticket not found
-            return response()->json(['tickets' => '']);
+            return response()->json(['data' => '']);
             // return response()->json(['message' => 'Ticket not found'], 404);
         }
     }

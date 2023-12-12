@@ -41,7 +41,7 @@
                     <!--begin::Logo-->
                     <a href="/" class="mb-12">
                         {{-- <img alt="Logo" src="{{ image('logos/custom-1.png') }}" class="h-60px h-lg-75px"/> --}}
-                        <img alt="Logo" src="{{ image('logos/ludo-white.svg') }}" class="h-60px h-lg-225px"/>
+                        <img alt="Logo" src="{{ image('logos/ludo-white.svg') }}" class="h-60px h-lg-65px"/>
                     </a>
                     <!--end::Logo-->
 
