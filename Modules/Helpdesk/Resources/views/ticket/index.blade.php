@@ -163,7 +163,18 @@
                         <div class="row g-9 mb-8">
                             <!--begin::Col-->
                             <div class="col-md-6 fv-row fv-plugins-icon-container">
-                                <label class="required fs-6 fw-semibold mb-2">Report Time</label>
+                                <!--begin::Label-->
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                                    <span class="required">Report Time</span>
+
+                                    <span class="m2-1" data-bs-toggle="tooltip"
+                                        title="User Report Time">
+                                        <i class="ki-duotone ki-information fs-7"><span
+                                                class="path1"></span><span class="path2"></span><span
+                                                class="path3"></span></i>
+                                    </span>
+                                </label>
+                                <!--end::Label-->
 
                                 <!--begin::Input-->
                                 <div class="position-relative d-flex align-items-center">
@@ -191,7 +202,18 @@
 
                         <!--begin::Col-->
                         <div class="col-md-6 fv-row fv-plugins-icon-container">
-                            <label class="required fs-6 fw-semibold mb-2">Response Time</label>
+                            <!--begin::Label-->
+                            <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                                <span class="required">Response Time</span>
+
+                                <span class="m2-1" data-bs-toggle="tooltip"
+                                    title="Staff Response Time">
+                                    <i class="ki-duotone ki-information fs-7"><span
+                                            class="path1"></span><span class="path2"></span><span
+                                            class="path3"></span></i>
+                                </span>
+                            </label>
+                            <!--end::Label-->
 
                             <!--begin::Input-->
                             <div class="position-relative d-flex align-items-center">

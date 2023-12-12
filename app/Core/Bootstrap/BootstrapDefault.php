@@ -7,10 +7,10 @@ class BootstrapDefault
     public function init()
     {
         // 1) Light sidebar layout (default.html)
-        $this->initLightSidebarLayout();
+        // $this->initLightSidebarLayout();
 
         // 2) Dark sidebar layout (default.html)
-        // $this->initDarkSidebarLayout();
+        $this->initDarkSidebarLayout();
 
         // 3) Dark header layout (default_header_layout.html)
         // $this->initDarkHeaderLayout();
@@ -28,6 +28,7 @@ class BootstrapDefault
         // addVendors(['datatables']);
 
         # Include global javascript files
+        addJavascriptFile('assets/js/custom/widgets.js');
         addJavascriptFile('assets/js/custom/account/settings/overview-account.js');
         // addJavascriptFile('assets/js/custom/apps/chat/chat.js');
         // addJavascriptFile('assets/js/custom/utilities/modals/upgrade-plan.js');

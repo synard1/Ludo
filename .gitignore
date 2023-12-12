@@ -6,6 +6,7 @@
 /public/storage
 /public/assets
 /public/mix-manifest.json
+/resources/_keenthemes/src/js/widgets/*
 /storage/*.key
 /stubs
 /vendor

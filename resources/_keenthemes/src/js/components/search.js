@@ -50,6 +50,7 @@ var KTSearch = function(element, options) {
         the.toggleElement = _getElement('toggle');   
         the.submitElement = _getElement('submit');
         the.toolbarElement = _getElement('toolbar');   
+        the.minLength = parseInt(_getOption('min-length'));
 
         the.resultsElement = _getElement('results');
         the.suggestionElement = _getElement('suggestion'); 
@@ -146,7 +147,7 @@ var KTSearch = function(element, options) {
     var _focus = function() {
         the.element.classList.add('focus');
 
-        if ( _getOption('show-on-focus') === true || the.inputElement.value.length >= minLength ) {
+        if ( _getOption('show-on-focus') === true || the.inputElement.value.length >= the.minLength ) {
             _show();
         }        
     }
@@ -170,9 +171,7 @@ var KTSearch = function(element, options) {
     // Input
     var _input = function() {
         if ( _getOption('min-length') )  {
-            var minLength = parseInt(_getOption('min-length'));
-
-            if ( the.inputElement.value.length >= minLength ) {
+            if ( the.inputElement.value.length >= the.minLength ) {
                 _search();
             } else if ( the.inputElement.value.length === 0 ) {
                 _clear();

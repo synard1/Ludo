@@ -270,44 +270,6 @@ class TicketController extends Controller
     public function saveTicket(Request $request)
     {
         $user = auth()->user();
-        $userId = $user->id;
-        $cid = $user->cid;
-
-        // $ticket = Ticket::create([
-        //     'user_id' => $userId,
-        //     'cid' => $cid,
-        //     'subject' => Uc($request->input('subject')),
-        //     'description' => Uc($request->input('description')),
-        //     'reporter_name' => Uc($request->input('reporter_name')),
-        //     'report_time' => $request->input('report_time'),
-        //     'origin_unit' => $request->input('origin_unit'),
-        //     'issue_category' => $request->input('issue_category'),
-        //     'source_report' => $request->input('source_report'),
-        //     'status' => 'Open',
-        // ]);
-
-        // $statusCheck = StatusHistory::where('cid',$cid)
-        //                             ->where('data_id',$ticket->id)
-        //                             ->first();
-        // if($statusCheck){
-
-        // }else{
-        //     // Create a new login log record
-        //     StatusHistory::create([
-        //         'user_id' => $user->id,
-        //         'cid' => $user->cid,
-        //         'data_id' => $ticket->id,
-        //         'name' => $ticket->subject,
-        //         'module' => 'Helpdesk',
-        //         'model' => 'Ticket',
-        //         'new_status' => $ticket->status,
-        //         'status' => 'Active',
-        //     ]);
-        // }
-
-        // // You can return a response, e.g., a success message
-        // return response()->json(['message' => 'Ticket saved or updated successfully']);
-
         try {
             $ticket = Ticket::create([
                 'subject' => Uc($request->input('subject')),
@@ -321,24 +283,16 @@ class TicketController extends Controller
                 'status' => 'Open',
             ]);
 
-            // $statusCheck = StatusHistory::where('cid',$cid)
-            //                             ->where('data_id',$ticket->id)
-            //                             ->first();
-            // if($statusCheck){
-
-            // }else{
-            //     // Create a new login log record
-            //     StatusHistory::create([
-            //         'user_id' => $user->id,
-            //         'cid' => $user->cid,
-            //         'data_id' => $ticket->id,
-            //         'name' => $ticket->subject,
-            //         'module' => 'Helpdesk',
-            //         'model' => 'Ticket',
-            //         'new_status' => $ticket->status,
-            //         'status' => 'Active',
-            //     ]);
-            // }
+            $statusHistory = StatusHistory::create([
+                'data_id' => $ticket->id,
+                'name' => Uc($ticket->subject),
+                'module' => 'Helpdesk',
+                'model' => 'Ticket',
+                'old_status' => '',
+                'new_status' => $ticket->status,
+                'status' => $ticket->status,
+                'reason' => 'Ticket Created',
+            ]);
 
             // You can return a response, e.g., a success message
             return response()->json(['message' => 'Ticket saved or updated successfully']);

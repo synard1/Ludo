@@ -50,8 +50,8 @@ var KTTicket = function () {
                     title: 'Created Date',
                     render: function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
-                            // Format the date as "YYYY-MM-DD HH:MM:SS"
-                            return data.toLocaleString();
+                            // Format the date using moment.js
+                            return moment(data).format('YYYY-MM-DD HH:mm:ss');
                         }
                         return data; // For sorting and other types
                     }
@@ -87,7 +87,7 @@ var KTTicket = function () {
             text: 'Reload',
             action: function ( e, dt, node, config ) {
                 $("#ticketTable").DataTable().ajax.reload(null, false); 
-                console.log('ticketTable Reloaded');
+                // console.log('ticketTable Reloaded');
             }
         };
         
