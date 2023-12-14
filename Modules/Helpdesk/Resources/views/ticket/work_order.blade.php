@@ -96,6 +96,7 @@
                     <div class="col-md-6 fv-row">
                         <label class="required fs-6 fw-semibold mb-2">Priority</label>
                         <select id="priority" name="priority" class="js-priority form-control" placeholder="Enter / Select Priority">
+                            <option value="" selected>-- Select Priority --</option>
                             @foreach ($priorities as $key => $value)
                                 <option value="{{ $key }}">{{ $value }}</option>
                             @endforeach
