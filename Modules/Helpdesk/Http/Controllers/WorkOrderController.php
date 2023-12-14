@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Models\SignaturePad;
 use App\Helpers\ModuleHelper;
+use App\Models\StatusHistory;
 
 class WorkOrderController extends Controller
 {
@@ -112,6 +113,8 @@ class WorkOrderController extends Controller
             'status' => 'Open',
             'ticket_details' => json_encode($ticket),
         ]);
+
+        
 
         $ticket2 = Ticket::where('id', $workorder->ticket_id)
                     ->update(['work_order_id' => $workorder->id,'priority' => $request->input('priority')]);
@@ -327,6 +330,19 @@ class WorkOrderController extends Controller
                 ]
             );
 
+            if($woResponse->isDirty('status')){
+                $statusHistory = StatusHistory::create([
+                    'data_id' => $ticket->id,
+                    'name' => Uc($ticket->subject),
+                    'module' => 'Helpdesk',
+                    'model' => 'WorkOrder',
+                    'old_status' => $ticket->status,
+                    'new_status' => $request->input('status'),
+                    'status' => $request->input('status'),
+                    'reason' => 'Update WO Response',
+                ]);
+            }
+
             // Update the work order with the response start and end time
             WorkOrder::where('id', $workorder->id)
                 ->update([
@@ -335,6 +351,12 @@ class WorkOrderController extends Controller
                     'status' => $woResponse->status,
                     'work_order_response' => $woResponse->id,
                 ]);
+
+            // Update the ticket with the new status
+            Ticket::where('id', $ticket->id)
+                    ->update([
+                        'status' => $request->input('status'),
+                    ]);
 
             // Commit the transaction
             DB::commit();

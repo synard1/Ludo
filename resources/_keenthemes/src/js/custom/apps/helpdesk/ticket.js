@@ -989,21 +989,38 @@ var KTTicket = function () {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
+        minDate: getSevenDaysAgo(),
     });
 
     $("#respond_date").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
+        minDate: getSevenDaysAgo(),
     });
 
+    // Flatpickr configuration
     $("#due_date").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
-        maxDate: new Date(),
+        maxDate: getLastDayOfMonth(),
+        minDate: getSevenDaysAgo(),
     });
 
-    
+    // Get the last day of the current month
+    function getLastDayOfMonth() {
+        var today = new Date();
+        var lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return lastDay;
+    }
+
+    // Get the date exactly 7 days ago
+    function getSevenDaysAgo() {
+        var today = new Date();
+        var sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        return sevenDaysAgo;
+    }
 
     // Initialize Select2 with tag support
     $('#staffSelect').select2({

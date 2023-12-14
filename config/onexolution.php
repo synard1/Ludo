@@ -175,6 +175,8 @@ return [
     */
     'system' => [
 
+        'app_name' => 'Ludo - Simplify IT Solution',
+
         'url' => '.ludo.my.id',
 
         'prefix_client' => 'c',
