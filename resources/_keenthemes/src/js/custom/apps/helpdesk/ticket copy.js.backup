@@ -17,7 +17,7 @@ var KTTicket = function () {
         $.fn.dataTable.ext.buttons.reload = {
             text: 'Reload',
             action: function ( e, dt, node, config ) {
-                $('#historyTable').DataTable().ajax.reload();
+                dt.ajax.reload();
             }
         };
 
@@ -76,11 +76,181 @@ var KTTicket = function () {
         
     }
 
+    // Private functions
+    var initDatatable = function() {
+        dtButtons = ['reload', 'print',
+        {
+            extend: 'colvis'
+        }];
+
+        $.fn.dataTable.ext.buttons.reload = {
+            text: 'Reload',
+            action: function ( e, dt, node, config ) {
+                $("#ticketTable").DataTable().ajax.reload(null, false); 
+                // console.log('ticketTable Reloaded');
+            }
+        };
+        
+        if (canCreateTicket) {
+            dtButtons.push({
+                text: 'New Ticket',
+                action: function(e, dt, node, config) {
+                    $('#kt_docs_card_ticket_list').collapse('hide');
+                    $('#kt_docs_card_ticket_new').collapse('show');
+                }
+            });
+        }
+
+        dtTicket = $("#ticketTable").DataTable({
+            scrollX: true,
+            ajax: {
+                url: "/apps/helpdesk/api/ticket",
+            },
+            columns: [{
+                    targets: 0,
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        // 'meta.row' contains the row number
+                        return meta.row + 1;
+                    },
+                },
+                {
+                    data: 'subject'
+                },
+                {
+                    data: 'user_name'
+                },
+                {
+                    data: 'description'
+                },
+                {
+                    data: 'origin_unit'
+                },
+                {
+                    data: 'source_report'
+                },
+                {
+                    data: 'priority'
+                },
+                {
+                    data: 'issue_category',
+                    render: function(data, type, row) {
+                        // Handle array values
+                        if (Array.isArray(data)) {
+                            return data.join(
+                            ', '); // Join array values with a comma and space
+                        }
+
+                        return data; // If not an array, return the original value
+                    }
+                },
+                {
+                    targets: 10,
+                    data: 'status',
+                    render: function(data, type, row) {
+                        // var isSupervisor = /* your logic to determine if the user is a supervisor */;
+                        var statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' + row.id + '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
+                
+                        var statusBadge = getStatusBadge(data);
+                
+                        return isSupervisor ? statusBadge + ' ' + statusLink : statusBadge;
+                    },
+                },
+                {
+                    targets: 12,
+                    data: 'work_order', // Assuming the attribute is named 'work_order'
+                    render: function(data, type, row) {
+                        if (data) {
+                            // If work_order exists, show "View" button
+                            return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' +
+                                row.work_order +
+                                '" target="_blank" class="text-info view-work-order" data-id="' +
+                                row.id + '">View</a></span>';
+                        } else {
+                            if (isSupervisor) {
+                                // If work_order does not exist, show "Generate Work Order" button
+                                return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' + row.id + '" data-report-time="' + row.report_time + '">Generate Work Order</a>';
+                            } else {
+                                return '<a href="#">N/A</a>';
+                            }
+                        }
+                    },
+                },
+                {
+                    class: 'text-end',
+                    orderable: false,
+                    data: 'actionButtons',
+                },
+            ],
+            dom: 'Bfrtip',
+            columnDefs: [
+                { responsivePriority: 1, targets: 1 },
+                {
+                    targets: 3,
+                    visible: false
+                }
+            ],
+            buttons: dtButtons,
+            
+            // Use the passed data
+        });
+
+        // Show loader on Ajax start
+        $('#ticketTable').on('xhr.dt', function (e, settings, json, xhr) {
+            $('#loader').show();
+        });
+
+        // Hide loader on Ajax complete
+        $('#ticketTable').on('xhr.dt', function (e, settings, json, xhr) {
+            $('#loader').hide();
+        });
+
+        tableTicket = dtTicket.$;
+        // Refresh the DataTable to reflect the changes
+        dtTicket.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
+
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        dtTicket.on('draw', function() {
+            handleDeleteRows();
+            KTMenu.init(); // reinit KTMenu instances
+        });
+
+        $('#ticketTable').on('click', '.status-history', function() {
+            var id = $(this).data('id');
+            initDatatableStatusHistory(id);
+        });
+
+        // Function to get the status badge
+        function getStatusBadge(status) {
+            var badgeColor = '';
+            switch (status.toLowerCase()) {
+                case 'open':
+                    badgeColor = 'success';
+                    break;
+                case 'pending':
+                    badgeColor = 'warning';
+                    break;
+                case 'closed':
+                    badgeColor = 'secondary';
+                    break;
+                case 'resolved':
+                    badgeColor = 'primary';
+                    break;
+                case 'in progress':
+                    badgeColor = 'info';
+                    break;
+                default:
+                    return status; // return original data if status is not recognized
+            }
+
+            return '<span class="badge badge-' + badgeColor + '">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
+        }
+    }
+
     // Delete ticket
     var handleDeleteRows = () => {
         // Select all delete buttons
         const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
-        // const deleteButtons = document.querySelector('#delete_row');
 
         deleteButtons.forEach(d => {
             // Delete button on click
@@ -290,7 +460,7 @@ var KTTicket = function () {
                                 // Enable button
                                 submitButtonWO.disabled = false;
 
-                                $('#tickets-table').DataTable().ajax.reload();
+                                $('#ticketTable').DataTable().ajax.reload();
 
                             });
                         },
@@ -331,7 +501,7 @@ var KTTicket = function () {
 
         
 
-        $('#tickets-table').on('click', '.generate-work-order', function() {
+        $('#ticketTable').on('click', '.generate-work-order', function() {
             var id = $(this).data('id');
             // Implement logic to handle "Generate Work Order" button click
             console.log('Generate work order for ID: ' + id);
@@ -460,7 +630,7 @@ var KTTicket = function () {
 
                                 formNotes.reset();
 
-                                $('#tickets-table').DataTable().ajax.reload();
+                                $('#ticketTable').DataTable().ajax.reload();
 
                             });
                         },
@@ -499,7 +669,7 @@ var KTTicket = function () {
             });
         });
 
-        $('#tickets-table').on('click', '.generate-notes', function() {
+        $('#ticketTable').on('click', '.generate-notes', function() {
             var id = $(this).data('id');
             // Implement logic to handle "Generate Notes" button click
             console.log('Generate Notes for ID: ' + id);
@@ -606,7 +776,7 @@ var KTTicket = function () {
 
                                 formStatus.reset();
 
-                                $('#tickets-table').DataTable().ajax.reload();
+                                $('#ticketTable').DataTable().ajax.reload();
 
                             });
                         },
@@ -645,99 +815,12 @@ var KTTicket = function () {
             });
         });
 
-        $('#tickets-table').on('click', '.status-change', function() {
+        $('#ticketTable').on('click', '.status-change', function() {
             var id = $(this).data('id');
             var status = $(this).data('status');
 
             $('#ticket_id').val(id);
             $('#old_status').val(status);
-        });
-
-        $('#tickets-table').on('click', '.delete-row', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            console.log('delete row click!');
-
-            // Select parent row
-            const parent = e.target.closest('tr');
-
-            // Get subject name
-            const ticketSubject = parent.querySelectorAll('td')[1].innerText;
-            const ticketId = $(this).data('id');
-            console.log(ticketId +' '+ ticketSubject);
-            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            Swal.fire({
-                icon: "warning",
-                html: `Are you sure you want to delete  <b>`+ ticketSubject +`</b> ?`,
-                showCancelButton: true,
-                buttonsStyling: false,
-                confirmButtonText: "Yes, delete!",
-                cancelButtonText: "No, cancel",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                    cancelButton: "btn fw-bold btn-active-light-primary"
-                }
-            }).then(function (result) {
-                if (result.value) {
-                    // Simulate delete request -- for demo purpose only
-                    Swal.fire({
-                        html: `Deleting  <b>`+ ticketSubject +`</b>`,
-                        icon: "info",
-                        buttonsStyling: false,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(function () {
-                        $.ajax({
-                            url: '/apps/helpdesk/api/deleteTicket/' + ticketId,
-                            type: 'DELETE',
-                            success: function(response) {
-                                // Refresh the DataTable or remove the row from the table
-                                // depending on your implementation
-                                swal.fire({
-                                    text: response.message,
-                                    icon: "success",
-                                    buttonsStyling: false,
-                                    confirmButtonText: "Ok, got it!",
-                                    customClass: {
-                                        confirmButton: "btn font-weight-bold btn-light-primary"
-                                    }
-                                }).then(function(){
-                                    $('#tickets-table').DataTable().ajax.reload();
-                                });
-                            },
-                            error: function (error) {
-                                let errorMessage = "Sorry, looks like there are some errors detected, please try again.";
-
-                                if (error.responseJSON && error.responseJSON.message) {
-                                    errorMessage = error.responseJSON.message;
-                                }
-
-                                Swal.fire({
-                                    text: errorMessage,
-                                    icon: "error",
-                                    buttonsStyling: false,
-                                    confirmButtonText: "Ok, got it!",
-                                    customClass: {
-                                        confirmButton: "btn btn-primary"
-                                    }
-                                });
-
-                                console.error('Error deleting ticket:', error);
-                            }
-                        });
-                    });
-                } else if (result.dismiss === 'cancel') {
-                    Swal.fire({
-                        html: `<b>`+ ticketSubject +`</b> was not deleted.`,
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    });
-                }
-            });
         });
 
     }
@@ -817,7 +900,7 @@ var KTTicket = function () {
             $('#kt_docs_card_ticket_new').collapse('hide');
             // Show kt_docs_card_ticket_list
             $('#kt_docs_card_ticket_list').collapse('show');
-            $("#tickets-table").DataTable().ajax.reload(null, false); 
+            dtTicket.ajax.reload();
         });
 
         // Handle form submit
@@ -928,12 +1011,7 @@ var KTTicket = function () {
         // Handle form close
         closeButtonHistory.addEventListener('click', function (e) {
             e.preventDefault();
-            $("#historyTable").DataTable().destroy();
-        });
-
-        $('#tickets-table').on('click', '.status-history', function() {
-            var id = $(this).data('id');
-            initDatatableStatusHistory(id);
+            dtStatus.destroy();
         });
 
         
@@ -1023,7 +1101,7 @@ var KTTicket = function () {
     return {
         // Initialization
         init: function () {
-            // initDatatable();
+            initDatatable();
             // initDatatableStatusHistory();
             handleDeleteRows();
             fetchStaffData();

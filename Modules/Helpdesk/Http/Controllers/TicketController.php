@@ -18,12 +18,38 @@ use App\Helpers\ModuleHelper;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
 
+use Modules\Helpdesk\Http\DataTables\TicketsDataTable;
+
 class TicketController extends Controller
 {
     /**
      * Display a listing of the resource.
      * @return Renderable
      */
+    public function newIndex(TicketsDataTable $dataTable)
+    {
+        $user = auth()->user();
+
+        addVendors(['datatables','tinymce']);
+        addJavascriptFile('assets/js/custom/apps/helpdesk/ticket.js');
+
+        $priorities = Config::get('onexolution.priorityWorkOrder');
+        $statusTicket = Config::get('onexolution.statusTicket');
+        // Retrieve distinct staff values from the database
+        $distinctStaff = User::distinct('name')
+                                    ->pluck('name')
+                                    ->where('user_cid',$user->cid)
+                                    ->filter()
+                                    ->map(function ($staff) {
+                                        // return json_decode($staff);
+                                        return $staff;
+                                    })->flatten()
+                                    ->unique()
+                                    ->values();
+
+        return $dataTable->render('helpdesk::ticket.newIndex',compact(['distinctStaff','priorities','statusTicket']));
+    }
+
     public function index()
     {
 
