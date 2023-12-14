@@ -199,13 +199,13 @@ var KTWorkorder = function () {
                             }
                         }
                     },
-                    'finish_date': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Finish Time is required'
-                            }
-                        }
-                    },
+                    // 'finish_date': {
+                    //     validators: {
+                    //         notEmpty: {
+                    //             message: 'Finish Time is required'
+                    //         }
+                    //     }
+                    // },
                     'status': {
                         validators: {
                             notEmpty: {

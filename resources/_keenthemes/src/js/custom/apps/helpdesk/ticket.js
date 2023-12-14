@@ -1075,11 +1075,19 @@ var KTTicket = function () {
         maxDate: new Date(),
     });
 
+    // Flatpickr configuration
     $("#due_date").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
-        maxDate: new Date(),
+        maxDate: getLastDayOfMonth(),
     });
+
+    // Get the last day of the current month
+    function getLastDayOfMonth() {
+        var today = new Date();
+        var lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return lastDay;
+    }
 
     
 
