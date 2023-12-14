@@ -116,15 +116,11 @@ class TicketsDataTable extends DataTable
             ->orderBy(3)
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
+                'scrollX'      =>  true,
                 'dom'          => 'Bfrtip',
-                'buttons'      => ['export', 'print', 'reload','myCustomAction'],
+                'buttons'      => ['export', 'print', 'reload'],
             ])
             ->drawCallback("function() {" . file_get_contents($modulePath.'Resources/views/ticket/_draw-scripts.js') . "}");
-    }
-
-    public function myCustomAction()
-    {
-        return 'aasdasd';
     }
 
     /**

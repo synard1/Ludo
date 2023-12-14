@@ -19,5 +19,16 @@
         </a>
     </div>
     <!--end::Menu item-->
+
+    <div class="separator mt-3 opacity-75"></div>
+
+    <!--begin::Menu item-->
+    <div class="menu-item px-2">
+        <a href="#" class="menu-link px-2 edit-workorder" data-id="{{ $ticket->work_order_id }}">
+            Edit Workorder
+        </a>
+    </div>
+    <!--end::Menu item-->
+
 </div>
 <!--end::Menu-->
