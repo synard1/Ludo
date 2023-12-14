@@ -58,7 +58,7 @@
 
                         <!--begin::Col-->
                         <div class="col-md-6 fv-row fv-plugins-icon-container">
-                            <label class="required fs-6 fw-semibold mb-2">Finish Time</label>
+                            <label class="fs-6 fw-semibold mb-2">Finish Time</label>
 
                             <!--begin::Input-->
                             <div class="position-relative d-flex align-items-center">
