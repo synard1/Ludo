@@ -329,25 +329,7 @@ var KTTicket = function () {
             });
         });
 
-        // Add a click event listener to the "New Ticket" button
-        newTicketButton.addEventListener('click', function (e) {
-            form = document.querySelector('#kt_new_ticket_form');
-            form.reset();
-            e.preventDefault();
-
-            // Change the title text when the button is clicked
-            ticketTitle.innerText = 'New Ticket';
-
-            // Find the input element by its id
-            var subjectInput = document.getElementById('subject');
-            subjectInput.removeAttribute('readonly');
-
-
-            // Close kt_docs_card_ticket_new
-            $('#kt_docs_card_ticket_new').collapse('show');
-            // Show kt_docs_card_ticket_list
-            $('#kt_docs_card_ticket_list').collapse('hide');
-        });
+        
 
         
 
@@ -1065,7 +1047,25 @@ var KTTicket = function () {
             initDatatableStatusHistory(id);
         });
 
-        
+        // Add a click event listener to the "New Ticket" button
+        newTicketButton.addEventListener('click', function (e) {
+            form = document.querySelector('#kt_new_ticket_form');
+            form.reset();
+            e.preventDefault();
+
+            // Change the title text when the button is clicked
+            ticketTitle.innerText = 'New Ticket';
+
+            // Find the input element by its id
+            var subjectInput = document.getElementById('subject');
+            subjectInput.removeAttribute('readonly');
+
+
+            // Close kt_docs_card_ticket_new
+            $('#kt_docs_card_ticket_new').collapse('show');
+            // Show kt_docs_card_ticket_list
+            $('#kt_docs_card_ticket_list').collapse('hide');
+        });
 
     }
 
