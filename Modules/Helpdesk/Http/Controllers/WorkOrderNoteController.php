@@ -71,25 +71,33 @@ class WorkOrderNoteController extends Controller
     {
         $user = auth()->user();
 
-        $ticket = Ticket::where('id', $request->input('ticket_id'))->first();
+        // $ticket = Ticket::where('id', $request->input('ticket_id'))->first();
+        //     $notes = WorkOrderNote::create([
+        //         'work_order_id' => $ticket->work_order_id,
+        //         'ticket_id' => $request->input('ticket_id'),
+        //         'response' => $request->input('notes'),
+        //         'issue_category' => $request->input('category'),
+        //     ]);
+    
+        //     // You can return a response, e.g., a success message
+        //     return response()->json(['message' => 'Notes saved or updated successfully']);
+        
+        try {
+            $ticket = Ticket::where('id', $request->input('ticket_id'))->first();
             $notes = WorkOrderNote::create([
                 'work_order_id' => $ticket->work_order_id,
                 'ticket_id' => $request->input('ticket_id'),
                 'response' => $request->input('notes'),
                 'issue_category' => $request->input('category'),
             ]);
-    
-            // You can return a response, e.g., a success message
-            return response()->json(['message' => 'Notes saved or updated successfully']);
 
-        try {
-            $ticket = Ticket::where('id', $request->input('ticket_id'))->first();
-            $notes = WorkOrderNote::create([
-                'work_order_id' => $ticket->work_order_id,
-                'ticket_id' => $request->input('ticket_id'),
-                'response' => $request->input('response'),
-                'issue_category' => $request->input('category'),
-            ]);
+            // Update the ticket with the new status
+            Ticket::where('id', $request->input('ticket_id'))
+                    ->update([
+                        'issue_category' => $request->input('category'),
+                        'work_order_note_id' => $notes->id,
+                        'notes' => $notes->response,
+                    ]);
     
             // You can return a response, e.g., a success message
             return response()->json(['message' => 'Notes saved or updated successfully']);

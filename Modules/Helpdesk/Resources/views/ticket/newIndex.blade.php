@@ -1,14 +1,8 @@
-@php
-
-    $canCreateTicket = auth()->check() && auth()->user()->level_access === 'Supervisor';
-    $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-
-@endphp
-
 <x-default-layout>
     <div class="card shadow-sm mb-5">
         <div class="card-header collapsible cursor-pointer rotate">
             <h3 class="card-title">Tickets List</h3>
+            @if($canCreateTicket)
             <div class="card-toolbar">
                 <!--begin::Menu-->
                 <button type="button" class="btn btn-primary" id="kt_new_ticket">
@@ -16,6 +10,7 @@
                 </button>
                 <!--end::Menu-->
             </div>
+            @endif
         </div>
         <div id="kt_docs_card_ticket_list" class="collapse show">
         <!--begin::Card body-->
@@ -30,7 +25,7 @@
     @if ($canCreateTicket)
         <div class="card shadow-sm mb-5">
             <div class="card-header collapsible cursor-pointer rotate">
-                <h3 class="card-title">New Ticket</h3>
+                <h3 class="card-title" id="ticketTitle">New Ticket</h3>
                 <div class="card-toolbar rotate-180">
                     <i class="ki-duotone ki-down fs-1"></i>
                 </div>
@@ -278,24 +273,6 @@
         // Pass data to JavaScript
         var canCreateTicket = @json($canCreateTicket);
         var isSupervisor = @json($isSupervisor);
-        let newTicketButton = document.querySelector('#kt_new_ticket');
-
-        // // Add a click event listener to the "Cancel" button
-        newTicketButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            // Close kt_docs_card_ticket_new
-            $('#kt_docs_card_ticket_new').collapse('show');
-            // Show kt_docs_card_ticket_list
-            $('#kt_docs_card_ticket_list').collapse('hide');
-        });
-
-        // $('#tickets-table').on('click', '.status-change', function() {
-        //     var id = $(this).data('id');
-        //     var status = $(this).data('status');
-
-        //     $('#ticket_id').val(id);
-        //     $('#old_status').val(status);
-        // });
     </script>
     @endpush
 

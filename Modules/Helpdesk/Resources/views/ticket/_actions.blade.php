@@ -6,7 +6,7 @@
 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4" data-kt-menu="true">
     <!--begin::Menu item-->
     <div class="menu-item px-3">
-        <a href="#" class="menu-link px-3 edit-row" data-kt-docs-table-filter="edit_row" data-id="{{ $ticket->id }}">
+        <a href="#" class="menu-link px-3 edit-ticket" data-id="{{ $ticket->id }}">
             Edit
         </a>
     </div>
@@ -21,14 +21,24 @@
     <!--end::Menu item-->
 
     <div class="separator mt-3 opacity-75"></div>
+    @if($isSupervisor && $ticket->status == 'Resolved' || $ticket->status == 'Closed')
+            <!--begin::Menu item-->
+            <div class="menu-item px-3">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order_note" class="menu-link px-3 generate-notes" data-kt-docs-table-filter="notes" data-id="{{ $ticket->id }}">
+                    Notes
+                </a>
+            </div>
+            <!--end::Menu item-->
+    @endif
 
-    <!--begin::Menu item-->
-    <div class="menu-item px-2">
-        <a href="#" class="menu-link px-2 edit-workorder" data-id="{{ $ticket->work_order_id }}">
-            Edit Workorder
+    {{-- <!--begin::Menu item-->
+    <div class="menu-item px-3">
+        <a href="#" class="menu-link px-3 edit-workorder" data-id="{{ $ticket->work_order_id }}">
+            Edit WO
         </a>
     </div>
-    <!--end::Menu item-->
+    <!--end::Menu item--> --}}
+
 
 </div>
 <!--end::Menu-->

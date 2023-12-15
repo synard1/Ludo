@@ -7,7 +7,6 @@ use Modules\Helpdesk\Entities\Ticket;
 
 class SourceReport extends Component
 {
-
     public $selectedSources;
     public $sourceReport;
 

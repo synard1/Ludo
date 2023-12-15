@@ -48,48 +48,93 @@ class TicketsDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        
-
         return (new EloquentDataTable($query))
             ->editColumn('work_order', function (Ticket $ticket) {
                 $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
 
-                if($ticket->work_order){
+                if ($ticket->work_order_id) {
                     return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' .
-                                $ticket->work_order .
-                                '" target="_blank" class="text-info view-work-order" data-id="' .
-                                $ticket->id . '">View</a></span>';
-
-                }else{
-                    if($isSupervisor){
-                        // If work_order does not exist, show "Generate Work Order" button
+                        $ticket->work_order_id .
+                        '" target="_blank" class="text-info view-work-order" data-id="' .
+                        $ticket->id . '">View</a></span>';
+                } else {
+                    if ($isSupervisor) {
                         return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
-                        $ticket->id . '" data-report-time="' . $ticket->report_time . '">Generate Work Order</a>';
-
+                            $ticket->id . '" data-report-time="' . $ticket->report_time . '">Generate Work Order</a>';
                     }
+
                     return '<a href="#">N/A</a>';
                 }
-
-                
             })
             ->editColumn('created_at', function (Ticket $ticket) {
                 return $ticket->created_at->format('d M Y, h:i a');
             })
             ->editColumn('status', function (Ticket $ticket) {
-                $statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' . $ticket->id . '" data-status="' . $ticket->status . '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' . $ticket->id . '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
+                $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+                $statusLink = $isSupervisor ?
+                    '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' . $ticket->id . '" data-status="' . $ticket->status . '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' . $ticket->id . '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>' :
+                    '';
 
-                $statusBadge = TicketsDataTable::getStatusBadge($ticket->status);
-                
-                return $statusBadge . ' ' . $statusLink;
-                // return $statusLink;
+                return TicketsDataTable::getStatusBadge($ticket->status) . ' ' . $statusLink;
             })
             ->addColumn('action', function (Ticket $ticket) {
-                // return '';
-                return view('helpdesk::ticket._actions', compact('ticket'));
+                $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+                return $isSupervisor ? view('helpdesk::ticket._actions', compact(['ticket','isSupervisor'])) : '';
             })
-            ->rawColumns(['status','work_order'])
+            ->rawColumns(['status', 'work_order'])
             ->setRowId('id');
     }
+
+    // public function dataTable(QueryBuilder $query): EloquentDataTable
+    // {
+    //     return (new EloquentDataTable($query))
+    //         ->editColumn('work_order', function (Ticket $ticket) {
+    //             $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+
+    //             if($ticket->work_order_id){
+    //                 return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' .
+    //                             $ticket->work_order_id .
+    //                             '" target="_blank" class="text-info view-work-order" data-id="' .
+    //                             $ticket->id . '">View</a></span>';
+
+    //             }else{
+    //                 if($isSupervisor){
+    //                     // If work_order does not exist, show "Generate Work Order" button
+    //                     return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
+    //                     $ticket->id . '" data-report-time="' . $ticket->report_time . '">Generate Work Order</a>';
+
+    //                 }
+    //                 return '<a href="#">N/A</a>';
+    //             }
+
+                
+    //         })
+    //         ->editColumn('created_at', function (Ticket $ticket) {
+    //             return $ticket->created_at->format('d M Y, h:i a');
+    //         })
+    //         ->editColumn('status', function (Ticket $ticket) {
+    //             $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+    //             $statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' . $ticket->id . '" data-status="' . $ticket->status . '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' . $ticket->id . '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
+
+    //             $statusBadge = TicketsDataTable::getStatusBadge($ticket->status);
+    //             if($isSupervisor){
+    //                 return $statusBadge . ' ' . $statusLink;
+    //             }else{
+    //                 return $statusBadge;
+    //             }
+                
+    //             })
+    //         ->addColumn('action', function (Ticket $ticket) {
+    //             $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+    //             if($isSupervisor){
+    //                 return view('helpdesk::ticket._actions', compact('ticket'));
+    //             }else{
+    //                 return '';
+    //             }
+    //         })
+    //         ->rawColumns(['status','work_order'])
+    //         ->setRowId('id');
+    // }
 
     
 
@@ -118,7 +163,7 @@ class TicketsDataTable extends DataTable
             ->parameters([
                 'scrollX'      =>  true,
                 'dom'          => 'Bfrtip',
-                'buttons'      => ['export', 'print', 'reload'],
+                'buttons'      => ['export', 'print', 'reload','colvis'],
             ])
             ->drawCallback("function() {" . file_get_contents($modulePath.'Resources/views/ticket/_draw-scripts.js') . "}");
     }
@@ -133,17 +178,19 @@ class TicketsDataTable extends DataTable
                     ->title('#')
                     ->render('meta.row + meta.settings._iDisplayStart + 1;')
                     ->width(50)
-                    ->controls(false)
+                    // ->controls(false)
                     ->orderable(false)
-                    ->searchable(false),
+                    ->searchable(false)
+                    ->printable(true),
             Column::make('subject')->title('Subject'),
-            Column::make('created_by')->title('Operator'),
-            Column::make('origin_unit')->title('Unit'),
-            Column::make('source_report')->title('Sources'),
-            Column::make('issue_category')->title('Category'),
+            Column::make('description')->title('Description')->visible(false),
+            Column::make('created_by')->title('Operator')->visible(false),
+            Column::make('origin_unit')->title('Unit')->visible(false),
+            Column::make('source_report')->title('Sources')->visible(false),
+            Column::make('issue_category')->title('Category')->visible(false),
             Column::make('priority')->title('Priority'),
             Column::make('status'),
-            Column::make('work_order')->title('Work Order'),
+            Column::make('work_order')->title('Work Order')->printable(false),
             Column::make('created_at')->title('Created Date'),
             Column::computed('action')
                 ->addClass('text-end')
@@ -159,6 +206,6 @@ class TicketsDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Tickets_' . date('YmdHis');
+        return 'Helpdesk_Tickets_' . date('YmdHis');
     }
 }
