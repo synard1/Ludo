@@ -24,7 +24,7 @@ Route::prefix('helpdesk')->group(function() {
 Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolution.route.middleware'))->group(function () {
 
     // Main Routes
-    Route::get('/ticket', [TicketController::class, 'index'])->name('tickets');
+    Route::get('/ticket', [TicketController::class, 'newIndex'])->name('tickets');
     Route::get('/workorder', [WorkOrderController::class, 'index'])->name('workorder');
     Route::get('/print/wo/{id}', [TicketController::class, 'woPrint'])->name('woPrint');
 

@@ -18,12 +18,41 @@ use App\Helpers\ModuleHelper;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
 
+use Modules\Helpdesk\Http\DataTables\TicketsDataTable;
+
 class TicketController extends Controller
 {
     /**
      * Display a listing of the resource.
      * @return Renderable
      */
+    public function newIndex(TicketsDataTable $dataTable)
+    {
+        $user = auth()->user();
+
+        addVendors(['datatables','tinymce']);
+        addJavascriptFile('assets/js/custom/apps/helpdesk/ticket.js');
+
+        $priorities = Config::get('onexolution.priorityWorkOrder');
+        $statusTicket = Config::get('onexolution.statusTicket');
+        // Retrieve distinct staff values from the database
+        $distinctStaff = User::distinct('name')
+                                    ->pluck('name')
+                                    ->where('user_cid',$user->cid)
+                                    ->filter()
+                                    ->map(function ($staff) {
+                                        // return json_decode($staff);
+                                        return $staff;
+                                    })->flatten()
+                                    ->unique()
+                                    ->values();
+
+        $canCreateTicket = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create ticket');
+        $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+
+        return $dataTable->render('helpdesk::ticket.newIndex',compact(['distinctStaff','priorities','statusTicket','canCreateTicket','isSupervisor']));
+    }
+
     public function index()
     {
 
@@ -36,6 +65,12 @@ class TicketController extends Controller
         $sourceReport = Ticket::distinct('source_report')
                                         ->where('user_cid',$cid)
                                         ->pluck('source_report')
+                                        ->filter()
+                                        ->toArray();
+
+        $reporterNames = Ticket::distinct('reporter_name')
+                                        ->where('user_cid',$cid)
+                                        ->pluck('reporter_name')
                                         ->filter()
                                         ->toArray();
 
@@ -70,7 +105,7 @@ class TicketController extends Controller
         $priorities = Config::get('onexolution.priorityWorkOrder');
         $statusTicket = Config::get('onexolution.statusTicket');
 
-        return view('helpdesk::ticket.index', compact(['sourceReport','distinctStaff', 'priorities', 'statusTicket']));
+        return view('helpdesk::ticket.index', compact(['sourceReport','distinctStaff','reporterNames', 'priorities', 'statusTicket']));
     }
 
     /**
@@ -151,6 +186,11 @@ class TicketController extends Controller
     {
         $user = auth()->user(); // Get the authenticated user's ID
         $cid = $user->cid; // Assuming 'cid' is provided in the request
+
+        if($request->input('ticket_id')){
+            $ticket = Ticket::where('id', $request->input('ticket_id'))->first();
+            return response()->json(['data' => $ticket]);
+        }
 
         // Retrieve the ticket data based on user_id and cid
         $tickets = Ticket::where('user_cid', $cid)->orderBy('created_at','desc')
@@ -271,28 +311,46 @@ class TicketController extends Controller
     {
         $user = auth()->user();
         try {
-            $ticket = Ticket::create([
-                'subject' => Uc($request->input('subject')),
-                'description' => Uc($request->input('description')),
-                'reporter_name' => Uc($request->input('reporter_name')),
-                'report_time' => $request->input('report_time'),
-                'response_time' => $request->input('respond_date'),
-                'origin_unit' => $request->input('origin_unit'),
-                'issue_category' => $request->input('issue_category'),
-                'source_report' => $request->input('source_report'),
-                'status' => 'Open',
-            ]);
 
-            $statusHistory = StatusHistory::create([
-                'data_id' => $ticket->id,
-                'name' => Uc($ticket->subject),
-                'module' => 'Helpdesk',
-                'model' => 'Ticket',
-                'old_status' => '',
-                'new_status' => $ticket->status,
-                'status' => $ticket->status,
-                'reason' => 'Ticket Created',
-            ]);
+            if($request->input('ticket_id')){
+                // Update the ticket with the new status
+                Ticket::where('id', $request->input('ticket_id'))
+                        ->update([
+                            'subject' => Uc($request->input('subject')),
+                            'description' => $request->input('description'),
+                            'reporter_name' => Uc($request->input('reporter-dropdown')),
+                            'report_time' => $request->input('report_time'),
+                            'response_time' => $request->input('respond_date'),
+                            'origin_unit' => $request->input('unit-dropdown'),
+                            'issue_category' => $request->input('issuecategory'),
+                            'source_report' => $request->input('sourcesReport'),
+                        ]);
+            }else{
+                $ticket = Ticket::create([
+                    'subject' => Uc($request->input('subject')),
+                    'description' => $request->input('description'),
+                    'reporter_name' => Uc($request->input('reporter-dropdown')),
+                    'report_time' => $request->input('report_time'),
+                    'response_time' => $request->input('respond_date'),
+                    'origin_unit' => $request->input('unit-dropdown'),
+                    'issue_category' => $request->input('issuecategory'),
+                    'source_report' => $request->input('sourcesReport'),
+                    'status' => 'Open',
+                ]);
+    
+                $statusHistory = StatusHistory::create([
+                    'data_id' => $ticket->id,
+                    'name' => Uc($ticket->subject),
+                    'module' => 'Helpdesk',
+                    'model' => 'Ticket',
+                    'old_status' => '',
+                    'new_status' => $ticket->status,
+                    'status' => $ticket->status,
+                    'reason' => 'Ticket Created',
+                ]);
+
+            }
+            
 
             // You can return a response, e.g., a success message
             return response()->json(['message' => 'Ticket saved or updated successfully']);

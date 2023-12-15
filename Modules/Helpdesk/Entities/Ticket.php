@@ -30,7 +30,9 @@ class Ticket extends Model
         'issue_category',
         'priority',
         'status',
-        'work_order_id'
+        'work_order_id',
+        'work_order_note_id',
+        'notes',
     ];
 
     protected $casts = [

@@ -3,11 +3,11 @@
 // Class definition
 var KTTicket = function () {
     // Shared variables
-    var tableTicket, tableStatus, ticketTitle;
+    var tableTicket, tableStatus;
     var dtTicket, dtStatus;
     var dtButtons;
     var form, formWO, formNotes, formStatus, formHistory;
-    var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus, closeButtonHistory, newTicketButton;
+    var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus, closeButtonHistory;
     var validator, validatorWO, validatorNotes, validatorStatus;
 
     // Private functions
@@ -17,7 +17,7 @@ var KTTicket = function () {
         $.fn.dataTable.ext.buttons.reload = {
             text: 'Reload',
             action: function ( e, dt, node, config ) {
-                $('#historyTable').DataTable().ajax.reload();
+                dt.ajax.reload();
             }
         };
 
@@ -76,11 +76,181 @@ var KTTicket = function () {
         
     }
 
+    // Private functions
+    var initDatatable = function() {
+        dtButtons = ['reload', 'print',
+        {
+            extend: 'colvis'
+        }];
+
+        $.fn.dataTable.ext.buttons.reload = {
+            text: 'Reload',
+            action: function ( e, dt, node, config ) {
+                $("#ticketTable").DataTable().ajax.reload(null, false); 
+                // console.log('ticketTable Reloaded');
+            }
+        };
+        
+        if (canCreateTicket) {
+            dtButtons.push({
+                text: 'New Ticket',
+                action: function(e, dt, node, config) {
+                    $('#kt_docs_card_ticket_list').collapse('hide');
+                    $('#kt_docs_card_ticket_new').collapse('show');
+                }
+            });
+        }
+
+        dtTicket = $("#ticketTable").DataTable({
+            scrollX: true,
+            ajax: {
+                url: "/apps/helpdesk/api/ticket",
+            },
+            columns: [{
+                    targets: 0,
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        // 'meta.row' contains the row number
+                        return meta.row + 1;
+                    },
+                },
+                {
+                    data: 'subject'
+                },
+                {
+                    data: 'user_name'
+                },
+                {
+                    data: 'description'
+                },
+                {
+                    data: 'origin_unit'
+                },
+                {
+                    data: 'source_report'
+                },
+                {
+                    data: 'priority'
+                },
+                {
+                    data: 'issue_category',
+                    render: function(data, type, row) {
+                        // Handle array values
+                        if (Array.isArray(data)) {
+                            return data.join(
+                            ', '); // Join array values with a comma and space
+                        }
+
+                        return data; // If not an array, return the original value
+                    }
+                },
+                {
+                    targets: 10,
+                    data: 'status',
+                    render: function(data, type, row) {
+                        // var isSupervisor = /* your logic to determine if the user is a supervisor */;
+                        var statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' + row.id + '" data-status="' + row.status + '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' + row.id + '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
+                
+                        var statusBadge = getStatusBadge(data);
+                
+                        return isSupervisor ? statusBadge + ' ' + statusLink : statusBadge;
+                    },
+                },
+                {
+                    targets: 12,
+                    data: 'work_order', // Assuming the attribute is named 'work_order'
+                    render: function(data, type, row) {
+                        if (data) {
+                            // If work_order exists, show "View" button
+                            return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' +
+                                row.work_order +
+                                '" target="_blank" class="text-info view-work-order" data-id="' +
+                                row.id + '">View</a></span>';
+                        } else {
+                            if (isSupervisor) {
+                                // If work_order does not exist, show "Generate Work Order" button
+                                return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' + row.id + '" data-report-time="' + row.report_time + '">Generate Work Order</a>';
+                            } else {
+                                return '<a href="#">N/A</a>';
+                            }
+                        }
+                    },
+                },
+                {
+                    class: 'text-end',
+                    orderable: false,
+                    data: 'actionButtons',
+                },
+            ],
+            dom: 'Bfrtip',
+            columnDefs: [
+                { responsivePriority: 1, targets: 1 },
+                {
+                    targets: 3,
+                    visible: false
+                }
+            ],
+            buttons: dtButtons,
+            
+            // Use the passed data
+        });
+
+        // Show loader on Ajax start
+        $('#ticketTable').on('xhr.dt', function (e, settings, json, xhr) {
+            $('#loader').show();
+        });
+
+        // Hide loader on Ajax complete
+        $('#ticketTable').on('xhr.dt', function (e, settings, json, xhr) {
+            $('#loader').hide();
+        });
+
+        tableTicket = dtTicket.$;
+        // Refresh the DataTable to reflect the changes
+        dtTicket.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
+
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        dtTicket.on('draw', function() {
+            handleDeleteRows();
+            KTMenu.init(); // reinit KTMenu instances
+        });
+
+        $('#ticketTable').on('click', '.status-history', function() {
+            var id = $(this).data('id');
+            initDatatableStatusHistory(id);
+        });
+
+        // Function to get the status badge
+        function getStatusBadge(status) {
+            var badgeColor = '';
+            switch (status.toLowerCase()) {
+                case 'open':
+                    badgeColor = 'success';
+                    break;
+                case 'pending':
+                    badgeColor = 'warning';
+                    break;
+                case 'closed':
+                    badgeColor = 'secondary';
+                    break;
+                case 'resolved':
+                    badgeColor = 'primary';
+                    break;
+                case 'in progress':
+                    badgeColor = 'info';
+                    break;
+                default:
+                    return status; // return original data if status is not recognized
+            }
+
+            return '<span class="badge badge-' + badgeColor + '">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
+        }
+    }
+
     // Delete ticket
     var handleDeleteRows = () => {
         // Select all delete buttons
         const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
-        // const deleteButtons = document.querySelector('#delete_row');
 
         deleteButtons.forEach(d => {
             // Delete button on click
@@ -93,7 +263,7 @@ var KTTicket = function () {
                 // Get subject name
                 const ticketSubject = parent.querySelectorAll('td')[1].innerText;
                 const ticketId = $(this).data('id');
-                // console.log(ticketId);
+                console.log(ticketId);
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
@@ -290,7 +460,7 @@ var KTTicket = function () {
                                 // Enable button
                                 submitButtonWO.disabled = false;
 
-                                $('#tickets-table').DataTable().ajax.reload();
+                                $('#ticketTable').DataTable().ajax.reload();
 
                             });
                         },
@@ -329,32 +499,12 @@ var KTTicket = function () {
             });
         });
 
-        // Add a click event listener to the "New Ticket" button
-        newTicketButton.addEventListener('click', function (e) {
-            form = document.querySelector('#kt_new_ticket_form');
-            form.reset();
-            e.preventDefault();
-
-            // Change the title text when the button is clicked
-            ticketTitle.innerText = 'New Ticket';
-
-            // Find the input element by its id
-            var subjectInput = document.getElementById('subject');
-            subjectInput.removeAttribute('readonly');
-
-
-            // Close kt_docs_card_ticket_new
-            $('#kt_docs_card_ticket_new').collapse('show');
-            // Show kt_docs_card_ticket_list
-            $('#kt_docs_card_ticket_list').collapse('hide');
-        });
-
         
 
-        $('#tickets-table').on('click', '.generate-work-order', function() {
+        $('#ticketTable').on('click', '.generate-work-order', function() {
             var id = $(this).data('id');
             // Implement logic to handle "Generate Work Order" button click
-            // console.log('Generate work order for ID: ' + id);
+            console.log('Generate work order for ID: ' + id);
             // Get the data-id attribute value from the clicked link
             var rowId = $(this).data('id');
 
@@ -480,7 +630,7 @@ var KTTicket = function () {
 
                                 formNotes.reset();
 
-                                $('#tickets-table').DataTable().ajax.reload();
+                                $('#ticketTable').DataTable().ajax.reload();
 
                             });
                         },
@@ -519,8 +669,19 @@ var KTTicket = function () {
             });
         });
 
-        
+        $('#ticketTable').on('click', '.generate-notes', function() {
+            var id = $(this).data('id');
+            // Implement logic to handle "Generate Notes" button click
+            console.log('Generate Notes for ID: ' + id);
+            // Get the data-id attribute value from the clicked link
+            var rowId = $(this).data('id');
+
+            // Assuming you want to set the data-id value to an input field in the modal form
+            $('#ticket_id').val(rowId);
+        });
+
     }
+
     // Handle form Work Order
     var handleFormStatus = function (e) {
         // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
@@ -615,7 +776,7 @@ var KTTicket = function () {
 
                                 formStatus.reset();
 
-                                $('#tickets-table').DataTable().ajax.reload();
+                                $('#ticketTable').DataTable().ajax.reload();
 
                             });
                         },
@@ -654,99 +815,12 @@ var KTTicket = function () {
             });
         });
 
-        $('#tickets-table').on('click', '.status-change', function() {
+        $('#ticketTable').on('click', '.status-change', function() {
             var id = $(this).data('id');
             var status = $(this).data('status');
 
             $('#ticket_id').val(id);
             $('#old_status').val(status);
-        });
-
-        $('#tickets-table').on('click', '.delete-row', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            // console.log('delete row click!');
-
-            // Select parent row
-            const parent = e.target.closest('tr');
-
-            // Get subject name
-            const ticketSubject = parent.querySelectorAll('td')[1].innerText;
-            const ticketId = $(this).data('id');
-            // console.log(ticketId +' '+ ticketSubject);
-            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            Swal.fire({
-                icon: "warning",
-                html: `Are you sure you want to delete  <b>`+ ticketSubject +`</b> ?`,
-                showCancelButton: true,
-                buttonsStyling: false,
-                confirmButtonText: "Yes, delete!",
-                cancelButtonText: "No, cancel",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                    cancelButton: "btn fw-bold btn-active-light-primary"
-                }
-            }).then(function (result) {
-                if (result.value) {
-                    // Simulate delete request -- for demo purpose only
-                    Swal.fire({
-                        html: `Deleting  <b>`+ ticketSubject +`</b>`,
-                        icon: "info",
-                        buttonsStyling: false,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(function () {
-                        $.ajax({
-                            url: '/apps/helpdesk/api/deleteTicket/' + ticketId,
-                            type: 'DELETE',
-                            success: function(response) {
-                                // Refresh the DataTable or remove the row from the table
-                                // depending on your implementation
-                                swal.fire({
-                                    text: response.message,
-                                    icon: "success",
-                                    buttonsStyling: false,
-                                    confirmButtonText: "Ok, got it!",
-                                    customClass: {
-                                        confirmButton: "btn font-weight-bold btn-light-primary"
-                                    }
-                                }).then(function(){
-                                    $('#tickets-table').DataTable().ajax.reload();
-                                });
-                            },
-                            error: function (error) {
-                                let errorMessage = "Sorry, looks like there are some errors detected, please try again.";
-
-                                if (error.responseJSON && error.responseJSON.message) {
-                                    errorMessage = error.responseJSON.message;
-                                }
-
-                                Swal.fire({
-                                    text: errorMessage,
-                                    icon: "error",
-                                    buttonsStyling: false,
-                                    confirmButtonText: "Ok, got it!",
-                                    customClass: {
-                                        confirmButton: "btn btn-primary"
-                                    }
-                                });
-
-                                console.error('Error deleting ticket:', error);
-                            }
-                        });
-                    });
-                } else if (result.dismiss === 'cancel') {
-                    Swal.fire({
-                        html: `<b>`+ ticketSubject +`</b> was not deleted.`,
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    });
-                }
-            });
         });
 
     }
@@ -826,7 +900,7 @@ var KTTicket = function () {
             $('#kt_docs_card_ticket_new').collapse('hide');
             // Show kt_docs_card_ticket_list
             $('#kt_docs_card_ticket_list').collapse('show');
-            $("#tickets-table").DataTable().ajax.reload(null, false); 
+            dtTicket.ajax.reload();
         });
 
         // Handle form submit
@@ -847,50 +921,27 @@ var KTTicket = function () {
                     // Disable button to avoid multiple click
                     submitButton.disabled = true;
 
-                    var formData = new FormData(document.getElementById('kt_new_ticket_form'));
-
-                    // Check if formData has the 'ticket_id' input
-                    if (formData.has('ticket_id')) {
-                        // console.log("FormData has 'ticket_id' input");
-                        // Get the selected issuecategory options
-                        var issuecategoryOptions = [];
-                        $("input[name='issuecategory[]']:checked").each(function () {
-                            issuecategoryOptions.push($(this).val());
-                        });
-                        
-                    } else {
-                        // console.log("FormData does not have 'ticket_id' input");
-
-                        // Get the selected issuecategory options
-                        var issuecategoryOptions = [];
-                        $("input[name='issuecategory[]']:checked").each(function () {
-                            issuecategoryOptions.push($(this).val());
-                        });
-                    }
-
-                    
-
-                    // Append issue_category to the formData
-                    // formData.append('issue_category', issuecategoryOptions);
+                    // Get the selected issuecategory options
+                    var issuecategoryOptions = [];
+                    $("input[name='issuecategory[]']:checked").each(function () {
+                        issuecategoryOptions.push($(this).val());
+                    });
 
                     $.ajax({
                         url: '/apps/helpdesk/api/ticket',
                         type: 'POST',
-                        data: formData,
-                        processData: false,  // Important: Don't process the data
-                        contentType: false,  // Important: Set content type to false
-                        // data: {
-                        //     subject: $('#subject').val(),
-                        //     description: $('#description').val(),
-                        //     report_time: $('#report_time').val(),
-                        //     respond_date: $('#respond_date').val(),
-                        //     reporter_name: $('#reporter-dropdown').val(),
-                        //     origin_unit: $('#unit-dropdown').val(),
-                        //     issue_category: issuecategoryOptions,
-                        //     source_report: $('#sourcesReport').val(),
-                        //     // Include other fields here
-                        //     // _token: '{{ csrf_token() }}', // CSRF token for Laravel
-                        // },
+                        data: {
+                            subject: $('#subject').val(),
+                            description: $('#description').val(),
+                            report_time: $('#report_time').val(),
+                            respond_date: $('#respond_date').val(),
+                            reporter_name: $('#reporter-dropdown').val(),
+                            origin_unit: $('#unit-dropdown').val(),
+                            issue_category: issuecategoryOptions,
+                            source_report: $('#sourcesReport').val(),
+                            // Include other fields here
+                            // _token: '{{ csrf_token() }}', // CSRF token for Laravel
+                        },
                         success: function (response) {
                             // alert(response.message);
                             // Hide loading indication
@@ -918,8 +969,7 @@ var KTTicket = function () {
                                 submitButton.disabled = false;
                                 $('#kt_docs_card_ticket_list').collapse('show');
                                 $('#kt_docs_card_ticket_new').collapse('hide');
-                                // dtTicket.ajax.reload();
-                                $('#tickets-table').DataTable().ajax.reload();
+                                dtTicket.ajax.reload();
                                 form.reset();
                             });
                         },
@@ -961,108 +1011,7 @@ var KTTicket = function () {
         // Handle form close
         closeButtonHistory.addEventListener('click', function (e) {
             e.preventDefault();
-            $("#historyTable").DataTable().destroy();
-        });
-
-        $('#tickets-table').on('click', '.edit-ticket', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-
-            // Change the title text when the button is clicked
-            ticketTitle.innerText = 'Edit Ticket';
-            // Select parent row
-            const parent = e.target.closest('tr');
-
-            // Get subject name
-            const ticketSubject = parent.querySelectorAll('td')[1].innerText;
-            const ticketId = $(this).data('id');
-            // console.log(ticketId +' '+ ticketSubject);
-
-            // Simulate delete request -- for demo purpose only
-            Swal.fire({
-                html: `Load Data <b>`+ ticketSubject +`</b>`,
-                icon: "info",
-                buttonsStyling: false,
-                showConfirmButton: false,
-                timer: 2000
-            }).then(function () {
-                // Close kt_docs_card_ticket_new
-                $('#kt_docs_card_ticket_new').collapse('show');
-                // Show kt_docs_card_ticket_list
-                $('#kt_docs_card_ticket_list').collapse('hide');
-
-                $.ajax({
-                    url: '/apps/helpdesk/api/ticket',
-                    type: 'GET',
-                    data: {
-                        ticket_id: ticketId,
-                    },
-                    success: function(response) {
-                        $('#subject').val(response.data.subject);
-                        $('#description').val(response.data.description);
-                        // $('#report_time').val(response.data.report_time);
-                        // $('#respond_date').val(response.data.response_time);
-
-                        // Find the input element by its id
-                        var subjectInput = document.getElementById('subject');
-                        subjectInput.setAttribute('readonly', true);
-
-                        // Format date and set values for report_time and respond_date
-                        $('#report_time').val(formatDateTime(response.data.report_time));
-                        $('#respond_date').val(formatDateTime(response.data.response_time));
-
-                        // Loop through the issue_category array and check the corresponding checkboxes
-                        // var categoryData = response.data.issue_category;
-                        response.data.issue_category.forEach(function(category) {
-                            $('input[name="issuecategory[]"][value="' + category + '"]').prop('checked', true);
-                        });
-
-
-                        // $('#unit-dropdown').val(response.data.origin_unit);
-
-                        // Auto-select the unit-dropdown based on response.data.origin_unit
-                        selectUnit(response.data.origin_unit);
-                        selectSource(response.data.source_report);
-                        selectReporter(response.data.reporter_name);
-
-                        // Create a new hidden input element
-                        var hiddenInput = document.createElement("input");
-                        hiddenInput.type = "hidden";
-                        hiddenInput.id = "ticket_id";
-                        hiddenInput.name = "ticket_id";
-                        hiddenInput.className = "form-control form-control-solid";
-                        hiddenInput.value = response.data.id;
-                        hiddenInput.readOnly = true;
-
-                        // Find the form by its id and append the hidden input to it
-                        document.getElementById("kt_new_ticket_form").appendChild(hiddenInput);
-                    },
-                    error: function (error) {
-                        let errorMessage = "Sorry, looks like there are some errors detected, please try again.";
-
-                        if (error.responseJSON && error.responseJSON.message) {
-                            errorMessage = error.responseJSON.message;
-                        }
-
-                        Swal.fire({
-                            text: errorMessage,
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        });
-
-                        console.error('Error deleting ticket:', error);
-                    }
-                });
-            });
-        });
-
-        $('#tickets-table').on('click', '.status-history', function() {
-            var id = $(this).data('id');
-            initDatatableStatusHistory(id);
+            dtStatus.destroy();
         });
 
         
@@ -1104,49 +1053,6 @@ var KTTicket = function () {
     }
 
 
-    var getTicket = function (id){
-        return new Promise(function(resolve, reject) {
-            try {
-                $.ajax({
-                    url: '/apps/helpdesk/api/ticket',
-                    type: 'GET',
-                    data: {
-                        ticket_id: id,
-                    },
-                    success: function(response) {
-                        resolve(response);
-                    },
-                    error: function (error) {
-                        reject(error);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    // Implement logic to handle "Generate Notes" button click
-    $('#tickets-table').on('click', '.generate-notes', function() {
-        var id = $(this).data('id');
-        getTicket(id)
-            .then(function(hasil) {
-                // console.log("Hasil:", hasil);
-
-                $('#notes').val(hasil.data.notes);
-
-                hasil.data.issue_category.forEach(function(category) {
-                    $('input[name="category[]"][value="' + category + '"]').prop('checked', true);
-                });
-            })
-            .catch(function(error) {
-                console.error("Error:", error);
-            });
-        
-        // Assuming you want to set the data-id value to an input field in the modal form
-        $('#ticket_id').val(id);
-        
-    });
 
     var isValidUrl = function(url) {
         try {
@@ -1157,66 +1063,25 @@ var KTTicket = function () {
         }
     }
 
-    
-
     $("#report_time").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
-        minDate: getSevenDaysAgo(),
     });
 
     $("#respond_date").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
-        minDate: getSevenDaysAgo(),
     });
 
-    // Flatpickr configuration
     $("#due_date").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
-        maxDate: getLastDayOfMonth(),
-        minDate: getSevenDaysAgo(),
+        maxDate: new Date(),
     });
 
-    // Function to format date and time (assuming response.data.report_time and response.data.response_time are in the format 'Y-m-d H:i:s')
-    function formatDateTime(dateTimeString) {
-        // return moment(dateTimeString, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm');
-        // Format the date using moment.js
-        return moment(dateTimeString).format('YYYY-MM-DD HH:mm:ss');
-    }
-
-    // Function to auto-select unit in dropdown
-    function selectUnit(selectedUnit) {
-        $('#unit-dropdown').val(selectedUnit).trigger('change'); // Assuming you are using a library like Select2 for the dropdown
-    }
-
-    // Function to auto-select unit in dropdown
-    function selectReporter(selectedUser) {
-        $('#reporter-dropdown').val(selectedUser).trigger('change'); // Assuming you are using a library like Select2 for the dropdown
-    }
-
-    // Function to auto-select unit in dropdown
-    function selectSource(selectedSource) {
-        $('#sourcesReport').val(selectedSource).trigger('change'); // Assuming you are using a library like Select2 for the dropdown
-    }
-
-    // Get the last day of the current month
-    function getLastDayOfMonth() {
-        var today = new Date();
-        var lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        return lastDay;
-    }
-
-    // Get the date exactly 7 days ago
-    function getSevenDaysAgo() {
-        var today = new Date();
-        var sevenDaysAgo = new Date(today);
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        return sevenDaysAgo;
-    }
+    
 
     // Initialize Select2 with tag support
     $('#staffSelect').select2({
@@ -1236,7 +1101,7 @@ var KTTicket = function () {
     return {
         // Initialization
         init: function () {
-            // initDatatable();
+            initDatatable();
             // initDatatableStatusHistory();
             handleDeleteRows();
             fetchStaffData();
@@ -1244,8 +1109,6 @@ var KTTicket = function () {
             form = document.querySelector('#kt_new_ticket_form');
             submitButton = document.querySelector('#kt_new_ticket_submit');
             xButton = document.querySelector('#kt_new_ticket_cancel');
-            newTicketButton = document.querySelector('#kt_new_ticket');
-            ticketTitle = document.getElementById('ticketTitle');
 
             formWO = document.querySelector('#kt_modal_new_work_order_form');
             submitButtonWO = document.querySelector('#kt_modal_new_work_order_submit');

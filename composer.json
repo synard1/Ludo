@@ -7,9 +7,12 @@
     "require": {
         "php": "^8.0.2",
         "aws/aws-sdk-php": "^3.293",
+        "barryvdh/laravel-snappy": "^1.0",
         "doctrine/dbal": "~3.5 || ~3.6.2",
         "geoip2/geoip2": "^2.13",
         "guzzlehttp/guzzle": "^7.2",
+        "h4cc/wkhtmltoimage-amd64": "0.12.x",
+        "h4cc/wkhtmltopdf-amd64": "0.12.x",
         "infyomlabs/adminlte-templates": "^6.0",
         "infyomlabs/generator-builder": "^1.0",
         "infyomlabs/laravel-generator": "^6.0",
