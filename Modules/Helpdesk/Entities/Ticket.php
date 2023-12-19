@@ -44,7 +44,7 @@ class Ticket extends Model
         'reporter_name' => 'string',
         'origin_unit' => 'string',
         'source_report' => 'string',
-        'issue_category' => 'string',
+        'issue_category' => 'array',
         'priority' => 'string',
         'status' => 'string',
         'work_order_id' => 'string',
@@ -81,6 +81,25 @@ class Ticket extends Model
         });
     }
 
+    public function scopeForUser($query)
+    {
+        if (auth()->user()->hasRole('Super Admin')) {
+            return $query; // No restriction for Super Admins
+        }
+
+        return $query->where('user_cid', auth()->user()->cid);
+    }
+
+    public function getAllForUser()
+    {
+        return $this->scopeForUser()->get();
+    }
+
+    public function getAll() // New method for Super Admins
+    {
+        return $this->get(); // No `user_cid` restriction
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -96,15 +115,15 @@ class Ticket extends Model
     //     return $this->belongsTo(WorkOrder::class);
     // }
 
-    public function setIssueCategoryAttribute($value)
-    {
-        $this->attributes['issue_category'] = json_encode($value);
-    }
+    // public function setIssueCategoryAttribute($value)
+    // {
+    //     $this->attributes['issue_category'] = json_encode($value);
+    // }
 
-    public function getIssueCategoryAttribute($value)
-    {
-        return json_decode($value, true);
-    }
+    // public function getIssueCategoryAttribute($value)
+    // {
+    //     return json_decode($value, true);
+    // }
 
     public function getUserNameAttribute()
     {

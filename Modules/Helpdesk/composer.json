@@ -17,7 +17,9 @@
     },
     "autoload": {
         "psr-4": {
+            "Database\\Seeders\\": "database/seeders/",
             "Modules\\Helpdesk\\": ""
+            
         }
     }
 }

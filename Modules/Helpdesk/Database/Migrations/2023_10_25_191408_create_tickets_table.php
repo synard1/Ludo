@@ -46,6 +46,12 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tickets');
+        // Schema::dropIfExists('work_order_notes', 'ifExists');
+        // Schema::dropIfExists('work_order_responses', 'ifExists');
+        // Schema::dropIfExists('work_orders', 'ifExists');
+        // Schema::dropIfExists('tickets', 'ifExists');
+        Schema::disableForeignKeyConstraints(); // Disable foreign key checks
+        Schema::dropIfExists('tickets'); // Drop the table
+        Schema::enableForeignKeyConstraints(); // Enable foreign key checks back
     }
 };

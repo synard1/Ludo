@@ -240,22 +240,6 @@
                         </div>
                         <!--end::Input group-->
 
-                        {{--
-                    <!--begin::Input group-->
-                    <div class="row mb-2">
-                        <div class="col">
-                            <label for="" class="form-label"><span class="required">Category:</span></label>
-                            <select class="form-select form-select-solid" id="category-dropdown"
-                                name="category-dropdown" data-control="select2" data-placeholder="Select an option">
-                                <option></option>
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!--end::Input group--> --}}
-
-
                     </div>
                     <!--end::Card body-->
 

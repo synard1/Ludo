@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('work_order_notes', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->uuid('ticket_id')->nullable();
+            $table->uuid('ticket_id');
             $table->uuid('work_order_id');
             $table->uuid('work_order_response_id')->nullable();
             $table->longText('response')->nullable();
@@ -39,6 +39,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('work_order_notes');
+        // Schema::dropIfExists('work_order_notes');
+        Schema::disableForeignKeyConstraints(); // Disable foreign key checks
+        Schema::dropIfExists('work_order_notes'); // Drop the table
+        Schema::enableForeignKeyConstraints(); // Enable foreign key checks back
     }
 };
