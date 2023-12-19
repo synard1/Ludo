@@ -25,6 +25,3 @@ php artisan make:migration add_image_path_and_logo_url_to_companies_table --tabl
 
 /opt/alt/php81/usr/bin/php artisan module:make-seed seed_fake_ticket_posts Helpdesk
 /opt/alt/php81/usr/bin/php artisan module:seed Helpdesk
-
-api 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
-
