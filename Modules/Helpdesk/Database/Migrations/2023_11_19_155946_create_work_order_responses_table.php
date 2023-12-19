@@ -47,6 +47,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('work_order_responses');
+        // Schema::dropIfExists('work_order_responses');
+        Schema::disableForeignKeyConstraints(); // Disable foreign key checks
+        Schema::dropIfExists('work_order_responses'); // Drop the table
+        Schema::enableForeignKeyConstraints(); // Enable foreign key checks back
     }
 };

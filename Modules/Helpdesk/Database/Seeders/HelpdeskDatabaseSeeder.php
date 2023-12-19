@@ -16,6 +16,10 @@ class HelpdeskDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
+        $this->call([
+            SeedFakeTicketPostsSeeder::class,
+        ]);
+
         // $this->call("OthersTableSeeder");
     }
 }

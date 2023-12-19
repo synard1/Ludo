@@ -141,7 +141,7 @@ class TicketsDataTable extends DataTable
     public function query(Ticket $model): QueryBuilder
     {
         // Get a new query builder instance
-        $query = $model->newQuery();
+        $query = $model->where('user_cid', auth()->user()->cid)->newQuery();
         return $query;
     }
 
