@@ -25,6 +25,7 @@ var KTWorkorder = function () {
             }
         };
 
+        
         dtWorkorder = $("#workOrderTable").DataTable({
             scrollX: true,
             ajax: {
@@ -233,7 +234,8 @@ var KTWorkorder = function () {
         cancelButton.addEventListener('click', function () {
             // Close the modal
             $('#kt_modal_work_order_response').modal('hide');
-            dtWorkorder.ajax.reload();
+            // dtWorkorder.ajax.reload();
+            $('#workOrders-table').DataTable().ajax.reload();
         });
 
         
@@ -309,7 +311,8 @@ var KTWorkorder = function () {
                                 // Enable button
                                 submitButton.disabled = false;
 
-                                dtWorkorder.ajax.reload();
+                                // dtWorkorder.ajax.reload();
+                                $('#workOrders-table').DataTable().ajax.reload();
 
                                 
                             });
@@ -485,7 +488,7 @@ var KTWorkorder = function () {
     return {
         // Initialization
         init: function () {
-            initDatatable();
+            // initDatatable();
             initEditor();
             // Elements
             form = document.querySelector('#kt_modal_work_order_response_form');

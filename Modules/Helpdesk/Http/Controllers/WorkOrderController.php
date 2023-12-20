@@ -16,12 +16,33 @@ use Illuminate\Support\Facades\DB;
 use App\Models\SignaturePad;
 use App\Helpers\ModuleHelper;
 use App\Models\StatusHistory;
+use Modules\Helpdesk\Http\DataTables\WorkOrdersDataTable;
 
 class WorkOrderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    public function newIndex(WorkOrdersDataTable $dataTable)
+    {
+        $user = auth()->user();
+
+        // addVendors(['datatables','tinymce','signpad']);
+        addVendors(['datatables','tinymce']);
+        addJavascriptFile('assets/js/custom/apps/helpdesk/workorder.js');
+        // Get the original status array
+        $statusWorkOrder = Config::get('onexolution.statusWorkOrder');
+        $canCreateWorkorder = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create workorder');
+        $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+
+        // Check if the member level is 'Staff'
+        if ($user->level_access === 'Staff') {
+            // Remove 'Cancel' and 'Closed' statuses
+            unset($statusWorkOrder['Cancel'], $statusWorkOrder['Closed']);
+        }
+        return $dataTable->render('helpdesk::workorder.newIndex',compact(['statusWorkOrder','canCreateWorkorder','isSupervisor']));
+    }
+
     public function index()
     {
         $user = auth()->user();
