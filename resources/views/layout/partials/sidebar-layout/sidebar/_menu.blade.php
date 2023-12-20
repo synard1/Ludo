@@ -280,6 +280,11 @@
 					<!--end:Menu item-->
 				</div>
 				<!--end:Menu sub-->
+				@if(App\Helpers\ModuleHelper::isModuleActive('Semver'))
+					@if(auth()->user()->can('access semver'))
+						@include('semver::layouts.partials.sidebar.menu')
+					@endif
+				@endif
 			</div>
 			<!--end:Menu item-->
 			@endif

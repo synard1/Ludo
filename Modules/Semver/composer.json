@@ -1,0 +1,31 @@
+{
+    "name": "ludo.my.id/semver",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mhd Iqbal Syahputra",
+            "email": "synard1@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Semver\\": "",
+            "Modules\\Semver\\App\\": "app/",
+            "Modules\\Semver\\Database\\Factories\\": "database/factories/",
+            "Modules\\Semver\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Semver\\Tests\\": "tests/"
+        }
+    }
+}
