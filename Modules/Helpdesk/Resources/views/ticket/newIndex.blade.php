@@ -90,7 +90,7 @@
 
                         <!--begin::Input group-->
                         <div class="row mb-4">
-                            <div class="col-12 fv-row">
+                            <div class="col-6 fv-row">
                                 <!-- Category -->
                                 <div class="mb-3">
                                     <label class="form-label required fw-semibold fs-6">Category</label>
@@ -129,7 +129,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-12 fv-row">
+                            <div class="col-6 fv-row">
                                 <!-- Source Report -->
                                 <div class="mb-3">
                                     <label class="form-label">Source Report:</label>
@@ -138,6 +138,28 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-4 fv-row">
+                                <!-- Category -->
+                                <div class="mb-3">
+                                    <label class="form-label required fw-semibold fs-6">KPI</label>
+                                    <div class="d-flex flex-row"> <!-- Use flex-row to align items horizontally -->
+                                        <!-- Option Yes -->
+                                        <div class="form-check me-3"> <!-- Add margin-right to create space between options -->
+                                            <input class="form-check-input" type="radio" id="countKpi" name="countKpi" value="1" checked>
+                                            <label class="form-check-label" for="countKpiYes">Yes</label>
+                                        </div>
+                            
+                                        <!-- Option No -->
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" id="countKpi" name="countKpi" value="0">
+                                            <label class="form-check-label" for="countKpiNo">No</label>
+                                        </div>
+                                    </div>
+                                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                </div>
+                            </div>
+                            
                         </div>
                         <!--end::Input group-->
 
