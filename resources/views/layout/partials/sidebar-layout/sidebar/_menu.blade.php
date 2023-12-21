@@ -239,7 +239,7 @@
 			@endif
 			@if(auth()->check() && auth()->user()->hasRole('Super Admin'))
 			<!--begin:Menu item-->
-			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('system.*') ? 'here show' : '' }}">
+			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('system.*') || request()->routeIs('semver.*') ? 'here show' : '' }}">
 				<!--begin:Menu link-->
 				<span class="menu-link">
 					<span class="menu-icon">{!! getIcon('abstract-28', 'fs-2') !!}</span>

@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Semver\Http\DataTables\VersionsDataTable;
+use Illuminate\Support\Facades\Config;
 
 class VersionController extends Controller
 {
@@ -16,11 +17,14 @@ class VersionController extends Controller
     public function index(VersionsDataTable $dataTable)
     {
         $user = auth()->user();
+        $status = Config::get('onexolution.semver.versionStatus');
+        $types = Config::get('onexolution.semver.versionType');
+
         addVendors(['datatables','tinymce']);
         $canCreateVersion = auth()->check() && auth()->user()->level_access === 'Super Admin' && $user->can('create version');
         $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
 
-        return $dataTable->render('semver::version.index',compact(['canCreateVersion','isSuperAdmin']));
+        return $dataTable->render('semver::version.index',compact(['canCreateVersion','isSuperAdmin','status','types']));
         // return view('semver::version.index');
     }
 
