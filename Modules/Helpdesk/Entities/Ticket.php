@@ -29,6 +29,7 @@ class Ticket extends Model
         'source_report',
         'issue_category',
         'priority',
+        'count_kpi',
         'status',
         'work_order_id',
         'work_order_note_id',

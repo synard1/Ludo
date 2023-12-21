@@ -69,6 +69,13 @@ class TicketsDataTable extends DataTable
             ->editColumn('created_at', function (Ticket $ticket) {
                 return $ticket->created_at->format('d M Y, h:i a');
             })
+            ->editColumn('count_kpi', function (Ticket $ticket) {
+                if($ticket->count_kpi){
+                    return 'Yes';
+                }else{
+                    return 'No';
+                }
+            })
             ->editColumn('status', function (Ticket $ticket) {
                 $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
                 $statusLink = $isSupervisor ?
@@ -158,7 +165,7 @@ class TicketsDataTable extends DataTable
             ->dom('Bfrtip')
             ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(3)
+            ->orderBy(10)
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
@@ -189,6 +196,7 @@ class TicketsDataTable extends DataTable
             Column::make('source_report')->title('Sources')->visible(false),
             Column::make('issue_category')->title('Category')->visible(false),
             Column::make('priority')->title('Priority'),
+            Column::make('count_kpi')->title('Include KPI')->visible(false),
             Column::make('status'),
             Column::make('work_order')->title('Work Order')->printable(false),
             Column::make('created_at')->title('Created Date'),

@@ -324,6 +324,7 @@ class TicketController extends Controller
                             'origin_unit' => $request->input('unit-dropdown'),
                             'issue_category' => $request->input('issuecategory'),
                             'source_report' => $request->input('sourcesReport'),
+                            'count_kpi' => $request->input('countKpi'),
                         ]);
             }else{
                 $ticket = Ticket::create([
@@ -335,6 +336,7 @@ class TicketController extends Controller
                     'origin_unit' => $request->input('unit-dropdown'),
                     'issue_category' => $request->input('issuecategory'),
                     'source_report' => $request->input('sourcesReport'),
+                    'count_kpi' => $request->input('countKpi'),
                     'status' => 'Open',
                 ]);
     
