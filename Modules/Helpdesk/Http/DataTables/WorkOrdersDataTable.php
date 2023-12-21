@@ -2,6 +2,7 @@
 
 namespace Modules\Helpdesk\Http\DataTables;
 
+use App\Models\Company;
 use Modules\Helpdesk\Entities\WorkOrder;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -73,6 +74,10 @@ class WorkOrdersDataTable extends DataTable
 
                 return $workOrder->subject . ' '. WorkOrdersDataTable::getStatusBadge($workOrder->priority);
             })
+            ->editColumn('user_cid', function (WorkOrder $workOrder, Company $company) {
+                $data = $company->where('cid',$workOrder->user_cid)->first();
+                return $data->name;
+            })
             ->addColumn('action', function (WorkOrder $workOrder) {
                 $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
 
@@ -92,12 +97,12 @@ class WorkOrdersDataTable extends DataTable
             // ->whereIn('staff', [$user->name])
             ->whereJsonContains('staff', $user->name)
             ->newQuery();
+        }elseif(auth()->user()->level_access == 'Super Admin'){
+            $query = $model->newQuery();
         }else{
             // Get a new query builder instance
             $query = $model->where('user_cid', $user->cid)->newQuery();
-
         }
-        
         
         return $query;
     }
@@ -147,6 +152,7 @@ class WorkOrdersDataTable extends DataTable
             // Column::make('priority')->title('Priority'),
             Column::make('status'),
             Column::make('created_at')->title('Created Date'),
+            Column::make('user_cid')->title('Company')->visible(false),
             Column::computed('action')
                 ->addClass('text-end')
                 ->exportable(false)
