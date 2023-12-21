@@ -3,6 +3,7 @@
 namespace Modules\Helpdesk\Http\DataTables;
 
 use Modules\Helpdesk\Entities\Ticket;
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -69,6 +70,10 @@ class TicketsDataTable extends DataTable
             ->editColumn('created_at', function (Ticket $ticket) {
                 return $ticket->created_at->format('d M Y, h:i a');
             })
+            ->editColumn('user_cid', function (Ticket $ticket, Company $company) {
+                $data = $company->where('cid',$ticket->user_cid)->first();
+                return $data->name;
+            })
             ->editColumn('count_kpi', function (Ticket $ticket) {
                 if($ticket->count_kpi){
                     return 'Yes';
@@ -92,63 +97,19 @@ class TicketsDataTable extends DataTable
             ->setRowId('id');
     }
 
-    // public function dataTable(QueryBuilder $query): EloquentDataTable
-    // {
-    //     return (new EloquentDataTable($query))
-    //         ->editColumn('work_order', function (Ticket $ticket) {
-    //             $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-
-    //             if($ticket->work_order_id){
-    //                 return '<span class="badge badge-primary"><a href="/apps/helpdesk/print/wo/' .
-    //                             $ticket->work_order_id .
-    //                             '" target="_blank" class="text-info view-work-order" data-id="' .
-    //                             $ticket->id . '">View</a></span>';
-
-    //             }else{
-    //                 if($isSupervisor){
-    //                     // If work_order does not exist, show "Generate Work Order" button
-    //                     return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
-    //                     $ticket->id . '" data-report-time="' . $ticket->report_time . '">Generate Work Order</a>';
-
-    //                 }
-    //                 return '<a href="#">N/A</a>';
-    //             }
-
-                
-    //         })
-    //         ->editColumn('created_at', function (Ticket $ticket) {
-    //             return $ticket->created_at->format('d M Y, h:i a');
-    //         })
-    //         ->editColumn('status', function (Ticket $ticket) {
-    //             $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-    //             $statusLink = '<a href="#" class="status-change" data-bs-toggle="modal" data-bs-target="#kt_modal_change_status" data-id="' . $ticket->id . '" data-status="' . $ticket->status . '"><i class="ki-duotone ki-pencil fs-5"><span class="path1"></span><span class="path2"></span></i></a> <a href="#" class="status-history" data-bs-toggle="modal" data-bs-target="#kt_modal_history_status" data-id="' . $ticket->id . '"><i class="ki-duotone ki-time fs-5"><span class="path1"></span><span class="path2"></span></i></a>';
-
-    //             $statusBadge = TicketsDataTable::getStatusBadge($ticket->status);
-    //             if($isSupervisor){
-    //                 return $statusBadge . ' ' . $statusLink;
-    //             }else{
-    //                 return $statusBadge;
-    //             }
-                
-    //             })
-    //         ->addColumn('action', function (Ticket $ticket) {
-    //             $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-    //             if($isSupervisor){
-    //                 return view('helpdesk::ticket._actions', compact('ticket'));
-    //             }else{
-    //                 return '';
-    //             }
-    //         })
-    //         ->rawColumns(['status','work_order'])
-    //         ->setRowId('id');
-    // }
-
-    
-
     public function query(Ticket $model): QueryBuilder
     {
         // Get a new query builder instance
-        $query = $model->where('user_cid', auth()->user()->cid)->newQuery();
+        $user = auth()->user();
+
+        if(!auth()->user()->level_access == 'Super Admin'){
+            $query = $model->where('user_cid', $user->cid)
+                            ->newQuery();
+        }else{
+            // Get a new query builder instance
+            $query = $model->newQuery();
+        }
+    
         return $query;
     }
 
@@ -165,7 +126,7 @@ class TicketsDataTable extends DataTable
             ->dom('Bfrtip')
             ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(10)
+            ->orderBy('11')
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
@@ -180,6 +141,15 @@ class TicketsDataTable extends DataTable
      */
     public function getColumns(): array
     {
+
+        // $user = auth()->user();
+
+        // if($user->level_access == 'Super Admin'){
+        //     $newcolumn = Column::make('user_cid')->title('Company');
+        // }else{
+        //     $newcolumn = '';
+        // }
+
         return [
             Column::make('row_number')
                     ->title('#')
@@ -200,6 +170,7 @@ class TicketsDataTable extends DataTable
             Column::make('status'),
             Column::make('work_order')->title('Work Order')->printable(false),
             Column::make('created_at')->title('Created Date'),
+            Column::make('user_cid')->title('Company')->visible(false),
             Column::computed('action')
                 ->addClass('text-end')
                 ->exportable(false)

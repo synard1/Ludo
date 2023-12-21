@@ -25,7 +25,7 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
 
     // Main Routes
     Route::get('/ticket', [TicketController::class, 'newIndex'])->name('tickets');
-    Route::get('/workorder1', [WorkOrderController::class, 'index'])->name('workorder1');
+    // Route::get('/workorder1', [WorkOrderController::class, 'index'])->name('workorder1');
     Route::get('/workorder', [WorkOrderController::class, 'newIndex'])->name('workorder');
     Route::get('/print/wo/{id}', [TicketController::class, 'woPrint'])->name('woPrint');
 
