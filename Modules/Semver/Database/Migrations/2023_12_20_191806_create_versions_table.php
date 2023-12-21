@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('versions', function (Blueprint $table) {
+        Schema::create('semver_versions', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
             $table->integer('major')->nullable();
             $table->integer('minor')->nullable();
             $table->integer('patch')->nullable();
             $table->datetime('release_date')->nullable();
+            $table->string('subject')->nullable();
             $table->longText('description')->nullable();
             $table->string('status');
 
@@ -35,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('versions');
+        Schema::dropIfExists('semver_versions');
     }
 };

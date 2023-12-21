@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('changelogs', function (Blueprint $table) {
+        Schema::create('semver_changelogs', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->uuid('version_id')->after('id');
-            $table->foreign('version_id')->references('id')->on('versions');
+            $table->uuid('version_id');
+            $table->foreign('version_id')->references('id')->on('semver_versions');
             $table->string('type')->nullable();
             $table->longText('description')->nullable();
             $table->string('status');
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('changelogs');
+        Schema::dropIfExists('semver_changelogs');
     }
 };

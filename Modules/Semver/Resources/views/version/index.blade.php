@@ -2,8 +2,17 @@
     <div class="card shadow-sm mb-5">
         <div class="card-header collapsible cursor-pointer rotate">
             <h3 class="card-title">Version History</h3>
+            @if($canCreateVersion)
+            <div class="card-toolbar">
+                <!--begin::Menu-->
+                <button type="button" class="btn btn-primary" id="kt_new_version">
+                    <i class="ki-duotone ki-plus fs-2"></i> New Version
+                </button>
+                <!--end::Menu-->
+            </div>
+            @endif
         </div>
-        <div id="kt_docs_card_ticket_list" class="collapse show">
+        <div id="kt_docs_card_version_list" class="collapse show">
         <!--begin::Card body-->
         <div class="card-body py-4">
             <!--begin::Table-->

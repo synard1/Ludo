@@ -6,15 +6,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\Semver\Http\DataTables\VersionsDataTable;
 
 class VersionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(VersionsDataTable $dataTable)
     {
-        return view('semver::version.index');
+        $user = auth()->user();
+        addVendors(['datatables','tinymce']);
+        $canCreateVersion = auth()->check() && auth()->user()->level_access === 'Super Admin' && $user->can('create version');
+        $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
+
+        return $dataTable->render('semver::version.index',compact(['canCreateVersion','isSuperAdmin']));
+        // return view('semver::version.index');
     }
 
     /**
