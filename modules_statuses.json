@@ -7,5 +7,6 @@
     "Helpdesk": true,
     "UserSign": false,
     "UserMedia": false,
-    "FeedbackPortal": true
+    "FeedbackPortal": true,
+    "Semver": true
 }

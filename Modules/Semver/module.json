@@ -1,0 +1,11 @@
+{
+    "name": "Semver",
+    "alias": "semver",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Semver\\Providers\\SemverServiceProvider"
+    ],
+    "files": []
+}

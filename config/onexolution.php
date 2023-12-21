@@ -184,7 +184,36 @@ return [
         'dev_disk' => 'contabo', // set system disk in filesystem.php
         
         'prod_disk' => 'contabo', // set system disk in filesystem.php
+    ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Semver modules settings
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+    'semver' => [
+
+        'versionStatus' => [
+            'In Progress' => 'In Progress',
+            'Pending' => 'Pending',
+            'Release' => 'Release',
+            'Planning' => 'Planning',
+            'Cancel' => 'Cancel',
+        ],
+
+        'versionType' => [
+            'Major' => 'Major',
+            'Minor' => 'Minor',
+            'Patch' => 'Patch',
+        ],
+
+        'version' => [
+            'major' => '1',
+            'minor' => '1',
+            'patch' => '0',
+        ],
 
     ],
 ];
