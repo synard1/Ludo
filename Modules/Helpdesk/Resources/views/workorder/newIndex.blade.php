@@ -55,13 +55,15 @@
         $("#start_date").flatpickr({
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            minDate:reportTime
+            minDate:reportTime,
+            minuteIncrement: 1
         });
 
         $("#finish_date").flatpickr({
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            minDate:reportTime
+            minDate:reportTime,
+            minuteIncrement: 1
         });
 
         function getWoResponse(id) {

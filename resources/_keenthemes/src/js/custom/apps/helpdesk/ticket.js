@@ -1164,6 +1164,7 @@ var KTTicket = function () {
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
         minDate: getSevenDaysAgo(),
+        minuteIncrement: 1
     });
 
     $("#respond_date").flatpickr({
@@ -1171,6 +1172,7 @@ var KTTicket = function () {
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
         minDate: getSevenDaysAgo(),
+        minuteIncrement: 1
     });
 
     // Flatpickr configuration
@@ -1179,6 +1181,7 @@ var KTTicket = function () {
         dateFormat: "Y-m-d H:i",
         maxDate: getLastDayOfMonth(),
         minDate: getSevenDaysAgo(),
+        minuteIncrement: 1
     });
 
     // Function to format date and time (assuming response.data.report_time and response.data.response_time are in the format 'Y-m-d H:i:s')
