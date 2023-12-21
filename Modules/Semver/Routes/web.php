@@ -27,11 +27,12 @@ Route::prefix('apps/semver')->name('semver.')->middleware(config('onexolution.ro
     Route::get('/changelog', [ChangelogController::class, 'index'])->name('changelog.index');
 
     // API
-    // Route::prefix('api')->name('api.')->group(function () {
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::post('/version', [VersionController::class, 'saveVersion'])->name('postVersion');
     //     Route::get('/ticket', [TicketController::class, 'getTicketData'])->name('getTicket');
     //     Route::get('/ticket/statushistory', [TicketController::class, 'getStatusHistory'])->name('getStatusHistory');
     //     Route::post('/ticket/status', [TicketController::class, 'saveStatus'])->name('postStatus');
-    //     Route::post('/ticket', [TicketController::class, 'saveTicket'])->name('postTicket');
+
     //     Route::delete('/deleteTicket/{id}', [TicketController::class, 'deleteTicket'])->name('deleteTicket');
     //     Route::get('/woresponse/{id}', [WorkOrderResponseController::class, 'getData'])->name('getWoResponse');
     //     Route::get('/workorder/staff', [WorkOrderController::class, 'getWorkOrderStaff'])->name('getWorkOrderStaff');
@@ -42,6 +43,6 @@ Route::prefix('apps/semver')->name('semver.')->middleware(config('onexolution.ro
     //     Route::post('/workorder', [WorkOrderController::class, 'saveWorkOrder'])->name('postWorkOrder');
     //     Route::delete('/deleteWorkOrder/{id}', [WorkOrderController::class, 'deleteWorkOrder'])->name('deleteWorkOrder');
 
-    // });
+    });
 
 });

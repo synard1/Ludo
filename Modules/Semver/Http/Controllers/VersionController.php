@@ -21,6 +21,8 @@ class VersionController extends Controller
         $types = Config::get('onexolution.semver.versionType');
 
         addVendors(['datatables','tinymce']);
+        addJavascriptFile('assets/js/custom/settings/semver/version.js');
+
         $canCreateVersion = auth()->check() && auth()->user()->level_access === 'Super Admin' && $user->can('create version');
         $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
 

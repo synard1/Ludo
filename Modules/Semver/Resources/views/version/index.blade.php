@@ -74,11 +74,46 @@
 
                         <!--begin::Input group-->
                         <div class="row g-9 mb-8">
+                            
+
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="required fs-6 fw-semibold mb-2">Status</label>
+                                <select id="status" name="status" class="js-status form-control" placeholder="Enter / Select Status">
+                                    <option value="" selected>-- Select Status --</option>
+                                    @foreach ($status as $key => $value)
+                                        <option value="{{ $key }}">{{ $value }}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                            <!--end::Col-->
+
+                            <div class="col-6 fv-row">
+                                <!-- Source Report -->
+                                <div class="mb-3">
+                                    <label class="form-label">Release Type:</label>
+                                    <div class="input-group">
+                                        <select id="type" name="type" class="js-select2 form-control">
+                                            <option value="">Select Release Type</option>
+                                            @foreach ($types as $type)
+                                                <option value="{{ $type }}">{{ $type }}</option>
+                                            @endforeach
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!--end::Input group-->
+
+                        <!--begin::Input group-->
+                        <div class="row g-9 mb-8">
                             <!--begin::Col-->
                             <div class="col-md-6 fv-row fv-plugins-icon-container">
                                 <!--begin::Label-->
                                 <label class="col-lg-4 col-form-label fw-semibold fs-6">
-                                    <span class="required">Release Data</span>
+                                    <span class="required">Release Date</span>
 
                                     <span class="m2-1" data-bs-toggle="tooltip"
                                         title="User Report Time">
@@ -112,39 +147,6 @@
                                 </div>
                             </div>
                             <!--end::Col-->
-
-                            <div class="col-6 fv-row">
-                                <!-- Source Report -->
-                                <div class="mb-3">
-                                    <label class="form-label">Release Type:</label>
-                                    <div class="input-group">
-                                        <select id="sourcesReport" name="sourcesReport" class="js-select2 form-control">
-                                            <option value="">Select Release Type</option>
-                                            @foreach ($types as $type)
-                                                <option value="{{ $type }}">{{ $type }}</option>
-                                            @endforeach
-                                    </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Input group-->
-                        <div class="row g-9 mb-8">
-                            <!--begin::Col-->
-                            <div class="col-md-6 fv-row">
-                                <label class="required fs-6 fw-semibold mb-2">Status</label>
-                                <select id="priority" name="priority" class="js-priority form-control" placeholder="Enter / Select Status">
-                                    <option value="" selected>-- Select Status --</option>
-                                    @foreach ($status as $key => $value)
-                                        <option value="{{ $key }}">{{ $value }}</option>
-                                    @endforeach
-                                </select>
-
-                            </div>
-                            <!--end::Col-->
                         </div>
                         <!--end::Input group-->
 
@@ -173,42 +175,6 @@
     <script src="https://cdn.datatables.net/buttons/1.0.3/js/dataTables.buttons.min.js"></script>
     <script src="/vendor/datatables/buttons.server-side.js"></script>
     {{ $dataTable->scripts() }}
-
-    <script>
-        var newVersionButton = document.querySelector('#kt_new_version');
-        var xButton = document.querySelector('#kt_new_version_cancel');
-
-        // Add a click event listener to the "New Ticket" button
-        newVersionButton.addEventListener('click', function (e) {
-            form = document.querySelector('#kt_new_version_form');
-            form.reset();
-            e.preventDefault();
-
-            // Change the title text when the button is clicked
-            versionTitle.innerText = 'New Version';
-
-            // Find the input element by its id
-            var subjectInput = document.getElementById('subject');
-            subjectInput.removeAttribute('readonly');
-
-
-            // Close kt_docs_card_version_new
-            $('#kt_docs_card_version_new').collapse('show');
-            // Show kt_docs_card_version_list
-            $('#kt_docs_card_version_list').collapse('hide');
-        });
-
-        // // Add a click event listener to the "Cancel" button
-        xButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            form.reset();
-            // Close kt_docs_card_version_new
-            $('#kt_docs_card_version_new').collapse('hide');
-            // Show kt_docs_card_version_list
-            $('#kt_docs_card_version_list').collapse('show');
-            $("#versions-table").DataTable().ajax.reload(null, false); 
-        });
-    </script>
     @endpush
 
 </x-default-layout>
