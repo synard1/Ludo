@@ -53,20 +53,21 @@
 
             fetch(`/apps/dashboard/api/fetch-data/AverageTimeBySourceReport?month=${selectedMonth}&year=${selectedYear}`)
                 .then(response => response.json())
-                .then(data => {
-                    updateChart(data);
+                .then(tickets => {
+                    updateChart(tickets);
                 });
         }
 
-        function updateChart(data) {
+        function updateChart(tickets) {
             var ctx = document.getElementById('myChart').getContext('2d');
 
             var chartData = {
-                labels: data.map(entry => entry.source_report),
+                labels: tickets.map(entry => entry.source_report),
                 datasets: [{
                     label: 'Average Time (minutes)',
-                    data: data.map(entry => Math.min(entry.avg_time, 60)), // Set max value to 60 minutes
-                    backgroundColor: data.map(entry => entry.avg_time > 60 ? 'red' : 'blue'), // Set color to red if > 60 minutes
+                    data: tickets.map(entry => Math.min(entry.avg_time)), // Set max value to 60 minutes
+                    // data: tickets.map(entry => Math.min(entry.avg_time, 60)), // Set max value to 60 minutes
+                    backgroundColor: tickets.map(entry => entry.avg_time > 60 ? 'red' : 'blue'), // Set color to red if > 60 minutes
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }]

@@ -23,19 +23,29 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         if($user){
-            // return view('dashboard::index');
-        $firstDayOfMonth = Carbon::now()->startOfMonth();
-        $lastDayOfMonth = Carbon::now()->endOfMonth();
+            $firstDayOfMonth = Carbon::now()->startOfMonth();
+            $lastDayOfMonth = Carbon::now()->endOfMonth();
+
+        // Split Env local data
+        if (isLocal()) {
+            // Code for local environment
+            $workOrders = WorkOrder::where('status','Resolved')->get();
+            $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
+                            ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
+                            ->groupBy('source_report')
+                            ->get();
+        }else{
+            $workOrders = WorkOrder::where('user_cid',$user->cid)->where('status','Resolved')->get();
+            $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
+                            ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
+                            ->where('user_cid',$user->cid)
+                            ->groupBy('source_report')
+                            ->get();
+        } 
+        // return view('dashboard::index');
+        
 
         $months = Config::get('onexolution.months');
-
-        $data = Ticket::selectRaw('source_report, AVG(TIMESTAMPDIFF(MINUTE, response_time, report_time)) as avg_time')
-            ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
-            ->groupBy('source_report')
-            ->get();
-
-        $workOrders = WorkOrder::where('user_cid',$user->cid)->get();
-
             $staffTimes = [];
 
             foreach ($workOrders as $workOrder) {
@@ -65,7 +75,7 @@ class DashboardController extends Controller
         //     ->groupBy('staff')
         //     ->get();
 
-        return view('dashboard::index', compact(['data','months','avgTimes']));
+        return view('dashboard::index', compact(['tickets','months','avgTimes']));
         }else{
 
         }
@@ -141,7 +151,7 @@ class DashboardController extends Controller
 
         $months = Config::get('onexolution.months');
 
-        $data = Ticket::selectRaw('source_report, AVG(TIMESTAMPDIFF(MINUTE, response_time, report_time)) as avg_time')
+        $data = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
             ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
             ->groupBy('source_report')
             ->get();
@@ -153,13 +163,26 @@ class DashboardController extends Controller
     {
         $selectedMonth = $request->input('month');
         $selectedYear = $request->input('year');
+        $user = auth()->user();
 
-        $data = DB::table('tickets')
-            ->select(DB::raw('source_report, AVG(TIMESTAMPDIFF(MINUTE, report_time, response_time)) as avg_time'))
+        if(isLocal()){
+            $data = DB::table('tickets')
+            ->select(DB::raw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
             ->whereMonth('created_at', '=', $selectedMonth)
             ->whereYear('created_at', '=', $selectedYear)
             ->groupBy('source_report')
             ->get();
+
+        }else{
+            $data = DB::table('tickets')
+            ->select(DB::raw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+            ->whereMonth('created_at', '=', $selectedMonth)
+            ->whereYear('created_at', '=', $selectedYear)
+            ->where('user_cid',$user->cid)
+            ->groupBy('source_report')
+            ->get();
+
+        }
 
         return response()->json($data);
     }
@@ -168,13 +191,26 @@ class DashboardController extends Controller
     {
         $selectedMonth = $request->input('month');
         $selectedYear = $request->input('year');
+        $user = auth()->user();
 
-        $data = DB::table('work_orders')
-            ->select(DB::raw('staff, AVG(TIMESTAMPDIFF(MINUTE, end_time, start_time)) as avg_time'))
+        if(isLocal()){
+            $data = DB::table('work_orders')
+            ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
             ->whereMonth('created_at', '=', $selectedMonth)
             ->whereYear('created_at', '=', $selectedYear)
             ->groupBy('staff')
             ->get();
+
+        }else{
+            $data = DB::table('work_orders')
+            ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
+            ->whereMonth('created_at', '=', $selectedMonth)
+            ->whereYear('created_at', '=', $selectedYear)
+            ->where('user_cid',$user->cid)
+            ->groupBy('staff')
+            ->get();
+
+        }
 
         return response()->json($data);
     }
