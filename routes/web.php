@@ -85,7 +85,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/', [DashboardController::class, 'index']);
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('logs', App\Http\Controllers\LogController::class);
     Route::resource('user-infos', App\Http\Controllers\UserInfoController::class);
 

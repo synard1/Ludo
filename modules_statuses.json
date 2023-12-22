@@ -8,5 +8,6 @@
     "UserSign": false,
     "UserMedia": false,
     "FeedbackPortal": true,
-    "Semver": true
+    "Semver": true,
+    "Dashboard": true
 }
