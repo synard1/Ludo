@@ -155,7 +155,7 @@ class DashboardController extends Controller
         $selectedYear = $request->input('year');
 
         $data = DB::table('tickets')
-            ->select(DB::raw('source_report, AVG(TIMESTAMPDIFF(MINUTE, response_time, report_time)) as avg_time'))
+            ->select(DB::raw('source_report, AVG(TIMESTAMPDIFF(MINUTE, report_time, response_time)) as avg_time'))
             ->whereMonth('created_at', '=', $selectedMonth)
             ->whereYear('created_at', '=', $selectedYear)
             ->groupBy('source_report')
