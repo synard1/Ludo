@@ -22,7 +22,8 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // return view('dashboard::index');
+        if($user){
+            // return view('dashboard::index');
         $firstDayOfMonth = Carbon::now()->startOfMonth();
         $lastDayOfMonth = Carbon::now()->endOfMonth();
 
@@ -65,6 +66,11 @@ class DashboardController extends Controller
         //     ->get();
 
         return view('dashboard::index', compact(['data','months','avgTimes']));
+        }else{
+
+        }
+
+        
     }
 
     /**
