@@ -16,8 +16,8 @@ use Modules\Dashboard\Http\Controllers\DashboardController;
 
 // Route::group([], function () {
 //     Route::resource('dashboard', DashboardController::class)->names('dashboard');
-Route::get('/', [DashboardController::class, 'index']);
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])->middleware('auth');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 // });
 
 Route::prefix('apps/dashboard')->name('dashboard.')->middleware(config('onexolution.route.middleware'))->group(function () {
