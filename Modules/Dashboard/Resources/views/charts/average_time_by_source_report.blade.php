@@ -51,7 +51,7 @@
                 myChart.destroy();
             }
 
-            fetch(`/apps/dashboard/api/fetch-data?month=${selectedMonth}&year=${selectedYear}`)
+            fetch(`/apps/dashboard/api/fetch-data/AverageTimeBySourceReport?month=${selectedMonth}&year=${selectedYear}`)
                 .then(response => response.json())
                 .then(data => {
                     updateChart(data);
@@ -108,7 +108,7 @@
         }
 
         // Initial data load
-        fetchData();
+        // fetchData();
     </script>
     {{-- <script>
         var ctx = document.getElementById('myChart').getContext('2d');

@@ -41,17 +41,17 @@
             myChart1.destroy();
         }
 
-        fetch(`/apps/dashboard/api/fetch-data?month=${selectedMonth}&year=${selectedYear}`)
+        fetch(`/apps/dashboard/api/fetch-data/AverageTimeByStaff?month=${selectedMonth}&year=${selectedYear}`)
             .then(response => response.json())
             .then(data => {
-                updateChart(data);
+                updateChart1(data);
             });
     }
 
-    function updateChart(data) {
-        var ctx = document.getElementById('myChart1').getContext('2d');
+    function updateChart1(data) {
+        var ctx1 = document.getElementById('myChart1').getContext('2d');
 
-        var chartData = {
+        var chartData1 = {
             labels: {!! json_encode(array_column($avgTimes, 'staff')) !!},
             datasets: [{
                 label: 'Average Time (minutes)',
@@ -62,9 +62,9 @@
             }]
         };
 
-        myChart1 = new Chart(ctx, {
+        myChart1 = new Chart(ctx1, {
             type: 'bar',
-            data: chartData,
+            data: chartData1,
             options: {
                 scales: {
                     y: {
@@ -76,6 +76,6 @@
     }
 
     // Initial data load
-    fetchData2();
+    // fetchData2();
     </script>
     @endpush

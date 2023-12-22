@@ -157,4 +157,19 @@ class DashboardController extends Controller
 
         return response()->json($data);
     }
+
+    public function fetchDataAverageTimeByStaff(Request $request)
+    {
+        $selectedMonth = $request->input('month');
+        $selectedYear = $request->input('year');
+
+        $data = DB::table('work_orders')
+            ->select(DB::raw('staff, AVG(TIMESTAMPDIFF(MINUTE, end_time, start_time)) as avg_time'))
+            ->whereMonth('created_at', '=', $selectedMonth)
+            ->whereYear('created_at', '=', $selectedYear)
+            ->groupBy('staff')
+            ->get();
+
+        return response()->json($data);
+    }
 }

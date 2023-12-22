@@ -16,18 +16,21 @@ use Modules\Dashboard\Http\Controllers\DashboardController;
 
 // Route::group([], function () {
 //     Route::resource('dashboard', DashboardController::class)->names('dashboard');
+Route::get('/', [DashboardController::class, 'index']);
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 // });
 
 Route::prefix('apps/dashboard')->name('dashboard.')->middleware(config('onexolution.route.middleware'))->group(function () {
 
     // Main Routes
-    Route::get('/', [DashboardController::class, 'index'])->name('index');
+    // Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/test1', [DashboardController::class, 'incidentResolutionTimeChart'])->name('incidentResolutionTimeChart');
     Route::get('/test2', [DashboardController::class, 'averageTimeBySourceReport'])->name('averageTimeBySourceReport');
 
     // // API
     Route::prefix('api')->name('api.')->group(function () {
-        Route::get('/fetch-data', [DashboardController::class, 'fetchDataAverageTimeBySourceReport'])->name('fetchDataAverageTimeBySourceReport');
+        Route::get('/fetch-data/AverageTimeBySourceReport', [DashboardController::class, 'fetchDataAverageTimeBySourceReport'])->name('fetchDataAverageTimeBySourceReport');
+        Route::get('/fetch-data/AverageTimeByStaff', [DashboardController::class, 'fetchDataAverageTimeByStaff'])->name('fetchDataAverageTimeByStaff');
     //     Route::get('/ticket/statushistory', [TicketController::class, 'getStatusHistory'])->name('getStatusHistory');
     //     Route::post('/ticket/status', [TicketController::class, 'saveStatus'])->name('postStatus');
     //     Route::post('/ticket', [TicketController::class, 'saveTicket'])->name('postTicket');
