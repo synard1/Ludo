@@ -1,5 +1,5 @@
         <div class="card-header collapsible cursor-pointer rotate">
-            <h3 class="card-title">Average Resolution Time KPI < 60 Minutes </h3>
+            <h3 class="card-title">Average Resolution Time KPI < 120 Minutes </h3>
         </div>
         <div id="kt_docs_card_workorder_list" class="collapse show">
         <!--begin::Card body-->
@@ -49,31 +49,48 @@
     }
 
     function updateChart1(data) {
-        var ctx1 = document.getElementById('myChart1').getContext('2d');
+    var ctx1 = document.getElementById('myChart1').getContext('2d');
 
-        var chartData1 = {
-            labels: {!! json_encode(array_column($avgTimes, 'staff')) !!},
-            datasets: [{
-                label: 'Average Time (minutes)',
-                data: {!! json_encode(array_column($avgTimes, 'avg_time')) !!},
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        };
+    // Assuming data is an array of average times
+    var avgTimes = {!! json_encode(array_column($avgTimes, 'avg_time')) !!};
 
-        myChart1 = new Chart(ctx1, {
-            type: 'bar',
-            data: chartData1,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+    // Add logic for coloring bars based on average time
+    var backgroundColors = avgTimes.map(function (avgTime) {
+        if (avgTime > 60 && avgTime <= 90) {
+            return 'rgba(255, 255, 0, 0.2)'; // Yellow
+        } else if (avgTime > 90) {
+            return 'rgba(255, 0, 0, 0.2)'; // Red
+        } else {
+            return 'rgba(75, 192, 192, 0.2)'; // Default color
+        }
+    });
+
+    var borderColor = 'rgba(75, 192, 192, 1)'; // Default border color
+
+    var chartData1 = {
+        labels: {!! json_encode(array_column($avgTimes, 'staff')) !!},
+        datasets: [{
+            label: 'Average Time (minutes)',
+            data: avgTimes,
+            backgroundColor: backgroundColors,
+            borderColor: borderColor,
+            borderWidth: 1
+        }]
+    };
+
+    myChart1 = new Chart(ctx1, {
+        type: 'bar',
+        data: chartData1,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
-    }
+        }
+    });
+}
+
 
     // Initial data load
     // fetchData2();

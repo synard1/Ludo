@@ -588,3 +588,10 @@ if (!function_exists('isMobileBrowser')) {
         return preg_match('/(iPhone|iPod|Android|webOS|BlackBerry|Windows Phone)/i', $userAgent);
     }
 }
+
+if (!function_exists('isLocal')) {
+    function isLocal()
+    {
+        return app()->environment('local');
+    }
+}
