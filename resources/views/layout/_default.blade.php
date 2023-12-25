@@ -1,3 +1,7 @@
+@php
+    $notifications = auth()->user()->notifications;
+@endphp
+
 @extends('layout.master')
 
 @section('content')

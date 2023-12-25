@@ -7,6 +7,8 @@ use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Channels\DatabaseChannel;
+use Illuminate\Notifications\Channels\DatabaseChannel as IlluminateDatabaseChannel;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -33,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
         Builder::defaultStringLength(191);
 
         KTBootstrap::init();
+
+        $this->app->instance(IlluminateDatabaseChannel::class, new DatabaseChannel);
 
         // Session::creating(function ($session) {
         //     $session->user_id = session('user_id');

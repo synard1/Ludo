@@ -64,10 +64,10 @@ class NewTicketNotification extends Notification
             'id' => $this->user->id,
             'name' => $this->user->name,
             'email' => $this->user->email,
-            'user_cid' => 'aa',
-            'user_id' => 'aa',
-            'created_by' => 'aa',
-            'created_by_level' => 'aa',
+            'user_id' => $this->user->id,
+            'user_cid' => $this->user->cid,
+            'created_by' => $this->user->name,
+            'created_by_level' => $this->user->level_access,
         ];
     }
 
@@ -75,12 +75,13 @@ class NewTicketNotification extends Notification
     {
         return [
             'ticket_id' => $this->ticket->id,
+            'subject' => $this->ticket->subject,
             'message' => 'A new ticket has been created.',
             'link' => url('/tickets/'.$this->ticket->id),
-            'user_cid' => 'aa',
-            'user_id' => 'aa',
-            'created_by' => 'aa',
-            'created_by_level' => 'aa',
+            'user_id' => $this->ticket->user_id,
+            'user_cid' => $this->ticket->user_cid,
+            'created_by' => $this->ticket->created_by,
+            'created_by_level' => $this->ticket->created_by_level,
         ];
     }
 }

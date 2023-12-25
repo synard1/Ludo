@@ -12,14 +12,14 @@
         <!--end::Drawer toggle-->
     </div>
     <!--end::Activities--> --}}
-    {{-- <!--begin::Notifications-->
+    <!--begin::Notifications-->
 	<div class="app-navbar-item ms-1 ms-md-4">
         <!--begin::Menu- wrapper-->
 		<div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" id="kt_menu_item_wow">{!! getIcon('notification-status', 'fs-2') !!}</div>
         @include('partials/menus/_notifications-menu')
         <!--end::Menu wrapper-->
     </div>
-    <!--end::Notifications--> --}}
+    <!--end::Notifications-->
     {{-- <!--begin::Chat-->
 	<div class="app-navbar-item ms-1 ms-md-4">
         <!--begin::Menu wrapper-->

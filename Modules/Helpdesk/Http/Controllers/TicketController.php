@@ -399,7 +399,7 @@ class TicketController extends Controller
             $notification = new NewTicketNotification($ticket);
         
             // Set the user_cid for the notification
-            $notification->user_cid = $user->user_cid;
+            $notification->user_cid = $user->cid;
             $notification->user_id = $user->id;
             $notification->created_by = $user->name;
             $notification->created_by_level = $user->level_access;
