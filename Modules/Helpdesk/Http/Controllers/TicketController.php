@@ -17,6 +17,10 @@ use App\Models\StatusHistory;
 use App\Helpers\ModuleHelper;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
+// use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Notification;
+use App\Listeners\SendNewTicketNotification;
+use App\Notifications\NewTicketNotification;
 
 use Modules\Helpdesk\Http\DataTables\TicketsDataTable;
 
@@ -310,7 +314,9 @@ class TicketController extends Controller
     public function saveTicket(Request $request)
     {
         $user = auth()->user();
-        try {
+        // Start a database transaction
+        DB::beginTransaction();
+        // try {
 
             if($request->input('ticket_id')){
                 // Update the ticket with the new status
@@ -351,16 +357,61 @@ class TicketController extends Controller
                     'reason' => 'Ticket Created',
                 ]);
 
+                // $users = User::where('cid',auth()->user()->cid)->get();
+                // Send notification
+                $this->sendTicketNotification($ticket);
+
+                // Notification::send($users, new NewTicketNotification($ticket));
+
             }
             
+            // Commit the transaction
+            DB::commit();
 
             // You can return a response, e.g., a success message
             return response()->json(['message' => 'Ticket saved or updated successfully']);
-        } catch (\Throwable $th) {
-            //throw $th;
-            return response()->json(['message' => 'Failed']);
+        // } catch (\Throwable $th) {
+        //     // An error occurred, rollback the transaction
+        //     DB::rollback();
+        //     //throw $th;
+        //     return response()->json(['message' => 'Failed']);
+        // }
+
+    }
+
+    private function sendTicketNotification(Ticket $ticket)
+    {
+        // $user = Auth::user();
+
+        // Notify all users (you can customize this based on your logic)
+        $users = User::where('cid',$ticket->user_cid)->get();
+
+        // dd($usersToNotify);
+        // $notification = new NewTicketNotification($ticket);
+        // $notification->user_cid = $usersToNotify->cid; // Set the user_cid from the authenticated user
+        // $notification->user_id = $usersToNotify->id; // Set the user_cid from the authenticated user
+        // $notification->created_by = $usersToNotify->name; // Set the user_cid from the authenticated user
+        // $notification->created_by_level = $usersToNotify->level_access; // Set the user_cid from the authenticated user
+        // $user->notify($notification);
+
+        foreach ($users as $user) {
+            // Create a new notification instance
+            $notification = new NewTicketNotification($ticket);
+        
+            // Set the user_cid for the notification
+            $notification->user_cid = $user->user_cid;
+            $notification->user_id = $user->id;
+            $notification->created_by = $user->name;
+            $notification->created_by_level = $user->level_access;
+        
+            // Send the notification to the user
+            $user->notify($notification);
         }
 
+        // foreach ($usersToNotify as $user) {
+        //     // $user->notify(new NewTicketNotification($ticket));
+        //     // $user->notify($notification);
+        // }
     }
 
     private function getActionButtons($ticket)

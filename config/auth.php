@@ -71,6 +71,13 @@ return [
         // ],
     ],
 
+    'channels' => [
+        'database' => [
+            'driver' => 'database',
+            'table' => 'notifications',
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Resetting Passwords
