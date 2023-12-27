@@ -183,6 +183,9 @@ glob.sync('node_modules/+(@fortawesome|socicon|line-awesome|bootstrap-icons)/**/
 // Widgets
 mix.scripts((glob.sync(`${dir}/js/widgets/**/*.js`) || []), `public/assets/js/widgets.bundle.js`);
 
+// Aditional Config
+mix.js("resources/js/bootstrap.js", "public/js");
+
 function getDemos() {
     // get possible demo from parameter command
     let demos = [];

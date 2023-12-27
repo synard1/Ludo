@@ -25,9 +25,20 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
 
     // Main Routes
     Route::get('/ticket', [TicketController::class, 'newIndex'])->name('tickets');
+    Route::get('/test', [TicketController::class, 'test'])->name('test');
     // Route::get('/workorder1', [WorkOrderController::class, 'index'])->name('workorder1');
     Route::get('/workorder', [WorkOrderController::class, 'newIndex'])->name('workorder');
     Route::get('/print/wo/{id}', [TicketController::class, 'woPrint'])->name('woPrint');
+
+    //Tester
+    Route::post('/broadcast-test', function () {
+        $time = now();
+        $message = 'Test broadcast ' . $time; 
+        $ticketData = ['ticket_id' => 456, 'message' => $message, 'created_at' => $time];
+        event(new \Modules\Helpdesk\Events\NewTicketEvent($ticketData));
+        broadcast(new \Modules\Helpdesk\Events\NewTicketEvent($ticketData));
+        return response()->json(['message' => 'Broadcast sent']);
+    });
 
     // API
     Route::prefix('api')->name('api.')->group(function () {

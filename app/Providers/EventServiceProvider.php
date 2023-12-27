@@ -7,6 +7,8 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Modules\Helpdesk\Events\NewTicketEvent;
+use Modules\Helpdesk\Listeners\NewTicketListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
             SendNewTicketNotification::class,
+        ],
+        NewTicketEvent::class => [
+            NewTicketListener::class,
         ],
     ];
 

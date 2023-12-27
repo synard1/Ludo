@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import Echo from 'laravel-echo';
 
 export default defineConfig({
     plugins: [
@@ -17,4 +18,11 @@ export default defineConfig({
             },
         ],
     },
+});
+
+window.io = require('socket.io-client');
+
+window.Echo = new Echo({
+    broadcaster: 'socket.io',
+    host: window.location.hostname + ':6001', // Update the port if needed
 });

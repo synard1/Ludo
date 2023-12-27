@@ -47,6 +47,8 @@
 
     @livewireStyles
 
+    <script type="module" src="{{ asset('js/bootstrap.js') }}"></script>
+
 </head>
 <!--end::Head-->
 

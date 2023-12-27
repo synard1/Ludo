@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use App\Listeners\SendNewTicketNotification;
 use App\Notifications\NewTicketNotification;
+use Modules\Helpdesk\Events\NewTicketEvent;
 
 use Modules\Helpdesk\Http\DataTables\TicketsDataTable;
 
@@ -116,6 +117,11 @@ class TicketController extends Controller
      * Show the form for creating a new resource.
      * @return Renderable
      */
+    public function test()
+    {
+        return view('helpdesk::ticket.test');
+    }
+
     public function create()
     {
         return view('helpdesk::create');
@@ -360,6 +366,8 @@ class TicketController extends Controller
                 // $users = User::where('cid',auth()->user()->cid)->get();
                 // Send notification
                 $this->sendTicketNotification($ticket);
+                event(new NewTicketEvent($ticket));
+                broadcast(new NewTicketEvent($ticket));
 
                 // Notification::send($users, new NewTicketNotification($ticket));
 
