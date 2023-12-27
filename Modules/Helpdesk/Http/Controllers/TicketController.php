@@ -366,8 +366,8 @@ class TicketController extends Controller
                 // $users = User::where('cid',auth()->user()->cid)->get();
                 // Send notification
                 $this->sendTicketNotification($ticket);
-                event(new NewTicketEvent($ticket));
-                broadcast(new NewTicketEvent($ticket));
+                // event(new NewTicketEvent($ticket));
+                // broadcast(new NewTicketEvent($ticket));
 
                 // Notification::send($users, new NewTicketNotification($ticket));
 

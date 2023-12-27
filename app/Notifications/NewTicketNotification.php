@@ -77,7 +77,7 @@ class NewTicketNotification extends Notification
             'ticket_id' => $this->ticket->id,
             'subject' => $this->ticket->subject,
             'message' => 'A new ticket has been created.',
-            'link' => url('/tickets/'.$this->ticket->id),
+            'link' => url('/apps/helpdesk/ticket/'.$this->ticket->id),
             'user_id' => $this->ticket->user_id,
             'user_cid' => $this->ticket->user_cid,
             'created_by' => $this->ticket->created_by,

@@ -6,23 +6,23 @@
 		style="background-image:url('/assets/media/misc/menu-header-bg.jpg')">
 		<!--begin::Title-->
 		<h3 class="text-white fw-semibold px-9 mt-10 mb-6">Notifications
-			<span class="fs-8 opacity-75 ps-3">24 reports</span>
+			<span class="fs-8 opacity-75 ps-3">{{ count($notifications)}} reports</span>
 		</h3>
 		<!--end::Title-->
 		<!--begin::Tabs-->
 		<ul class="nav nav-line-tabs nav-line-tabs-2x nav-stretch fw-semibold px-9">
 			<li class="nav-item">
-				<a class="nav-link text-white opacity-75 opacity-state-100 pb-4" data-bs-toggle="tab"
+				<a class="nav-link text-white opacity-75 opacity-state-100 pb-4 active" data-bs-toggle="tab"
 					href="#kt_topbar_notifications_1">Alerts</a>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link text-white opacity-75 opacity-state-100 pb-4 active" data-bs-toggle="tab"
+			{{-- <li class="nav-item">
+				<a class="nav-link text-white opacity-75 opacity-state-100 pb-4" data-bs-toggle="tab"
 					href="#kt_topbar_notifications_2">Updates</a>
 			</li>
 			<li class="nav-item">
 				<a class="nav-link text-white opacity-75 opacity-state-100 pb-4" data-bs-toggle="tab"
 					href="#kt_topbar_notifications_3">Logs</a>
-			</li>
+			</li> --}}
 		</ul>
 		<!--end::Tabs-->
 	</div>
@@ -30,7 +30,7 @@
 	<!--begin::Tab content-->
 	<div class="tab-content">
 		<!--begin::Tab panel-->
-		<div class="tab-pane fade" id="kt_topbar_notifications_1" role="tabpanel">
+		<div class="tab-pane fade show active" id="kt_topbar_notifications_1" role="tabpanel">
 			<!--begin::Items-->
 			<div class="scroll-y mh-325px my-5 px-8">
 				@foreach ($notifications as $notification)
@@ -237,7 +237,7 @@
 		</div>
 		<!--end::Tab panel-->
 		<!--begin::Tab panel-->
-		<div class="tab-pane fade show active" id="kt_topbar_notifications_2" role="tabpanel">
+		{{-- <div class="tab-pane fade show " id="kt_topbar_notifications_2" role="tabpanel">
 			<!--begin::Wrapper-->
 			<div class="d-flex flex-column px-9">
 				<!--begin::Section-->
@@ -264,10 +264,10 @@
 				<!--end::Illustration-->
 			</div>
 			<!--end::Wrapper-->
-		</div>
+		</div> --}}
 		<!--end::Tab panel-->
 		<!--begin::Tab panel-->
-		<div class="tab-pane fade" id="kt_topbar_notifications_3" role="tabpanel">
+		{{-- <div class="tab-pane fade" id="kt_topbar_notifications_3" role="tabpanel">
 			<!--begin::Items-->
 			<div class="scroll-y mh-325px my-5 px-8">
 				<!--begin::Item-->
@@ -482,7 +482,7 @@
 					'fs-5') !!}</a>
 			</div>
 			<!--end::View more-->
-		</div>
+		</div> --}}
 		<!--end::Tab panel-->
 	</div>
 	<!--end::Tab content-->
