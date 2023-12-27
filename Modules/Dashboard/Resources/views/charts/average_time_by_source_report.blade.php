@@ -1,5 +1,5 @@
         <div class="card-header collapsible cursor-pointer rotate">
-            <h3 class="card-title">Mean Time to Response ( MTTR ) KPI < 60 Minutes </h3>
+            <h3 class="card-title">Mean Time to Response ( MTTR ) SLA < 60 Minutes </h3>
         </div>
         <div id="kt_docs_card_workorder_list" class="collapse show">
         <!--begin::Card body-->
