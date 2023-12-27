@@ -47,7 +47,8 @@
 
     @livewireStyles
 
-    <script type="module" src="{{ asset('js/bootstrap.js') }}"></script>
+    {{-- Push Notification Script --}}
+    {{-- <script type="module" src="{{ asset('js/bootstrap.js') }}"></script> --}}
 
 </head>
 <!--end::Head-->
