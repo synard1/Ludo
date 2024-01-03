@@ -6,15 +6,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\SLA\Http\DataTables\SlaDataTable;
 
 class SLAController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(SlaDataTable $dataTable)
     {
-        return view('sla::index');
+        addVendors(['datatables','tinymce']);
+        // addJavascriptFile('assets/js/custom/apps/helpdesk/ticket.js');
+
+        $user = auth()->user();
+        $canCreateSla = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create sla');
+        $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+
+        // return view('sla::index');
+        return $dataTable->render('sla::newIndex',compact(['isSupervisor','canCreateSla']));
+
     }
 
     /**
