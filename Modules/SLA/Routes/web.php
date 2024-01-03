@@ -15,6 +15,34 @@ use Modules\SLA\Http\Controllers\SLAController;
 |
 */
 
-Route::group([], function () {
-    Route::resource('sla', SLAController::class)->names('sla');
+// Route::group([], function () {
+//     Route::resource('sla', SLAController::class)->names('sla');
+// })->middleware(['auth']);
+
+Route::prefix('apps/sla')->name('sla.')->middleware(config('onexolution.route.middleware'))->group(function () {
+
+    // Main Routes
+    Route::get('/', [SLAController::class, 'index'])->name('index');
+    // Route::get('/workorder1', [WorkOrderController::class, 'index'])->name('workorder1');
+    // Route::get('/workorder', [WorkOrderController::class, 'newIndex'])->name('workorder');
+    // Route::get('/print/wo/{id}', [TicketController::class, 'woPrint'])->name('woPrint');
+
+    // API
+    // Route::prefix('api')->name('api.')->group(function () {
+    //     Route::get('/ticket', [TicketController::class, 'getTicketData'])->name('getTicket');
+    //     Route::get('/ticket/statushistory', [TicketController::class, 'getStatusHistory'])->name('getStatusHistory');
+    //     Route::post('/ticket/status', [TicketController::class, 'saveStatus'])->name('postStatus');
+    //     Route::post('/ticket', [TicketController::class, 'saveTicket'])->name('postTicket');
+    //     Route::delete('/deleteTicket/{id}', [TicketController::class, 'deleteTicket'])->name('deleteTicket');
+    //     Route::get('/woresponse/{id}', [WorkOrderResponseController::class, 'getData'])->name('getWoResponse');
+    //     Route::get('/workorder/staff', [WorkOrderController::class, 'getWorkOrderStaff'])->name('getWorkOrderStaff');
+    //     Route::post('/workorder/response', [WorkOrderController::class, 'saveWorkOrderResponse'])->name('postWorkOrderResponse');
+    //     Route::get('/workorder/notes', [WorkOrderNoteController::class, 'getWorkOrderNotes'])->name('getWorkOrderNotes');
+    //     Route::post('/workorder/notes', [WorkOrderNoteController::class, 'saveWorkOrderNotes'])->name('postWorkOrderNotes');
+    //     Route::get('/workorder', [WorkOrderController::class, 'getWorkOrderData'])->name('getWorkOrder');
+    //     Route::post('/workorder', [WorkOrderController::class, 'saveWorkOrder'])->name('postWorkOrder');
+    //     Route::delete('/deleteWorkOrder/{id}', [WorkOrderController::class, 'deleteWorkOrder'])->name('deleteWorkOrder');
+
+    // });
+
 });

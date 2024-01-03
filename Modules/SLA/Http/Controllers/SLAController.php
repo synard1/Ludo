@@ -16,10 +16,10 @@ class SLAController extends Controller
     public function index(SlaDataTable $dataTable)
     {
         addVendors(['datatables','tinymce']);
-        // addJavascriptFile('assets/js/custom/apps/helpdesk/ticket.js');
+        addJavascriptFile('assets/js/custom/apps/sla/sla.js');
 
         $user = auth()->user();
-        $canCreateSla = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create sla');
+        $canCreateSla = auth()->check() && auth()->user()->level_access === 'Owner' && $user->can('create sla');
         $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
 
         // return view('sla::index');
