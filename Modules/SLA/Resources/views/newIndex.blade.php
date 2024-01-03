@@ -26,7 +26,7 @@
     @if ($canCreateSla)
         <div class="card shadow-sm mb-5">
             <div class="card-header collapsible cursor-pointer rotate">
-                <h3 class="card-title" id="slaTitle">New SLA</h3>
+                <h3 class="card-title" id="slaFormTitle">New SLA</h3>
                 <div class="card-toolbar rotate-180">
                     <i class="ki-duotone ki-down fs-1"></i>
                 </div>
@@ -42,7 +42,7 @@
                             <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
                                 <!--begin::Label-->
                                 <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                                    <span class="required">Subject</span>
+                                    <span class="required">SLA Title</span>
                                 </label>
                                 <!--end::Label-->
 
@@ -60,11 +60,11 @@
                             <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
                                 <!--begin::Label-->
                                 <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                                    Description
+                                    <span class="required">SLA Description</span>
                                 </label>
                                 <!--end::Label-->
 
-                                <textarea class="form-control form-control-solid" name="description" id="description"> </textarea>
+                                <textarea class="form-control form-control-solid" name="description" id="description"></textarea>
                                 <div
                                     class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                                 </div>
@@ -119,7 +119,7 @@
     <script src="/vendor/datatables/buttons.server-side.js"></script>
     {{ $dataTable->scripts() }}
 
-    <script>
+    {{-- <script>
         var newSlaButton = document.querySelector('#kt_new_sla');
         // Add a click event listener to the "New Ticket" button
         newSlaButton.addEventListener('click', function (e) {
@@ -140,7 +140,7 @@
             // Show kt_docs_card_sla_list
             $('#kt_docs_card_sla_list').collapse('hide');
         });
-    </script>
+    </script> --}}
     @endpush
 
 </x-default-layout>

@@ -31,8 +31,8 @@ class SlaDataTable extends DataTable
                 return $data->name;
             })
             ->addColumn('action', function (SLA $sla) {
-                $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-                return $isSupervisor ? view('sla::_actions', compact(['sla','isSupervisor'])) : '';
+                $isOwner = auth()->check() && auth()->user()->level_access === 'Owner';
+                return $isOwner ? view('sla::scripts._actions', compact(['sla','isOwner'])) : '';
             })
             ->rawColumns(['status'])
             ->setRowId('id');
@@ -92,9 +92,10 @@ class SlaDataTable extends DataTable
                     ->searchable(false)
                     ->printable(true),
             Column::make('name')->title('Name'),
+            Column::make('duration')->title('Duration ( In Minutes )'),
             Column::make('description')->title('Description')->visible(false),
             Column::make('created_by')->title('Operator')->visible(false),
-            Column::make('status'),
+            // Column::make('status'),
             Column::make('created_at')->title('Created Date'),
             Column::make('user_cid')->title('Company')->visible(false),
             Column::computed('action')

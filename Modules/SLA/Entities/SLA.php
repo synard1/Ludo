@@ -17,6 +17,12 @@ class SLA extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'duration',
+    ];
+
     protected static function boot()
     {
         parent::boot();
