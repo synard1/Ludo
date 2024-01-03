@@ -1,0 +1,31 @@
+{
+    "name": "ludo.my.id/sla",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mhd Iqbal Syahputra",
+            "email": "synard1@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\SLA\\": "",
+            "Modules\\SLA\\App\\": "app/",
+            "Modules\\SLA\\Database\\Factories\\": "database/factories/",
+            "Modules\\SLA\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\SLA\\Tests\\": "tests/"
+        }
+    }
+}
