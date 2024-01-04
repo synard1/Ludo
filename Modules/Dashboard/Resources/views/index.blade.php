@@ -1,3 +1,9 @@
+@php
+    $jsonData = json_decode($company->payload, true);
+    $mttrValue = $jsonData['mttr'] ?? null;
+    $artValue = $jsonData['art'] ?? null;
+@endphp
+
 <x-default-layout>
     <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
         <!--begin::Col-->

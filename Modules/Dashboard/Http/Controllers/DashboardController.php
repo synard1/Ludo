@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use App\Models\Company;
 
 class DashboardController extends Controller
 {
@@ -21,6 +22,7 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $company = Company::where('cid',$user->cid)->first();
 
         if($user){
             $firstDayOfMonth = Carbon::now()->startOfMonth();
@@ -75,7 +77,7 @@ class DashboardController extends Controller
         //     ->groupBy('staff')
         //     ->get();
 
-        return view('dashboard::index', compact(['tickets','months','avgTimes']));
+        return view('dashboard::index', compact(['tickets','months','avgTimes','company']));
         }else{
 
         }

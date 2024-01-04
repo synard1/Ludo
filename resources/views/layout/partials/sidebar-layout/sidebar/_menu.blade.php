@@ -59,6 +59,11 @@
 						@include('helpdesk::layouts.partials.sidebar.menu')
 					@endif
 				@endif
+				@if(App\Helpers\ModuleHelper::isModuleActive('SLA'))
+					@if(auth()->user()->can('access sla') || auth()->user()->can('read sla'))
+						@include('sla::layouts.partials.sidebar.menu')
+					@endif
+				@endif
 			@endif
 
             @if(auth()->check() && auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Administrator'))

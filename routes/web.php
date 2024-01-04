@@ -128,6 +128,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/limit', [SettingController::class, 'getLimit'])->name('getLimit');
             Route::get('/version', [SettingController::class, 'getVersion'])->name('getVersion');
             Route::post('/company', [SettingController::class, 'saveCompany'])->name('postCompany');
+            Route::post('/sla', [SettingController::class, 'saveSla'])->name('postSla');
             Route::put('/update-company-status/{id}', [SettingController::class, 'updateStatus'])->name('update-company-status');
             // Route::put('/update-company-status/{id}', 'SettingController@updateStatus')->name('update-company-status');
             // Route::post('/company', 'SettingController@saveCompany');

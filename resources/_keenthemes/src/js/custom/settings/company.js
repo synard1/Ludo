@@ -3,9 +3,9 @@
 // Class definition
 var KTCompany = function () {
     // Elements
-    var form;
-    var submitButton;
-    var validator;
+    var form, formSla;
+    var submitButton, submitButtonSla;
+    var validator, validatorSla;
     // var passwordMeter;
 
     // Handle form
@@ -95,12 +95,6 @@ var KTCompany = function () {
                     // Disable button to avoid multiple click
                     submitButton.disabled = true;
 
-                    // Get the selected communication options
-                    // var communicationOptions = [];
-                    // $("input[name='communication[]']:checked").each(function () {
-                    //     communicationOptions.push($(this).val());
-                    // });
-
                     // Your form data
                     var formData = new FormData($('#kt_company_profile_form')[0]);
 
@@ -164,6 +158,123 @@ var KTCompany = function () {
 
                             // Enable button
                             submitButton.disabled = false;
+                        }
+                    });
+
+                } else {
+                    // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
+                    Swal.fire({
+                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        });
+
+    }
+
+    // Handle form SLA
+    var handleFormSla = function (e) {
+        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+        validatorSla = FormValidation.formValidation(
+            formSla,
+            {
+                fields: {
+                    'mttr': {
+                        validators: {
+                            notEmpty: {
+                                message: 'MTTR Duration is required'
+                            }
+                        }
+                    },
+                    'art': {
+                        validators: {
+                            notEmpty: {
+                                message: 'ART Duration is required'
+                            }
+                        }
+                    },
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger({
+                        event: {
+                            password: false
+                        }
+                    }),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',  // comment to enable invalid state icons
+                        eleValidClass: '' // comment to enable valid state icons
+                    })
+                }
+            }
+        );
+
+        // Handle form submit
+        submitButtonSla.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            validatorSla.validate().then(function (status) {
+                if (status == 'Valid') {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    // Show loading indication
+                    submitButtonSla.setAttribute('data-kt-indicator', 'on');
+
+                    // Disable button to avoid multiple click
+                    submitButtonSla.disabled = true;
+
+                    // Your form data
+                    var formData = new FormData($('#kt_sla_form')[0]);
+
+                    $.ajax({
+                        url: '/setting/api/sla',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            // Hide loading indication
+                            submitButtonSla.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonSla.disabled = false;
+
+                            swal.fire({
+                                text: response.message,
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            }).then(function(){
+                                // Hide loading indication
+                                submitButtonSla.removeAttribute('data-kt-indicator');
+
+                                // Enable button
+                                submitButtonSla.disabled = false;
+
+                                // Reload the page after a successful response
+                                location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            // Handle errors here
+                            // Hide loading indication
+                            submitButtonSla.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButtonSla.disabled = false;
                         }
                     });
 
@@ -319,9 +430,17 @@ var KTCompany = function () {
         // Initialization
         init: function () {
             // Elements
+            formSla = document.querySelector('#kt_sla_form');
+            submitButtonSla = document.querySelector('#kt_sla_dashboard_submit');
+
             form = document.querySelector('#kt_company_profile_form');
             submitButton = document.querySelector('#kt_company_profile_submit');
-            // passwordMeter = KTPasswordMeter.getInstance(form.querySelector('[data-kt-password-meter="true"]'));
+
+            if (isValidUrl(submitButtonSla.closest('form').getAttribute('action'))) {
+                handleFormSla();
+            }else{
+                handleFormSla();
+            }
 
             if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
                 handleFormAjax();
