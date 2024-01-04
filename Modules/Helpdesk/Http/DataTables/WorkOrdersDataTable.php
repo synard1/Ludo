@@ -69,6 +69,10 @@ class WorkOrdersDataTable extends DataTable
             ->editColumn('created_at', function (WorkOrder $workOrder) {
                 return $workOrder->created_at->format('d M Y, h:i a');
             })
+            ->editColumn('due_date', function (WorkOrder $workOrder) {
+                // return $workOrder->due_date->format('d M Y, h:i a') ?? '';
+                return $workOrder->due_date;
+            })
             ->editColumn('subject', function (WorkOrder $workOrder) {
                 // $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
 
@@ -147,6 +151,7 @@ class WorkOrdersDataTable extends DataTable
             Column::make('subject')->title('Subject'),
             Column::make('staff')->title('Staff Assign'),
             Column::make('description')->title('Description')->visible(false),
+            Column::make('due_date')->title('Due Date')->visible(false),
             Column::make('created_by')->title('Operator')->visible(false),
             Column::make('origin_unit')->title('Unit')->visible(false),
             // Column::make('priority')->title('Priority'),
