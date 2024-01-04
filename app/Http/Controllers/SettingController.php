@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Models\Company;
+use App\Models\CompanySla;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -46,9 +47,13 @@ class SettingController extends Controller
         ->where('cid', $cid)
         ->first(); // Use 'first' to get a single result or null if not found
 
+    $companySla = CompanySla::where('user_id', $uid)
+        ->where('user_cid', $cid)
+        ->whereIn('name', ['mttr', 'art'])
+        ->first(); // Assuming you're expecting a single result
     // return view('company.form', compact('company'));
 
-        return view('pages.settings.index', compact('company'));
+        return view('pages.settings.index', compact(['companySla','company']));
     }
 
 
@@ -253,6 +258,55 @@ class SettingController extends Controller
 
 
     }
+
+    public function saveSla(Request $request)
+    {
+        $user = auth()->user();
+
+        // Assuming your form data is passed as an array in the 'payload' field
+        $payloadData = [
+            'mttr' => $request->input('mttr'),
+            'art' => $request->input('art'),
+            // Add other fields as needed
+        ];
+
+        Company::where('cid',$user->cid)
+                    ->update([
+                        'payload' => $payloadData,
+                    ]);
+
+        return response()->json(['message' => 'SLA saved or updated successfully']);
+
+        // try {
+
+        //     if($request->input('sla_id')){
+        //         // Update the ticket with the new status
+        //         CompanySla::where('id', $request->input('sla_id'))
+        //             ->where('user_cid',$user->cid)
+        //             ->update([
+        //                 // 'name' => $request->input('title'),
+        //                 'description' => $request->input('description'),
+        //                 'duration' => $request->input('duration'),
+        //             ]);
+        //     }else{
+        //         $sla = CompanySla::create([
+        //             'name' => $request->input('title'),
+        //             'description' => $request->input('description'),
+        //             'duration' => $request->input('duration'),
+        //         ]);
+        
+        //     }
+    
+        //     // You can return a response, e.g., a success message
+        //     return response()->json(['message' => 'SLA saved or updated successfully']);
+        // } catch (\Throwable $th) {
+        //     //throw $th;
+        //     return response()->json(['message' => 'Failed']);
+        // }
+
+    }
+
+    
 
 public function getCompanyData(Request $request)
 {

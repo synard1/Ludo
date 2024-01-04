@@ -86,7 +86,7 @@ class SLAController extends Controller
                 SLA::where('id', $request->input('sla_id'))
                     ->where('user_cid',$user->cid)
                     ->update([
-                        'name' => $request->input('title'),
+                        // 'name' => $request->input('title'),
                         'description' => $request->input('description'),
                         'duration' => $request->input('duration'),
                     ]);

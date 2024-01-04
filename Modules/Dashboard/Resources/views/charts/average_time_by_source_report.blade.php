@@ -1,5 +1,5 @@
         <div class="card-header collapsible cursor-pointer rotate">
-            <h3 class="card-title">Mean Time to Response ( MTTR ) KPI < 60 Minutes </h3>
+            <h3 class="card-title">Mean Time to Response ( MTTR ) SLA < {{$mttrValue}} Minutes </h3>
         </div>
         <div id="kt_docs_card_workorder_list" class="collapse show">
         <!--begin::Card body-->
@@ -32,6 +32,8 @@
     <script>
 
     var myChart; // Declare a variable to store the chart instance
+    var mttr = @json($mttrValue);
+    console.log(mttr);
 
 
         // document.getElementById('filterMonth').addEventListener('change', function () {
@@ -67,7 +69,7 @@
                     label: 'Average Time (minutes)',
                     data: tickets.map(entry => Math.min(entry.avg_time)), // Set max value to 60 minutes
                     // data: tickets.map(entry => Math.min(entry.avg_time, 60)), // Set max value to 60 minutes
-                    backgroundColor: tickets.map(entry => entry.avg_time > 60 ? 'red' : 'blue'), // Set color to red if > 60 minutes
+                    backgroundColor: tickets.map(entry => entry.avg_time > mttr ? 'red' : 'blue'), // Set color to red if > 60 minutes
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }]

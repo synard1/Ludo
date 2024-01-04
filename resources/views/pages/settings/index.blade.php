@@ -1,3 +1,9 @@
+@php
+    $jsonData = json_decode($company->payload, true);
+    $mttrValue = $jsonData['mttr'] ?? null;
+    $artValue = $jsonData['art'] ?? null;
+@endphp
+
 <x-default-layout>
     <div class="card">
         <!--begin::Card body-->
@@ -9,11 +15,11 @@
                             <a class="nav-link active" data-bs-toggle="tab" href="#kt_tab_pane_7" aria-selected="true"
                                 role="tab">Company Profile</a>
                         </li>
-                        {{-- <li class="nav-item" role="presentation">
+                         <li class="nav-item" role="presentation">
                             <a class="nav-link" data-bs-toggle="tab" href="#kt_tab_pane_8" aria-selected="false"
-                                tabindex="-1" role="tab">Link 2</a>
+                                tabindex="-1" role="tab">SLA Dashboard</a>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        {{--<li class="nav-item" role="presentation">
                             <a class="nav-link" data-bs-toggle="tab" href="#kt_tab_pane_9" aria-selected="false"
                                 tabindex="-1" role="tab">Link 3</a>
                         </li>
@@ -337,16 +343,86 @@
                         </div>
 
                         <div class="tab-pane fade" id="kt_tab_pane_8" role="tabpanel">
-                            Nulla est ullamco ut irure incididunt nulla Lorem Lorem minim irure officia enim
-                            reprehenderit.
-                            Magna duis labore cillum sint adipisicing exercitation ipsum. Nostrud ut anim non
-                            exercitation velit laboris fugiat cupidatat.
-                            Commodo esse dolore fugiat sint velit ullamco magna consequat voluptate minim amet aliquip
-                            ipsum aute laboris nisi.
-                            Labore labore veniam irure irure ipsum pariatur mollit magna in cupidatat dolore magna irure
-                            esse tempor ad mollit.
-                            Dolore commodo nulla minim amet ipsum officia consectetur amet ullamco voluptate nisi
-                            commodo ea sit eu.
+                            <!--begin::Form-->
+                            <form id="kt_sla_form" class="form fv-plugins-bootstrap5 fv-plugins-framework"
+                                novalidate="novalidate" enctype="multipart/form-data">
+                                <!--begin::Card body-->
+                                <div class="card-body p-9">
+                                    <!--begin::Input group-->
+                                    <div class="row mb-6">
+                                        <!--begin::Label-->
+                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                                            <span>Mean Time to Response</span>
+
+                                            <span class="m2-1" data-bs-toggle="tooltip"
+                                                title="Calculate response time since user report">
+                                                <i class="ki-duotone ki-information fs-7"><span
+                                                        class="path1"></span><span class="path2"></span><span
+                                                        class="path3"></span></i>
+                                            </span>
+                                        </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Col for mttr-->
+                                        <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                            <input type="number" 
+                                                min="0" 
+                                                name="mttr" 
+                                                id="mttr"
+                                                class="form-control form-control-lg form-control-solid"             
+                                                value="{{ $mttrValue }}">
+                                            <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                        <!--end::Col-->
+                                    </div>
+                                    <!--end::Input group-->
+
+                                    <!--begin::Input group-->
+                                    <div class="row mb-6">
+                                        <!--begin::Label-->
+                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                                            <span>Average Resolution Time</span>
+
+                                            <span class="m2-1" data-bs-toggle="tooltip"
+                                                title="Time for technician resolve an issue">
+                                                <i class="ki-duotone ki-information fs-7"><span
+                                                        class="path1"></span><span class="path2"></span><span
+                                                        class="path3"></span></i>
+                                            </span>
+                                        </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Col for art-->
+                                        <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                            <input type="text" 
+                                                min="0" 
+                                                name="art" 
+                                                id="art"
+                                                class="form-control form-control-lg form-control-solid"             
+                                                value="{{ $artValue }}">
+                                            <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                        <!--end::Col-->
+                                    </div>
+                                    <!--end::Input group-->
+
+                                </div>
+                                <!--end::Card body-->
+
+                                <!--begin::Actions-->
+                                <div class="card-footer d-flex justify-content-end py-6 px-9">
+                                    <button type="reset"
+                                        class="btn btn-light btn-active-light-primary me-2">Discard</button>
+                                        <button type="submit" id="kt_sla_dashboard_submit" class="btn btn-primary">
+                                            @include('partials/general/_button-indicator', ['label' => 'Save Changes'])
+                                        </button>
+                                </div>
+                                <!--end::Actions-->
+                                <input type="hidden">
+                            </form>
+                            <!--end::Form-->
                         </div>
 
                         <div class="tab-pane fade" id="kt_tab_pane_9" role="tabpanel">
