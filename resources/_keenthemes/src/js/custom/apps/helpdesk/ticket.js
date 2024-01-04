@@ -9,6 +9,7 @@ var KTTicket = function () {
     var form, formWO, formNotes, formStatus, formHistory;
     var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus, closeButtonHistory, newTicketButton;
     var validator, validatorWO, validatorNotes, validatorStatus;
+    var checkSLA;
 
     // Private functions
     var initDatatableStatusHistory = function(id) {
@@ -189,7 +190,18 @@ var KTTicket = function () {
                     'due_date': {
                         validators: {
                             notEmpty: {
-                                message: 'Due Date is required'
+                                message: 'Due Date is required',
+                                // Conditionally enable or disable the validator based on slaExists
+                                enabled: !checkSLA
+                            }
+                        }
+                    },
+                    'sla': {
+                        validators: {
+                            notEmpty: {
+                                message: 'SLA is required',
+                                // Conditionally enable or disable the validator based on slaExists
+                                enabled: checkSLA
                             }
                         }
                     },
@@ -256,6 +268,7 @@ var KTTicket = function () {
                             subject: $('#subject_wo').val(),
                             description: $('#description_wo').val(),
                             due_date: $('#due_date').val(),
+                            sla: $('#sla').val(),
                             staff: $('#staffSelect').val(),
                             priority: $('#priority').val(),
                         },
@@ -1261,6 +1274,10 @@ var KTTicket = function () {
 
             formHistory = document.querySelector('#kt_modal_change_status_form');
             closeButtonHistory = document.querySelector('#kt_modal_history_status_close');
+
+            if(slaExist){
+                checkSLA = true;
+            }
 
             if(isSupervisor){
                 if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {

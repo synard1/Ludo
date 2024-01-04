@@ -67,6 +67,7 @@
                     </div>
                     <!--end::Col-->
 
+                    @if(!$sla)
                     <!--begin::Col-->
                     <div class="col-md-6 fv-row fv-plugins-icon-container">
                         <label class="required fs-6 fw-semibold mb-2">Due Date</label>
@@ -87,6 +88,25 @@
                         <!--end::Input-->
                     <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
                     <!--end::Col-->
+                    @else
+                    <!--begin::Col-->
+                    <div class="col-md-6 fv-row fv-plugins-icon-container">
+                        <label class="required fs-6 fw-semibold mb-2">SLA</label>
+
+                        <!--begin::Input-->
+                        <div class="position-relative d-flex align-items-center">
+
+                            <select id="sla" name="sla" class="js-select2 form-control">
+                                <option value="">Select SLA</option>
+                                @foreach ($sla as $slas)
+                                    <option value="{{ $slas->id }}">{{ $slas->name }}</option>
+                                @endforeach
+                        </select>
+                        </div>
+                        <!--end::Input-->
+                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                    <!--end::Col-->
+                    @endif
                 </div>
                 <!--end::Input group-->
 

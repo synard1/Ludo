@@ -17,6 +17,7 @@ use App\Models\StatusHistory;
 use App\Helpers\ModuleHelper;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
+use Modules\SLA\Entities\SLA;
 
 use Modules\Helpdesk\Http\DataTables\TicketsDataTable;
 
@@ -33,6 +34,7 @@ class TicketController extends Controller
         addVendors(['datatables','tinymce']);
         addJavascriptFile('assets/js/custom/apps/helpdesk/ticket.js');
 
+        $sla = SLA::where('user_cid',$user->cid)->get();
         $priorities = Config::get('onexolution.priorityWorkOrder');
         $statusTicket = Config::get('onexolution.statusTicket');
         // Retrieve distinct staff values from the database
@@ -49,8 +51,9 @@ class TicketController extends Controller
 
         $canCreateTicket = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create ticket');
         $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+        
 
-        return $dataTable->render('helpdesk::ticket.newIndex',compact(['distinctStaff','priorities','statusTicket','canCreateTicket','isSupervisor']));
+        return $dataTable->render('helpdesk::ticket.newIndex',compact(['distinctStaff','priorities','statusTicket','canCreateTicket','isSupervisor','sla']));
     }
 
     public function index()

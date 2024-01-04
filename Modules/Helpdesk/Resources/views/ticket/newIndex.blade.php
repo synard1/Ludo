@@ -295,6 +295,7 @@
         // Pass data to JavaScript
         var canCreateTicket = @json($canCreateTicket);
         var isSupervisor = @json($isSupervisor);
+        var slaExist = @json($sla);
     </script>
     @endpush
 
