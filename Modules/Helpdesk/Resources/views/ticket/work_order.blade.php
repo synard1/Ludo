@@ -67,7 +67,7 @@
                     </div>
                     <!--end::Col-->
 
-                    @if(!$sla)
+                    @if($sla->isEmpty())
                     <!--begin::Col-->
                     <div class="col-md-6 fv-row fv-plugins-icon-container">
                         <label class="required fs-6 fw-semibold mb-2">Due Date</label>

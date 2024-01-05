@@ -1277,6 +1277,8 @@ var KTTicket = function () {
 
             if(slaExist){
                 checkSLA = true;
+            }else{
+                checkSLA = false;
             }
 
             if(isSupervisor){
