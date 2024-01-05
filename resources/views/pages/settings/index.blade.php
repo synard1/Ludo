@@ -1,7 +1,14 @@
 @php
-    $jsonData = json_decode($company->payload, true);
-    $mttrValue = $jsonData['mttr'] ?? null;
-    $artValue = $jsonData['art'] ?? null;
+    if($company){
+        $jsonData = json_decode($company->payload, true);
+        $mttrValue = $jsonData['mttr'] ?? Config::get('onexolution.dashboard.mttr');
+        $artValue = $jsonData['art'] ?? Config::get('onexolution.dashboard.art');
+
+    }else{
+        $mttrValue = Config::get('onexolution.dashboard.mttr');
+        $artValue =  Config::get('onexolution.dashboard.art');
+    }
+
 @endphp
 
 <x-default-layout>
