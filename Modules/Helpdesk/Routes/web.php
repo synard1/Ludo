@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Modules\Helpdesk\Http\Controllers\TicketController;
+use Modules\Helpdesk\Http\Controllers\ServiceManagementController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderResponseController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderNoteController;
@@ -25,6 +26,7 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
 
     // Main Routes
     Route::get('/ticket', [TicketController::class, 'newIndex'])->name('tickets');
+    Route::get('/service', [ServiceManagementController::class, 'index'])->name('service');
     // Route::get('/workorder1', [WorkOrderController::class, 'index'])->name('workorder1');
     Route::get('/workorder', [WorkOrderController::class, 'newIndex'])->name('workorder');
     Route::get('/print/wo/{id}', [TicketController::class, 'woPrint'])->name('woPrint');
