@@ -11,25 +11,33 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('helpdesk_service_management', function (Blueprint $table) {
+        Schema::create('helpdesk_services', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->string('subject')->nullable();
+            $table->string('name')->nullable();
             $table->text('description')->nullable();
-            $table->datetime('response_time')->nullable();
-            $table->datetime('resolution_time')->nullable();
-
-            $table->datetime('report_time');
-            $table->string('report_source');
-            $table->string('report_name')->nullable();     // Nama pelapor
-            $table->string('report_unit')->nullable();       // Unit kerja asal
             
-            $table->json('category')->nullable();
-            $table->string('priority')->nullable();          // Prioritas
-            $table->boolean('count_kpi')->default(true);
-            $table->string('status')->nullable();
+            $table->string('user_cid');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->string('created_by');
+            $table->string('created_by_level');
+            
+            $table->timestamps();
+        });
 
-            $table->string('work_order_id')->nullable();
-            $table->longText('work_order')->nullable();
+        Schema::create('helpdesk_service_requests', function (Blueprint $table) {
+            $table->uuid('id')->primary()->unique();
+            $table->text('request_description')->nullable();
+            $table->timestamp('request_date');
+            $table->string('status')->default('Pending');
+
+            $table->uuid('service_id');
+            $table->string('service_name');
+            $table->foreign('service_id')->references('id')->on('helpdesk_services');
+
+            $table->string('requester_name');
+            $table->string('requester_unit');
+            $table->string('requester_cid');
 
             $table->string('user_cid');
             $table->unsignedBigInteger('user_id');
@@ -39,6 +47,56 @@ return new class extends Migration
             
             $table->timestamps();
         });
+
+        Schema::create('helpdesk_service_tracking', function (Blueprint $table) {
+            $table->uuid('id')->primary()->unique();
+            $table->text('notes')->nullable();
+            $table->string('progress_status');
+
+            $table->string('service_request_id');
+            $table->foreign('service_request_id')->references('id')->on('helpdesk_service_requests');
+
+            $table->unsignedBigInteger('staff_id');
+            $table->string('staff_name');
+            $table->string('staff_cid');
+            $table->foreign('staff_id')->references('id')->on('users');
+
+            $table->string('user_cid');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->string('created_by');
+            $table->string('created_by_level');
+            
+            $table->timestamps();
+        });
+
+        Schema::create('helpdesk_performance_monitoring', function (Blueprint $table) {
+            $table->uuid('id')->primary()->unique();
+            $table->uuid('service_id');
+            $table->uuid('service_tracking_id');
+
+            $table->string('performance_metric');
+            $table->float('value');
+            $table->string('measurement_unit', 50);
+            $table->text('notes')->nullable();
+            $table->timestamp('recorded_at');
+
+            $table->unsignedBigInteger('staff_id');
+            $table->string('staff_name');
+            $table->string('staff_cid');
+            $table->foreign('staff_id')->references('id')->on('users');
+
+            $table->string('user_cid');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->string('created_by');
+            $table->string('created_by_level');
+
+            $table->timestamps();
+
+            $table->foreign('service_id')->references('id')->on('helpdesk_services')->onDelete('cascade');
+            $table->foreign('service_tracking_id')->references('id')->on('helpdesk_service_tracking')->onDelete('cascade');
+        });
     }
 
     /**
@@ -46,6 +104,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_management');
+        Schema::dropIfExists('helpdesk_performance_monitoring');
+        Schema::dropIfExists('helpdesk_service_tracking');
+        Schema::dropIfExists('helpdesk_service_requests');
+        Schema::dropIfExists('helpdesk_services');
+
     }
 };

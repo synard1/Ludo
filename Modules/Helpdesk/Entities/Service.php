@@ -4,14 +4,15 @@ namespace Modules\Helpdesk\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Helpdesk\Database\factories\ServiceFactory;
 use App\Traits\UserTrackingTrait;
 use Ramsey\Uuid\Uuid;
 
-class ServiceManagement extends Model
+class Service extends Model
 {
     use HasFactory, UserTrackingTrait;
 
-    public $table = 'helpdesk_service_requests';
+    public $table = 'helpdesk_services';
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -30,4 +31,8 @@ class ServiceManagement extends Model
      */
     protected $fillable = [];
     
+    protected static function newFactory(): ServiceFactory
+    {
+        //return ServiceFactory::new();
+    }
 }

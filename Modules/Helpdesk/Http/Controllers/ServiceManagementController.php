@@ -6,15 +6,28 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\Helpdesk\Http\DataTables\ServiceManagementDataTable;
+use Modules\Helpdesk\Http\DataTables\ServiceRequestDataTable;
+use Modules\Helpdesk\Entities\Service;
 
 class ServiceManagementController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ServiceRequestDataTable $dataTable)
     {
-        return view('helpdesk::index');
+        addVendors(['datatables','tinymce']);
+        addJavascriptFile('assets/js/custom/apps/helpdesk/service.js');
+        
+        $user = auth()->user();
+        $canCreateService = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create service management');
+        $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+        $services = Service::where('user_cid',$user->cid)->orderBy('name','asc')->get();
+        
+
+        return $dataTable->render('helpdesk::service-management.index',compact(['canCreateService','isSupervisor','services']));
+        // return view('helpdesk::service-management.index',compact(['canCreateService','isSupervisor']));
     }
 
     /**
