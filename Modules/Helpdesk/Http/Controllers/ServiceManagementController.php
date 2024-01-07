@@ -15,18 +15,18 @@ class ServiceManagementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ServiceRequestDataTable $dataTable)
+    public function index(ServiceManagementDataTable $dataTable)
     {
         addVendors(['datatables','tinymce']);
         addJavascriptFile('assets/js/custom/apps/helpdesk/service.js');
         
         $user = auth()->user();
-        $canCreateService = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create service management');
-        $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+        $canCreateService = auth()->check() && auth()->user()->level_access === 'Owner' && $user->can('create service management');
         $services = Service::where('user_cid',$user->cid)->orderBy('name','asc')->get();
         
 
-        return $dataTable->render('helpdesk::service-management.index',compact(['canCreateService','isSupervisor','services']));
+        return $dataTable->render('helpdesk::service-management.index',compact(['canCreateService','services']));
+        // return $dataTable->render('helpdesk::service-management.index',compact(['canCreateService','isSupervisor','services']));
         // return view('helpdesk::service-management.index',compact(['canCreateService','isSupervisor']));
     }
 

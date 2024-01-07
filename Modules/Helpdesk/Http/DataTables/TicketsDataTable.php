@@ -61,7 +61,7 @@ class TicketsDataTable extends DataTable
                 } else {
                     if ($isSupervisor) {
                         return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
-                            $ticket->id . '" data-report-time="' . $ticket->report_time . '">Generate Work Order</a>';
+                            $ticket->id . '" data-report-time="' . $ticket->report_time . '" data-title="' . $ticket->subject . '">Generate Work Order</a>';
                     }
 
                     return '<a href="#">N/A</a>';

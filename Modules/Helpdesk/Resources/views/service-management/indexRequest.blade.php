@@ -1,12 +1,12 @@
 <x-default-layout>
     <div class="card shadow-sm mb-5">
         <div class="card-header collapsible cursor-pointer rotate">
-            <h3 class="card-title">Service List</h3>
+            <h3 class="card-title">Service Request List</h3>
             @if($canCreateService)
             <div class="card-toolbar">
                 <!--begin::Menu-->
                 <button type="button" class="btn btn-primary" id="kt_new_service">
-                    <i class="ki-duotone ki-plus fs-2"></i> New Service
+                    <i class="ki-duotone ki-plus fs-2"></i> New Service Request
                 </button>
                 <!--end::Menu-->
             </div>
@@ -25,7 +25,7 @@
     @if ($canCreateService)
         <div class="card shadow-sm mb-5">
             <div class="card-header collapsible cursor-pointer rotate">
-                <h3 class="card-title" id="serviceTitle">New Service</h3>
+                <h3 class="card-title" id="serviceTitle">New Service Request</h3>
                 <div class="card-toolbar rotate-180">
                     <i class="ki-duotone ki-down fs-1"></i>
                 </div>
@@ -163,6 +163,8 @@
     <script>
         // Pass data to JavaScript
         var canCreateService = @json($canCreateService);
+        var isSupervisor = @json($isSupervisor);
+        var slaExist = true;
     </script>
     @endpush
 

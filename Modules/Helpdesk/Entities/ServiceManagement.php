@@ -11,7 +11,7 @@ class ServiceManagement extends Model
 {
     use HasFactory, UserTrackingTrait;
 
-    public $table = 'helpdesk_service_requests';
+    public $table = 'helpdesk_services';
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;

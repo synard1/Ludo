@@ -4,6 +4,7 @@ namespace Modules\Helpdesk\Http\DataTables;
 
 use Modules\Helpdesk\Entities\ServiceManagement;
 use Modules\Helpdesk\Entities\ServiceRequest;
+use Modules\Helpdesk\Entities\Service;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -24,27 +25,42 @@ class ServiceManagementDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->editColumn('created_at', function (ServiceManagement $service) {
+            ->editColumn('created_at', function (Service $service) {
                 return $service->created_at->format('d M Y, h:i a');
             })
-            ->editColumn('user_cid', function (ServiceManagement $service, Company $company) {
+            ->editColumn('user_cid', function (Service $service, Company $company) {
+                // if(auth()->user()->level_access == 'Super Admin'){
+                //     // $data = $company->where('cid',$service->user_cid)->first();
+                //     return $service->user_cid;
+                //     // return $data->name;
+                // }else{
+                //     // $data = $company->where('cid',$service->user_cid)->first();
+                //     // return $data->name;
+                //     return $service->user_cid;
+                // }
+                
                 $data = $company->where('cid',$service->user_cid)->first();
                 return $data->name;
+                
+                
             })
-            ->addColumn('action', function (ServiceManagement $service) {
-                $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-                // return $isSupervisor ? view('helpdesk::service._actions', compact(['service','isSupervisor'])) : '';
+            ->addColumn('action', function (Service $service) {
+                $isOwner = auth()->check() && auth()->user()->level_access === 'Owner';
+                return $isOwner ? view('helpdesk::service-management._actions', compact(['service','isOwner'])) : '';
             })
             ->rawColumns([''])
             ->setRowId('id');
     }
 
-    public function query(ServiceManagement $model): QueryBuilder
+    public function query(Service $model): QueryBuilder
     {
         // Get a new query builder instance
         $user = auth()->user();
 
         if(!auth()->user()->level_access == 'Super Admin'){
+            $query = $model->where('user_cid', $user->cid)
+                            ->newQuery();
+        }elseif(auth()->user()->level_access == 'Owner'){
             $query = $model->where('user_cid', $user->cid)
                             ->newQuery();
         }else{
@@ -68,7 +84,7 @@ class ServiceManagementDataTable extends DataTable
             ->dom('Bfrtip')
             ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy('11')
+            ->orderBy('1')
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
@@ -92,18 +108,10 @@ class ServiceManagementDataTable extends DataTable
                     ->orderable(false)
                     ->searchable(false)
                     ->printable(true),
-            Column::make('subject')->title('Subject'),
-            Column::make('description')->title('Description')->visible(false),
-            Column::make('created_by')->title('Operator')->visible(false),
-            Column::make('origin_unit')->title('Unit')->visible(false),
-            Column::make('source_report')->title('Sources')->visible(false),
-            Column::make('issue_category')->title('Category')->visible(false),
-            Column::make('priority')->title('Priority'),
-            Column::make('count_kpi')->title('Include KPI')->visible(false),
-            Column::make('status'),
-            Column::make('work_order')->title('Work Order')->printable(false),
+            Column::make('name')->title('Name'),
+            Column::make('description')->title('Description')->visible(true),
+            Column::make('user_cid')->title('Created By'),
             Column::make('created_at')->title('Created Date'),
-            Column::make('user_cid')->title('Company')->visible(false),
             Column::computed('action')
                 ->addClass('text-end')
                 ->exportable(false)

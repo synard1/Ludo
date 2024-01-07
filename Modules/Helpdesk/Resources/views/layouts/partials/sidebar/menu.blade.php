@@ -26,7 +26,8 @@
     </div>
     <!--end:Menu sub-->
 
-    {{-- <!--begin:Menu sub-->
+    @if(auth()->check() && auth()->user()->level_access === 'Owner')
+    <!--begin:Menu sub-->
     <div class="menu-sub menu-sub-accordion">
         <!--begin:Menu item-->
         <div class="menu-item">
@@ -42,7 +43,8 @@
         </div>
         <!--end:Menu item-->
     </div>
-    <!--end:Menu sub--> --}}
+    <!--end:Menu sub-->
+    @endif
 
     <!--begin:Menu sub-->
     <div class="menu-sub menu-sub-accordion">

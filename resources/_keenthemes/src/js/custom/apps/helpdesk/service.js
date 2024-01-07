@@ -6,10 +6,9 @@ var KTService = function () {
     var tableService, tableStatus, serviceTitle;
     var dtService, dtStatus;
     var dtButtons;
-    var form, formWO, formNotes, formStatus, formHistory;
+    var form, formRequest, formNotes, formStatus, formHistory;
     var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus, closeButtonHistory, newServiceButton;
     var validator, validatorWO, validatorNotes, validatorStatus;
-    var checkSLA;
 
     // Delete service
     var handleDeleteRows = () => {
@@ -277,6 +276,176 @@ var KTService = function () {
 
     }
 
+    // Handle form
+    var handleFormRequest = function (e) {
+        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+        validator = FormValidation.formValidation(
+            formRequest,
+            {
+                fields: {
+                    'service': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Service is required'
+                            }
+                        }
+                    },
+                    'request_time': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Request Time is required'
+                            }
+                        }
+                    },
+                    'unit-dropdown': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Unit is required'
+                            }
+                        }
+                    },
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger({
+                        event: {
+                            password: false
+                        }
+                    }),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',  // comment to enable invalid state icons
+                        eleValidClass: '' // comment to enable valid state icons
+                    })
+                }
+            }
+        );
+
+        // // Add a click event listener to the "Cancel" button
+        xButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            formRequest.reset();
+            // Close kt_docs_card_service_new
+            $('#kt_docs_card_service_new').collapse('hide');
+            // Show kt_docs_card_service_list
+            $('#kt_docs_card_service_list').collapse('show');
+            $("#serviceRequest-table").DataTable().ajax.reload(null, false); 
+        });
+
+        // Handle form submit
+        submitButton.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            validator.validate().then(function (status) {
+                if (status == 'Valid') {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    // Show loading indication
+                    submitButton.setAttribute('data-kt-indicator', 'on');
+
+                    // Disable button to avoid multiple click
+                    submitButton.disabled = true;
+
+                    var formData = new FormData(document.getElementById('kt_new_service_form'));
+
+                    $.ajax({
+                        url: '/apps/helpdesk/api/service-management/request',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,  // Important: Don't process the data
+                        contentType: false,  // Important: Set content type to false
+                        success: function (response) {
+                            // alert(response.message);
+                            // Hide loading indication
+                            submitButton.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButton.disabled = false;
+
+                            swal.fire({
+                                text: response.message,
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            }).then(function(){
+                                // settingCompanyForm.reset();
+                                // validation.resetForm(); // Reset formvalidation --- more info: https://formvalidation.io/guide/api/reset-form/
+                                // toggleChangeEmail();
+                                // Hide loading indication
+                                submitButton.removeAttribute('data-kt-indicator');
+
+                                // Enable button
+                                submitButton.disabled = false;
+                                $('#kt_docs_card_service_list').collapse('show');
+                                $('#kt_docs_card_service_new').collapse('hide');
+                                // dtService.ajax.reload();
+                                $('#serviceRequest-table').DataTable().ajax.reload();
+                                formRequest.reset();
+                            });
+                        },
+                        error: function (xhr) {
+                            // Handle errors here
+                            // Hide loading indication
+                            submitButton.removeAttribute('data-kt-indicator');
+
+                            // Enable button
+                            submitButton.disabled = false;
+
+                            Swal.fire({
+                                text: "Sorry, looks like there are some errors detected, please try again.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
+                    Swal.fire({
+                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        });
+
+        // Add a click event listener to the "New Service" button
+        newServiceButton.addEventListener('click', function (e) {
+            form = document.querySelector('#kt_new_service_form');
+            form.reset();
+            e.preventDefault();
+
+            // Change the title text when the button is clicked
+            serviceTitle.innerText = 'New Service Request';
+
+            // Find the input element by its id
+            var serviceInput = document.getElementById('service');
+            serviceInput.removeAttribute('readonly');
+
+
+            // Close kt_docs_card_service_new
+            $('#kt_docs_card_service_new').collapse('show');
+            // Show kt_docs_card_service_list
+            $('#kt_docs_card_service_list').collapse('hide');
+        });
+
+    }
+
 
     var isValidUrl = function(url) {
         try {
@@ -372,19 +541,14 @@ var KTService = function () {
             handleDeleteRows();
             // Elements
             form = document.querySelector('#kt_new_service_form');
+            formRequest = '';
             submitButton = document.querySelector('#kt_new_service_submit');
 
             xButton = document.querySelector('#kt_new_service_cancel');
             newServiceButton = document.querySelector('#kt_new_service');
             serviceTitle = document.getElementById('serviceTitle');
 
-            if(slaExist){
-                checkSLA = true;
-            }else{
-                checkSLA = false;
-            }
-
-            if(isSupervisor){
+            if(canCreateService){
                 if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {
                     handleForm();
                 } else {
