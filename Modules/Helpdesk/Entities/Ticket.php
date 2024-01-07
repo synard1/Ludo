@@ -19,6 +19,8 @@ class Ticket extends Model
     use UserTrackingTrait;
 
     protected $fillable = [
+        'service_id',
+        'service_name',
         'subject',
         'description',
         'report_time',
@@ -68,7 +70,7 @@ class Ticket extends Model
         'timezone' => 'required|timezone:all'
     ];
 
-    public $table = 'tickets';
+    public $table = 'helpdesk_tickets';
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;

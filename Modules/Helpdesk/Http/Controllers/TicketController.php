@@ -9,6 +9,7 @@ use Modules\Helpdesk\Entities\Ticket;
 use Modules\Helpdesk\Entities\WorkOrder;
 use Modules\Helpdesk\Entities\WorkOrderResponse;
 use Modules\Helpdesk\Entities\WorkOrderNote;
+use Modules\Helpdesk\Entities\Service;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
@@ -37,6 +38,7 @@ class TicketController extends Controller
         $sla = SLA::where('user_cid',$user->cid)->get();
         $priorities = Config::get('onexolution.priorityWorkOrder');
         $statusTicket = Config::get('onexolution.statusTicket');
+        $services = Service::where('user_cid',$user->cid)->orderBy('name','asc')->get();
         // Retrieve distinct staff values from the database
         $distinctStaff = User::distinct('name')
                                     ->pluck('name')
@@ -53,7 +55,7 @@ class TicketController extends Controller
         $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
         
 
-        return $dataTable->render('helpdesk::ticket.newIndex',compact(['distinctStaff','priorities','statusTicket','canCreateTicket','isSupervisor','sla']));
+        return $dataTable->render('helpdesk::ticket.newIndex',compact(['services','distinctStaff','priorities','statusTicket','canCreateTicket','isSupervisor','sla']));
     }
 
     public function index()
@@ -313,12 +315,16 @@ class TicketController extends Controller
     public function saveTicket(Request $request)
     {
         $user = auth()->user();
+        $service = Service::where('user_cid', $user->cid)->where('id', $request->input('service'))->first(); // Use 'first' to get a single result or null if not found
+
         try {
 
             if($request->input('ticket_id')){
                 // Update the ticket with the new status
                 Ticket::where('id', $request->input('ticket_id'))
                         ->update([
+                            'service_id' => $service->id,
+                            'service_name' => $service->name,
                             'subject' => Uc($request->input('subject')),
                             'description' => $request->input('description'),
                             'reporter_name' => Uc($request->input('reporter-dropdown')),
@@ -331,6 +337,8 @@ class TicketController extends Controller
                         ]);
             }else{
                 $ticket = Ticket::create([
+                    'service_id' => $service->id,
+                    'service_name' => $service->name,
                     'subject' => Uc($request->input('subject')),
                     'description' => $request->input('description'),
                     'reporter_name' => Uc($request->input('reporter-dropdown')),

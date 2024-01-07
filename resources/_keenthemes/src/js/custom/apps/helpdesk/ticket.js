@@ -753,6 +753,13 @@ var KTTicket = function () {
             form,
             {
                 fields: {
+                    'service': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Service is required'
+                            }
+                        }
+                    },
                     'subject': {
                         validators: {
                             notEmpty: {

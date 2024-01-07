@@ -14,7 +14,8 @@ class SeedServicesSeeder extends Seeder
      */
     public function run(): void
     {
-        $user1 = User::where('email', 'admin@demo.com')->first();
+        $users = User::where('parent_id', null)->get();
+        // $user1 = User::where('email', 'admin@demo.com')->first();
 
         $services = [
             ['name' => 'IT Support', 'description' => 'Provides technical support for IT-related issues'],
@@ -37,17 +38,20 @@ class SeedServicesSeeder extends Seeder
             ['name' => 'IT Policy and Compliance', 'description' => 'Develops and enforces IT policies and ensures compliance'],
         ];
 
-        foreach ($services as $service) {
-            $model = new Service([
-                'id' => Uuid::uuid4()->toString(), // Generate and assign UUID
-                'name' => $service['name'],
-                'description' => $service['description'],
-                'user_id' => $user1->id,
-                'user_cid' => $user1->cid,
-                'created_by' => $user1->name,
-                'created_by_level' => $user1->level_access,
-            ]);
-            $model->save();
+
+        foreach ($users as $user) {
+            foreach ($services as $service) {
+                $model = new Service([
+                    'id' => Uuid::uuid4()->toString(), // Generate and assign UUID
+                    'name' => $service['name'],
+                    'description' => $service['description'],
+                    'user_id' => $user->id,
+                    'user_cid' => $user->cid,
+                    'created_by' => $user->name,
+                    'created_by_level' => $user->level_access,
+                ]);
+                $model->save();
+            }
         }
 
     }
