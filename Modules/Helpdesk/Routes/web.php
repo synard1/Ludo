@@ -48,7 +48,10 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
         Route::post('/workorder', [WorkOrderController::class, 'saveWorkOrder'])->name('postWorkOrder');
         Route::delete('/deleteWorkOrder/{id}', [WorkOrderController::class, 'deleteWorkOrder'])->name('deleteWorkOrder');
 
+        Route::post('/service', [ServiceManagementController::class, 'store'])->name('postService');
+        Route::get('/service', [ServiceManagementController::class, 'getServiceData'])->name('getService');
         Route::post('/service-management/request', [ServiceRequestController::class, 'saveServiceRequest'])->name('postServiceRequest');
+        Route::delete('/deleteService/{id}', [ServiceManagementController::class, 'deleteService'])->name('deleteService');
 
     });
 

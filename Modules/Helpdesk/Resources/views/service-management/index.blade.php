@@ -25,7 +25,7 @@
     @if ($canCreateService)
         <div class="card shadow-sm mb-5">
             <div class="card-header collapsible cursor-pointer rotate">
-                <h3 class="card-title" id="serviceTitle">New Service</h3>
+                <h3 class="card-title" id="serviceTitleForm">New Service</h3>
                 <div class="card-toolbar rotate-180">
                     <i class="ki-duotone ki-down fs-1"></i>
                 </div>
@@ -43,13 +43,8 @@
 
                                     <!--begin::Input-->
                                     <div class="position-relative d-flex align-items-center">
-
-                                        <select id="service" name="service" class="js-select2 form-control">
-                                            <option value="">Select Service Category</option>
-                                            @foreach ($services as $service)
-                                                <option value="{{ $service->id }}"><b>{{ $service->name }}</b> -- {{ $service->description }}</option>
-                                            @endforeach
-                                    </select>
+                                        <input type="text" class="form-control form-control-solid"
+                                            placeholder="Enter your service name" name="service" id="service">
                                     </div>
                                     <!--end::Input-->
                                 <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
@@ -61,7 +56,7 @@
                         <div class="row mb-2">
                             <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
                                 <!--begin::Label-->
-                                <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                <label class="d-flex align-items-center fs-6 fw-semibold mb-2 required">
                                     Description
                                 </label>
                                 <!--end::Label-->
@@ -71,67 +66,6 @@
                                     class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                                 </div>
                             </div>
-                        </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Input group-->
-                        <div class="row mb-2">
-                            <div class="col fv-row">
-                                <label for="" class="form-label"><span class="required">Unit:</span></label>
-                                <div class="input-group">
-                                    <livewire:helpdesk::unit-select />
-                                </div>
-                            </div>
-                            <div class="col fv-row">
-                                <label for="" class="form-label">User:</label>
-                                <div class="input-group">
-                                    <livewire:helpdesk::reporter-select />
-                                </div>
-                            </div>
-                        </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Input group-->
-                        <div class="row g-9 mb-8">
-                            <!--begin::Col-->
-                            <div class="col-md-6 fv-row fv-plugins-icon-container">
-                                <!--begin::Label-->
-                                <label class="col-lg-4 col-form-label fw-semibold fs-6">
-                                    <span class="required">Request Time</span>
-
-                                    <span class="m2-1" data-bs-toggle="tooltip"
-                                        title="User Report Time">
-                                        <i class="ki-duotone ki-information fs-7"><span
-                                                class="path1"></span><span class="path2"></span><span
-                                                class="path3"></span></i>
-                                    </span>
-                                </label>
-                                <!--end::Label-->
-
-                                <!--begin::Input-->
-                                <div class="position-relative d-flex align-items-center">
-                                    <!--begin::Icon-->
-                                    <div class="symbol symbol-20px me-4 position-absolute ms-4">
-                                        <span class="symbol-label bg-secondary">
-                                            <i class="ki-duotone ki-element-11"><span class="path1"></span><span
-                                                    class="path2"></span><span class="path3"></span><span
-                                                    class="path4"></span></i> </span>
-                                    </div>
-                                    <!--end::Icon-->
-
-                                    <!--begin::Datepicker-->
-                                    <input class="form-control form-control-solid ps-12 flatpickr-input"
-                                        placeholder="Select a date" name="report_time" id="report_time"
-                                        type="text">
-                                    <!--end::Datepicker-->
-                                </div>
-                                <!--end::Input-->
-                                <div
-                                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                                </div>
-                            </div>
-                            <!--end::Col-->
-
                         </div>
                         <!--end::Input group-->
 

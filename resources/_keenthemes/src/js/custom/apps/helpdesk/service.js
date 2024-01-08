@@ -3,7 +3,7 @@
 // Class definition
 var KTService = function () {
     // Shared variables
-    var tableService, tableStatus, serviceTitle;
+    var tableService, tableStatus, serviceTitle, serviceTitleForm;
     var dtService, dtStatus;
     var dtButtons;
     var form, formRequest, formNotes, formStatus, formHistory;
@@ -120,17 +120,10 @@ var KTService = function () {
                             }
                         }
                     },
-                    'request_time': {
+                    'description': {
                         validators: {
                             notEmpty: {
-                                message: 'Request Time is required'
-                            }
-                        }
-                    },
-                    'unit-dropdown': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Unit is required'
+                                message: 'Description is required'
                             }
                         }
                     },
@@ -182,7 +175,7 @@ var KTService = function () {
                     var formData = new FormData(document.getElementById('kt_new_service_form'));
 
                     $.ajax({
-                        url: '/apps/helpdesk/api/service-management/request',
+                        url: '/apps/helpdesk/api/service',
                         type: 'POST',
                         data: formData,
                         processData: false,  // Important: Don't process the data
@@ -215,7 +208,7 @@ var KTService = function () {
                                 $('#kt_docs_card_service_list').collapse('show');
                                 $('#kt_docs_card_service_new').collapse('hide');
                                 // dtService.ajax.reload();
-                                $('#serviceRequest-table').DataTable().ajax.reload();
+                                $('#services-table').DataTable().ajax.reload();
                                 form.reset();
                             });
                         },
@@ -261,7 +254,7 @@ var KTService = function () {
             e.preventDefault();
 
             // Change the title text when the button is clicked
-            serviceTitle.innerText = 'New Service Request';
+            serviceTitleForm.innerText = 'New Service';
 
             // Find the input element by its id
             var serviceInput = document.getElementById('service');
@@ -272,6 +265,169 @@ var KTService = function () {
             $('#kt_docs_card_service_new').collapse('show');
             // Show kt_docs_card_service_list
             $('#kt_docs_card_service_list').collapse('hide');
+        });
+
+        $('#services-table').on('click', '.delete-row', function(e) {
+            e.preventDefault();
+            var id = $(this).data('id');
+            // console.log('delete row click!');
+
+            // Select parent row
+            const parent = e.target.closest('tr');
+
+            // Get subject name
+            const serviceTitle = parent.querySelectorAll('td')[1].innerText;
+            const serviceId = $(this).data('id');
+            // console.log(serviceId +' '+ serviceTitle);
+            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
+            Swal.fire({
+                icon: "warning",
+                html: `Are you sure you want to delete  <b>`+ serviceTitle +`</b> ?`,
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    // Simulate delete request -- for demo purpose only
+                    Swal.fire({
+                        html: `Deleting  <b>`+ serviceTitle +`</b>`,
+                        icon: "info",
+                        buttonsStyling: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(function () {
+                        $.ajax({
+                            url: '/apps/helpdesk/api/deleteService/' + serviceId,
+                            type: 'DELETE',
+                            success: function(response) {
+                                // Refresh the DataTable or remove the row from the table
+                                // depending on your implementation
+                                swal.fire({
+                                    text: response.message,
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn font-weight-bold btn-light-primary"
+                                    }
+                                }).then(function(){
+                                    $('#services-table').DataTable().ajax.reload();
+                                });
+                            },
+                            error: function (error) {
+                                let errorMessage = "Sorry, looks like there are some errors detected, please try again.";
+
+                                if (error.responseJSON && error.responseJSON.message) {
+                                    errorMessage = error.responseJSON.message;
+                                }
+
+                                Swal.fire({
+                                    text: errorMessage,
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                });
+
+                                console.error('Error deleting service:', error);
+                            }
+                        });
+                    });
+                } else if (result.dismiss === 'cancel') {
+                    Swal.fire({
+                        html: `<b>`+ serviceTitle +`</b> was not deleted.`,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                }
+            });
+        });
+
+        $('#services-table').on('click', '.edit-service', function(e) {
+            e.preventDefault();
+            var id = $(this).data('id');
+
+            // Change the title text when the button is clicked
+            serviceTitleForm.innerText = 'Edit Service';
+            // Select parent row
+            const parent = e.target.closest('tr');
+
+            // Get subject name
+            const serviceTitle = parent.querySelectorAll('td')[1].innerText;
+            const serviceId = $(this).data('id');
+            // console.log(serviceId +' '+ serviceTitle);
+
+            // Simulate delete request -- for demo purpose only
+            Swal.fire({
+                html: `Load Data <b>`+ serviceTitle +`</b>`,
+                icon: "info",
+                buttonsStyling: false,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(function () {
+                // Close kt_docs_card_service_new
+                $('#kt_docs_card_service_new').collapse('show');
+                // Show kt_docs_card_service_list
+                $('#kt_docs_card_service_list').collapse('hide');
+
+                $.ajax({
+                    url: '/apps/helpdesk/api/service',
+                    type: 'GET',
+                    data: {
+                        service_id: serviceId,
+                    },
+                    success: function(response) {
+                        $('#service').val(response.data.name);
+                        $('#description').val(response.data.description);
+
+                        // Find the input element by its id
+                        var serviceInput = document.getElementById('service');
+                        serviceInput.setAttribute('readonly', true);
+
+                        // Create a new hidden input element
+                        var hiddenInput = document.createElement("input");
+                        hiddenInput.type = "hidden";
+                        hiddenInput.id = "service_id";
+                        hiddenInput.name = "service_id";
+                        hiddenInput.className = "form-control form-control-solid";
+                        hiddenInput.value = response.data.id;
+                        hiddenInput.readOnly = true;
+
+                        // Find the form by its id and append the hidden input to it
+                        document.getElementById("kt_new_service_form").appendChild(hiddenInput);
+                    },
+                    error: function (error) {
+                        let errorMessage = "Sorry, looks like there are some errors detected, please try again.";
+
+                        if (error.responseJSON && error.responseJSON.message) {
+                            errorMessage = error.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            text: errorMessage,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+
+                        console.error('Error deleting service:', error);
+                    }
+                });
+            });
         });
 
     }
@@ -546,7 +702,7 @@ var KTService = function () {
 
             xButton = document.querySelector('#kt_new_service_cancel');
             newServiceButton = document.querySelector('#kt_new_service');
-            serviceTitle = document.getElementById('serviceTitle');
+            serviceTitleForm = document.getElementById('serviceTitleForm');
 
             if(canCreateService){
                 if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {

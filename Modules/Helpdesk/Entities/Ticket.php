@@ -108,6 +108,11 @@ class Ticket extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function services()
+    {
+        return $this->belongsTo(Service::class);
+    }
+
     public function workOrders(): HasOne
     {
         return $this->hasOne(WorkOrder::class);
