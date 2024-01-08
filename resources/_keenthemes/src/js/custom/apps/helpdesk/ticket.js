@@ -349,16 +349,14 @@ var KTTicket = function () {
         $('#tickets-table').on('click', '.generate-work-order', function() {
             var id = $(this).data('id');
             var title = $(this).data('title');
-            // Implement logic to handle "Generate Work Order" button click
-            // console.log('Generate work order for ID: ' + id);
-            // Get the data-id attribute value from the clicked link
-            var rowId = $(this).data('id');
 
             fetchStaffData();
 
             // Assuming you want to set the data-id value to an input field in the modal form
-            $('#ticket_id').val(rowId);
+            $('#ticket_id').val(id);
             $('#subject_wo').val(title);
+            console.log('Generate work order for ID: ' + id);
+            console.log('Generate work order for title: ' + title);
         });
 
         var options = {
