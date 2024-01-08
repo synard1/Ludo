@@ -4,10 +4,12 @@ namespace Modules\Helpdesk\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Helpdesk\Database\factories\ServiceFactory;
 use App\Traits\UserTrackingTrait;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Ramsey\Uuid\Uuid;
 
-class ServiceManagement extends Model
+class Service extends Model
 {
     use HasFactory, UserTrackingTrait;
 
@@ -30,7 +32,11 @@ class ServiceManagement extends Model
      */
     protected $fillable = [
         'name',
-        'description',
+        'description'
     ];
-    
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'service_id', 'id');
+    }
 }

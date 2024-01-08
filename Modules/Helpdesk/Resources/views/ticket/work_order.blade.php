@@ -39,7 +39,7 @@
                         </label>
                         <!--end::Label-->
 
-                        <input type="text" class="form-control form-control-solid" placeholder="Enter your ticket subject" name="subject_wo" id="subject_wo">
+                        <input type="text" class="form-control form-control-solid" placeholder="Enter your ticket subject" name="subject_wo" id="subject_wo" readonly>
                     <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
                     <!--end::Input group-->
 

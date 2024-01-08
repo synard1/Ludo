@@ -61,7 +61,7 @@ class TicketsDataTable extends DataTable
                 } else {
                     if ($isSupervisor) {
                         return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
-                            $ticket->id . '" data-report-time="' . $ticket->report_time . '">Generate Work Order</a>';
+                            $ticket->id . '" data-report-time="' . $ticket->report_time . '" data-title="' . $ticket->subject . '">Generate Work Order</a>';
                     }
 
                     return '<a href="#">N/A</a>';
@@ -126,7 +126,7 @@ class TicketsDataTable extends DataTable
             ->dom('Bfrtip')
             ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy('11')
+            ->orderBy('12')
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
@@ -159,6 +159,7 @@ class TicketsDataTable extends DataTable
                     ->orderable(false)
                     ->searchable(false)
                     ->printable(true),
+            Column::make('service_name')->title('Service'),
             Column::make('subject')->title('Subject'),
             Column::make('description')->title('Description')->visible(false),
             Column::make('created_by')->title('Operator')->visible(false),

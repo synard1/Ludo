@@ -25,13 +25,15 @@
         <!--end:Menu item-->
     </div>
     <!--end:Menu sub-->
+
+    @if(auth()->check() && auth()->user()->level_access === 'Owner')
     <!--begin:Menu sub-->
     <div class="menu-sub menu-sub-accordion">
         <!--begin:Menu item-->
         <div class="menu-item">
             <!--begin:Menu link-->
-            <a class="menu-link {{ request()->routeIs('helpdesk.service') ? 'active' : '' }}"
-                href="{{ route('helpdesk.service') }}">
+            <a class="menu-link {{ request()->routeIs('helpdesk.service-management') ? 'active' : '' }}"
+                href="{{ route('helpdesk.service-management') }}">
                 <span class="menu-bullet">
                     <span class="bullet bullet-dot"></span>
                 </span>
@@ -42,6 +44,8 @@
         <!--end:Menu item-->
     </div>
     <!--end:Menu sub-->
+    @endif
+
     <!--begin:Menu sub-->
     <div class="menu-sub menu-sub-accordion">
         <!--begin:Menu item-->

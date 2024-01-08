@@ -49,6 +49,7 @@ class RolesPermissionsSeeder extends Seeder
                 'user sign ticket',
                 'user sign helpdesk',
                 'sla',
+                'service management',
 
             ],
             'Administrator' => [
@@ -59,6 +60,7 @@ class RolesPermissionsSeeder extends Seeder
                 'ticket',
                 'workorder',
                 'sla',
+                'service management',
             ],
             'developer' => [
                 'api controls',
@@ -75,6 +77,7 @@ class RolesPermissionsSeeder extends Seeder
                 'helpdesk',
                 'ticket',
                 'workorder',
+                'service management',
             ],
             'Trial' => [
                 'setting management',

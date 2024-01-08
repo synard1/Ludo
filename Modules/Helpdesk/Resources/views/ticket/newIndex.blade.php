@@ -39,6 +39,27 @@
                         <!--begin::Input group-->
                         <div class="row mb-2">
                             <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
+                                    <label class="required fs-6 fw-semibold mb-2">Service Category</label>
+
+                                    <!--begin::Input-->
+                                    <div class="position-relative d-flex align-items-center">
+
+                                        <select id="service" name="service" class="js-select2 form-control">
+                                            <option value="">Select Service Category</option>
+                                            @foreach ($services as $service)
+                                                <option value="{{ $service->id }}"><b>{{ $service->name }}</b> -- {{ $service->description }}</option>
+                                            @endforeach
+                                    </select>
+                                    </div>
+                                    <!--end::Input-->
+                                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <!--end::Input group-->
+
+                        <!--begin::Input group-->
+                        <div class="row mb-2">
+                            <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
                                 <!--begin::Label-->
                                 <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                                     <span class="required">Subject</span>

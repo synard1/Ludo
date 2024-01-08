@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\UserTrackingTrait;
 use Ramsey\Uuid\Uuid;
 
-class ServiceManagement extends Model
+class ServiceRequest extends Model
 {
     use HasFactory, UserTrackingTrait;
 
-    public $table = 'helpdesk_services';
+    public $table = 'helpdesk_service_requests';
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -29,8 +29,14 @@ class ServiceManagement extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'name',
-        'description',
+        'request_description',
+        'request_date',
+        'status',
+        'service_id',
+        'service_name',
+        'requester_name',
+        'requester_unit',
+        'requester_cid',
     ];
     
 }
