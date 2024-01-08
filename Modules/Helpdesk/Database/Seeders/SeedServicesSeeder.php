@@ -36,6 +36,14 @@ class SeedServicesSeeder extends Seeder
             ['name' => 'System Monitoring and Alerts', 'description' => 'Monitors system performance and sets up alerts'],
             ['name' => 'Database Administration', 'description' => 'Manages and administers organization databases'],
             ['name' => 'IT Policy and Compliance', 'description' => 'Develops and enforces IT policies and ensures compliance'],
+            ['name' => 'Network Infrastructure Upgrade', 'description' => 'Plans and executes upgrades to the network infrastructure'],
+            ['name' => 'Endpoint Security Management', 'description' => 'Ensures security on endpoint devices, such as computers and laptops'],
+            ['name' => 'Cloud Services Administration', 'description' => 'Manages and administers cloud-based services and solutions'],
+            ['name' => 'IT Training and Knowledge Sharing', 'description' => 'Provides training sessions and shares IT knowledge within the organization'],
+            ['name' => 'IT Asset Management', 'description' => 'Tracks and manages the organization\'s IT assets'],
+            ['name' => 'Disaster Recovery Planning', 'description' => 'Develops and implements plans for disaster recovery and business continuity'],
+            ['name' => 'IT Governance', 'description' => 'Establishes and oversees IT governance practices'],
+            ['name' => 'Health Information System Administration', 'description' => 'Administers and maintains the organization\'s health information system (e.g., SIMRS)'],
         ];
 
 
