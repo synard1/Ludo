@@ -10,5 +10,6 @@
     "FeedbackPortal": true,
     "Semver": true,
     "Dashboard": true,
-    "SLA": true
+    "SLA": true,
+    "ITSM": true
 }

@@ -44,6 +44,11 @@
 					<!--end:Menu content-->
 				</div>
 				<!--end:Menu item-->
+				@if(App\Helpers\ModuleHelper::isModuleActive('ITSM'))
+					@if(auth()->user()->can('access itsm'))
+						@include('itsm::layouts.partials.sidebar.menu')
+					@endif
+				@endif
 				@if(App\Helpers\ModuleHelper::isModuleActive('AdsPortal'))
 					@if(auth()->user()->can('access ads portal'))
 						@include('adsportal::layouts.partials.sidebar.menu')

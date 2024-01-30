@@ -50,6 +50,11 @@ class RolesPermissionsSeeder extends Seeder
                 'user sign helpdesk',
                 'sla',
                 'service management',
+                'itsm',
+                'itsm-incident',
+                'itsm-incident-category',
+                'itsm-service',
+                'itsm-service-category',
 
             ],
             'Administrator' => [
@@ -61,6 +66,11 @@ class RolesPermissionsSeeder extends Seeder
                 'workorder',
                 'sla',
                 'service management',
+                'itsm',
+                'itsm-incident',
+                'itsm-incident-category',
+                'itsm-service',
+                'itsm-service-category',
             ],
             'developer' => [
                 'api controls',
@@ -78,6 +88,11 @@ class RolesPermissionsSeeder extends Seeder
                 'ticket',
                 'workorder',
                 'service management',
+                'itsm',
+                'itsm-incident',
+                'itsm-incident-category',
+                'itsm-service',
+                'itsm-service-category',
             ],
             'Trial' => [
                 'setting management',
