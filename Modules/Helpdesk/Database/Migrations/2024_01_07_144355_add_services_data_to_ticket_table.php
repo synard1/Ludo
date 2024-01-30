@@ -24,6 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ticket', function (Blueprint $table) {
+            $table->dropColumn(['service_id','service_name']);
             
         });
     }

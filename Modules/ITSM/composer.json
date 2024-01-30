@@ -1,0 +1,31 @@
+{
+    "name": "ludo.my.id/itsm",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mhd Iqbal Syahputra",
+            "email": "synard1@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ITSM\\": "",
+            "Modules\\ITSM\\App\\": "app/",
+            "Modules\\ITSM\\Database\\Factories\\": "database/factories/",
+            "Modules\\ITSM\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\ITSM\\Tests\\": "tests/"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "ITSM",
+    "alias": "itsm",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ITSM\\Providers\\ITSMServiceProvider"
+    ],
+    "files": []
+}

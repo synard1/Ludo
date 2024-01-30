@@ -245,6 +245,14 @@ return [
                 'assets/js/jquery.signature.js',
             ],
         ],
+        'tempus-dominus' => [
+            'css' => [
+                'https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css',
+            ],
+            'js' => [
+                'https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous',
+            ],
+        ],
     ],
 
 ];

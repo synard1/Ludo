@@ -42,6 +42,17 @@
         <!--end::Col-->
 
     </div>
+    <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+            <!--begin::Card widget 15-->
+            <div class="card card-flush h-xl-100">
+                <!--begin::Body-->
+                <div class="card-body py-9">
+                    @include('dashboard::charts/total_incident_service_report')
+                </div>
+                <!--end::Body-->
+            </div>
+            <!--end::Card widget 15-->
+    </div>
     @push('scripts')
 
     @endpush

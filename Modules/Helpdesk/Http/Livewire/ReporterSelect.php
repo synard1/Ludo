@@ -5,6 +5,7 @@ namespace Modules\Helpdesk\Http\Livewire;
 use Livewire\Component;
 use Modules\Helpdesk\Entities\Ticket;
 
+
 class ReporterSelect extends Component
 {
     public $selectedReporter;

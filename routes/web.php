@@ -155,9 +155,9 @@ require __DIR__.'/superadmin.php';
 require __DIR__.'/client.php';
 
 // Fallback route
-Route::fallback(function () {
-    return redirect()->back();
-});
+// Route::fallback(function () {
+//     return redirect()->back();
+// });
 
 
 
