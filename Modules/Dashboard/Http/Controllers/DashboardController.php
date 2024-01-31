@@ -175,20 +175,56 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         if(isLocal()){
-            $data = DB::table('helpdesk_tickets')
-            ->select(DB::raw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+            $data = DB::table('itsm_reporteds')
+            ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
             ->whereMonth('created_at', '=', $selectedMonth)
             ->whereYear('created_at', '=', $selectedYear)
-            ->groupBy('source_report')
+            ->groupBy('source')
             ->get();
 
         }else{
-            $data = DB::table('helpdesk_tickets')
-            ->select(DB::raw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+            $data = DB::table('itsm_reporteds')
+            ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
             ->whereMonth('created_at', '=', $selectedMonth)
             ->whereYear('created_at', '=', $selectedYear)
             ->where('user_cid',$user->cid)
-            ->groupBy('source_report')
+            ->groupBy('source')
+            ->get();
+
+        }
+
+        return response()->json($data);
+    }
+
+    public function fetchDataAverageTimeHisReport(Request $request)
+    {
+        $selectedMonth = $request->input('month');
+        $selectedYear = $request->input('year');
+        $user = auth()->user();
+
+        if(isLocal()){
+            $data = DB::table('itsm_reporteds')
+            ->select(DB::raw('category, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+            ->where(function ($query) {
+                $query->where('category', 'LIKE', '%SIMRS%')
+                    ->orWhere('category', 'LIKE', '%HIS%');
+            })
+            ->whereMonth('created_at', '=', $selectedMonth)
+            ->whereYear('created_at', '=', $selectedYear)
+            ->groupBy('category')
+            ->get();
+
+        }else{
+            $data = DB::table('itsm_reporteds')
+            ->select(DB::raw('category, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+            ->where(function ($query) {
+                $query->where('category', 'LIKE', '%SIMRS%')
+                    ->orWhere('category', 'LIKE', '%HIS%');
+            })
+            ->whereMonth('created_at', '=', $selectedMonth)
+            ->whereYear('created_at', '=', $selectedYear)
+            ->where('user_cid',$user->cid)
+            ->groupBy('category')
             ->get();
 
         }
@@ -203,7 +239,7 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         if(isLocal()){
-            $data = DB::table('work_orders')
+            $data = DB::table('itsm_work_orders')
             ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
             ->whereMonth('created_at', '=', $selectedMonth)
             ->whereYear('created_at', '=', $selectedYear)
@@ -211,7 +247,7 @@ class DashboardController extends Controller
             ->get();
 
         }else{
-            $data = DB::table('work_orders')
+            $data = DB::table('itsm_work_orders')
             ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
             ->whereMonth('created_at', '=', $selectedMonth)
             ->whereYear('created_at', '=', $selectedYear)
