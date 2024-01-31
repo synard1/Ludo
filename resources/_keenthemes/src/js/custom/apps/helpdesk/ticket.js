@@ -9,6 +9,7 @@ var KTTicket = function () {
     var form, formWO, formNotes, formStatus, formHistory;
     var submitButton, xButton, submitButtonWO, submitButtonNotes, submitButtonStatus, closeButtonHistory, newTicketButton;
     var validator, validatorWO, validatorNotes, validatorStatus;
+    var checkSLA;
 
     // Private functions
     var initDatatableStatusHistory = function(id) {
@@ -189,7 +190,18 @@ var KTTicket = function () {
                     'due_date': {
                         validators: {
                             notEmpty: {
-                                message: 'Due Date is required'
+                                message: 'Due Date is required',
+                                // Conditionally enable or disable the validator based on slaExists
+                                enabled: !checkSLA
+                            }
+                        }
+                    },
+                    'sla': {
+                        validators: {
+                            notEmpty: {
+                                message: 'SLA is required',
+                                // Conditionally enable or disable the validator based on slaExists
+                                enabled: checkSLA
                             }
                         }
                     },
@@ -256,6 +268,7 @@ var KTTicket = function () {
                             subject: $('#subject_wo').val(),
                             description: $('#description_wo').val(),
                             due_date: $('#due_date').val(),
+                            sla: $('#sla').val(),
                             staff: $('#staffSelect').val(),
                             priority: $('#priority').val(),
                         },
@@ -335,15 +348,15 @@ var KTTicket = function () {
 
         $('#tickets-table').on('click', '.generate-work-order', function() {
             var id = $(this).data('id');
-            // Implement logic to handle "Generate Work Order" button click
-            // console.log('Generate work order for ID: ' + id);
-            // Get the data-id attribute value from the clicked link
-            var rowId = $(this).data('id');
+            var title = $(this).data('title');
 
             fetchStaffData();
 
             // Assuming you want to set the data-id value to an input field in the modal form
-            $('#ticket_id').val(rowId);
+            $('#ticket_id').val(id);
+            $('#subject_wo').val(title);
+            console.log('Generate work order for ID: ' + id);
+            console.log('Generate work order for title: ' + title);
         });
 
         var options = {
@@ -740,6 +753,13 @@ var KTTicket = function () {
             form,
             {
                 fields: {
+                    'service': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Service is required'
+                            }
+                        }
+                    },
                     'subject': {
                         validators: {
                             notEmpty: {
@@ -1261,6 +1281,12 @@ var KTTicket = function () {
 
             formHistory = document.querySelector('#kt_modal_change_status_form');
             closeButtonHistory = document.querySelector('#kt_modal_history_status_close');
+
+            if(slaExist){
+                checkSLA = true;
+            }else{
+                checkSLA = false;
+            }
 
             if(isSupervisor){
                 if (isValidUrl(submitButton.closest('form').getAttribute('action'))) {

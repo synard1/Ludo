@@ -2,9 +2,11 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Modules\Helpdesk\Http\Controllers\TicketController;
+use Modules\Helpdesk\Http\Controllers\ServiceManagementController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderResponseController;
 use Modules\Helpdesk\Http\Controllers\WorkOrderNoteController;
+use Modules\Helpdesk\Http\Controllers\ServiceRequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +27,7 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
 
     // Main Routes
     Route::get('/ticket', [TicketController::class, 'newIndex'])->name('tickets');
+    Route::get('/service-management', [ServiceManagementController::class, 'index'])->name('service-management');
     // Route::get('/workorder1', [WorkOrderController::class, 'index'])->name('workorder1');
     Route::get('/workorder', [WorkOrderController::class, 'newIndex'])->name('workorder');
     Route::get('/print/wo/{id}', [TicketController::class, 'woPrint'])->name('woPrint');
@@ -44,6 +47,11 @@ Route::prefix('apps/helpdesk')->name('helpdesk.')->middleware(config('onexolutio
         Route::get('/workorder', [WorkOrderController::class, 'getWorkOrderData'])->name('getWorkOrder');
         Route::post('/workorder', [WorkOrderController::class, 'saveWorkOrder'])->name('postWorkOrder');
         Route::delete('/deleteWorkOrder/{id}', [WorkOrderController::class, 'deleteWorkOrder'])->name('deleteWorkOrder');
+
+        Route::post('/service', [ServiceManagementController::class, 'store'])->name('postService');
+        Route::get('/service', [ServiceManagementController::class, 'getServiceData'])->name('getService');
+        Route::post('/service-management/request', [ServiceRequestController::class, 'saveServiceRequest'])->name('postServiceRequest');
+        Route::delete('/deleteService/{id}', [ServiceManagementController::class, 'deleteService'])->name('deleteService');
 
     });
 

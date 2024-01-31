@@ -1,0 +1,11 @@
+{
+    "name": "SLA",
+    "alias": "sla",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SLA\\Providers\\SLAServiceProvider"
+    ],
+    "files": []
+}

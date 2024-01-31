@@ -17,6 +17,8 @@ use App\Models\SignaturePad;
 use App\Helpers\ModuleHelper;
 use App\Models\StatusHistory;
 use Modules\Helpdesk\Http\DataTables\WorkOrdersDataTable;
+use Carbon\Carbon;
+use Modules\SLA\Entities\SLA;
 
 class WorkOrderController extends Controller
 {
@@ -118,6 +120,9 @@ class WorkOrderController extends Controller
         $max = WorkOrder::where('user_cid', $cid)->max('no');
         $ticket = Ticket::where('id', $request->input('ticket_id'))->first();
 
+        $due_date = $request->input('due_date');
+        $sla = $request->input('sla');
+
         $workorder = WorkOrder::create([
             'user_id' => $userId,
             'no' => $max+1,
@@ -127,7 +132,7 @@ class WorkOrderController extends Controller
             'user' => $ticket->reporter_name,
             'subject' => Uc($request->input('subject')),
             'description' => $request->input('description'),
-            'due_date' => $request->input('due_date'),
+            'due_date' => $due_date,
             'supervisor' => Uc($user->name),
             'staff' => $request->input('staff'),
             'priority' => $request->input('priority'),
@@ -135,7 +140,17 @@ class WorkOrderController extends Controller
             'ticket_details' => json_encode($ticket),
         ]);
 
-        
+        if($sla){
+            $slaData = SLA::where('id',$sla)->first();
+            // Create a Carbon instance from the original date
+            $carbonDate = Carbon::parse($workorder->created_at);
+
+            // Add sla minutes
+            $newDate = $carbonDate->addMinutes($slaData->duration);
+
+            $workorder2 = WorkOrder::where('id', $workorder->id)
+                        ->update(['due_date' => $newDate]);
+        }
 
         $ticket2 = Ticket::where('id', $workorder->ticket_id)
                     ->update(['work_order_id' => $workorder->id,'priority' => $request->input('priority')]);

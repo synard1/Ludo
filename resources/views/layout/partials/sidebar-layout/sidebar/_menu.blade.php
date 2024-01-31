@@ -44,6 +44,11 @@
 					<!--end:Menu content-->
 				</div>
 				<!--end:Menu item-->
+				@if(App\Helpers\ModuleHelper::isModuleActive('ITSM'))
+					@if(auth()->user()->can('access itsm'))
+						@include('itsm::layouts.partials.sidebar.menu')
+					@endif
+				@endif
 				@if(App\Helpers\ModuleHelper::isModuleActive('AdsPortal'))
 					@if(auth()->user()->can('access ads portal'))
 						@include('adsportal::layouts.partials.sidebar.menu')
@@ -57,6 +62,11 @@
 				@if(App\Helpers\ModuleHelper::isModuleActive('Helpdesk'))
 					@if(auth()->user()->can('access helpdesk') || auth()->user()->can('read helpdesk'))
 						@include('helpdesk::layouts.partials.sidebar.menu')
+					@endif
+				@endif
+				@if(App\Helpers\ModuleHelper::isModuleActive('SLA'))
+					@if(auth()->user()->can('access sla') || auth()->user()->can('read sla'))
+						@include('sla::layouts.partials.sidebar.menu')
 					@endif
 				@endif
 			@endif

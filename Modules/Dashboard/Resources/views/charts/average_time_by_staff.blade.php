@@ -1,5 +1,5 @@
         <div class="card-header collapsible cursor-pointer rotate">
-            <h3 class="card-title">Average Resolution Time SLA < 120 Minutes </h3>
+            <h3 class="card-title">Average Resolution Time SLA < {{$artValue}} Minutes </h3>
         </div>
         <div id="kt_docs_card_workorder_list" class="collapse show">
         <!--begin::Card body-->
@@ -32,6 +32,10 @@
     <script>
 
     var myChart1; // Declare a variable to store the chart instance
+    var art = @json($artValue);
+    var artH = art / 2;
+    console.log(art);
+
     function fetchData2() {
         var selectedMonth = document.getElementById('filterMonth').value;
         var selectedYear = document.getElementById('filterYear').value;
@@ -56,9 +60,9 @@
 
     // Add logic for coloring bars based on average time
     var backgroundColors = avgTimes.map(function (avgTime) {
-        if (avgTime > 60 && avgTime <= 90) {
+        if (avgTime > artH && avgTime <= art) {
             return 'rgba(255, 255, 0, 0.2)'; // Yellow
-        } else if (avgTime > 90) {
+        } else if (avgTime > art) {
             return 'rgba(255, 0, 0, 0.2)'; // Red
         } else {
             return 'rgba(75, 192, 192, 0.2)'; // Default color

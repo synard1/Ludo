@@ -9,5 +9,7 @@
     "UserMedia": false,
     "FeedbackPortal": true,
     "Semver": true,
-    "Dashboard": true
+    "Dashboard": true,
+    "SLA": true,
+    "ITSM": true
 }

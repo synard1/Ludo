@@ -28,3 +28,5 @@ php artisan make:migration add_image_path_and_logo_url_to_companies_table --tabl
 
 
 /opt/alt/php81/usr/bin/php  artisan module:make-migration add_report_time_to_work_orders_table Helpdesk
+
+/opt/alt/php81/usr/bin/php  artisan module:make-model ServiceManagement -mc Helpdesk
