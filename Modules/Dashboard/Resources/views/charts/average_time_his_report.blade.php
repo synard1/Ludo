@@ -57,14 +57,20 @@ function updateChartHis(tickets) {
 
     var chartData = {
         labels: tickets.map(entry => entry.name),
-        // labels: "HIS",
-        datasets: [{
-            label: 'Total Data',
-            data: tickets.map(entry => Math.min(entry.total)), // Set max value to 60 minutes
-            backgroundColor: 'blue', // Set color to red if > 60 minutes
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-        }]
+        datasets: [
+            {
+                label: 'Under 5H',
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'blue',
+                data: tickets.map(entry => Math.min(entry.total_under)),
+            },
+            {
+                label: 'Upper 5H',
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'red',
+                data: tickets.map(entry => Math.min(entry.total_upper)),
+            },
+        ],
     };
 
     myChartHis = new Chart(ctx, {
@@ -76,12 +82,6 @@ function updateChartHis(tickets) {
                 beginAtZero: true,
             }
         },
-        // plugins: {
-        //     legend: {
-        //         display: true,
-        //         position: 'top'
-        //     }
-        // },
     }
 });
 }
