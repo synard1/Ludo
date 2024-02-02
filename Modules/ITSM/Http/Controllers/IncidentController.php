@@ -222,7 +222,7 @@ class IncidentController extends Controller
             $incident = Incident::where('id', $request->input('id'))->first();
             $data = [
                 'id' => $incident->id,
-                'category_id' => $incident->incidentCategory->id,
+                'category_id' => $incident->incidentCategory->id ?? '',
                 'title' => $incident->title,
                 'description' => $incident->description,
                 'severity' => $incident->severity,

@@ -6,10 +6,12 @@ use Illuminate\Console\Command;
 
 use Modules\Helpdesk\Entities\Ticket;
 use Modules\Helpdesk\Entities\WorkOrder as WoHelpdesk;
+use Modules\Helpdesk\Entities\WorkOrderResponse as WoResponse;
 
 use Modules\ITSM\Entities\Reported;
 use Modules\ITSM\Entities\Incident;
 use Modules\ITSM\Entities\WorkOrder;
+use Modules\ITSM\Entities\WorkorderResponse;
 
 
 use Carbon\Carbon;
@@ -35,19 +37,14 @@ class CopyHelpdesk extends Command
 
         // Fetch the data from the helpdesk_tickets table
         $helpdeskTickets = Ticket::where('user_cid',$cid)
-                            ->where('id','df225a51-2673-48b3-a96a-80fb2c352e3a')
+                            // ->where('id','df225a51-2673-48b3-a96a-80fb2c352e3a')
                             ->orderBy('created_at', 'asc')->get();
         $totalRecords = $helpdeskTickets->count();
 
         $currentYear = date('Y');
-        $maxNumber = Incident::where('user_cid', $cid)->whereYear('created_at', $currentYear)->max('number');
-        $newNumber = $maxNumber + 1;
-        $formattedNumber = 'INC'. $currentYear. str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+        
 
-        $maxNumberWO = WorkOrder::where('user_cid', $cid)->whereYear('created_at', $currentYear)->max('number');
-        $prefixWO = config('itsm.workorder.series');
-        $newNumberWO = $maxNumberWO+1;
-        $formattedNumberWO = $prefixWO. $currentYear. str_pad($newNumberWO, 3, '0', STR_PAD_LEFT);
+        
 
         $progress = 0;
         $successCount = 0;
@@ -55,6 +52,15 @@ class CopyHelpdesk extends Command
         $module = 'ITSM\\Incident';
 
         foreach ($helpdeskTickets as $helpdeskTicket) {
+            $maxNumber = Incident::where('user_cid', $cid)->whereYear('created_at', $currentYear)->max('number');
+            $newNumber = $maxNumber + 1;
+            $formattedNumber = 'INC'. $currentYear. str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+
+            $maxNumberWO = WorkOrder::where('user_cid', $cid)->whereYear('created_at', $currentYear)->max('number');
+            $prefixWO = config('itsm.workorder.series');
+            $newNumberWO = $maxNumberWO+1;
+            $formattedNumberWO = $prefixWO. $currentYear. str_pad($newNumberWO, 3, '0', STR_PAD_LEFT);
+
             // Start a database transaction
             DB::beginTransaction();
 
@@ -112,11 +118,12 @@ class CopyHelpdesk extends Command
                 ]);
 
                 $workorder = WoHelpdesk::where('ticket_id',$helpdeskTicket->id)->first();
+                $workorderResponse = WoResponse::where('work_order_id',$workorder->id)->first();
                 $inc = Incident::where('id',$incidents->id)->first();
 
                 $wo = WorkOrder::create([
-                    'number' => $workorder->no,
-                    'workorder_number' => $workorder->no_workorder,
+                    'number' => $newNumberWO,
+                    'workorder_number' => $formattedNumberWO,
                     'supervisor' => $workorder->supervisor,
                     'staff' => $workorder->staff,
                     'user' => $workorder->user,
@@ -147,9 +154,35 @@ class CopyHelpdesk extends Command
                     'deleted_at' => $helpdeskTicket->deleted_at,
                 ]);
 
+                Reported::where('id', $incidents->reported_id)
+                    ->update([
+                        'resolved_time' => $wo->resolved_time,
+                ]);
+
                 Incident::where('id', $inc->id)
                         ->update([
                             'work_order_id' => $wo->id,
+                ]);
+
+                $response = WorkorderResponse::create([
+                    // Map fields accordingly
+                    'workorder_id' => $wo->id,
+                    'description' => $wo->description,
+                    'module' => $module,
+                    'status' => $workorderResponse->status,
+                    'publish' => '1',
+                    'start_time' => $workorderResponse->start_time,
+                    'end_time' => $workorderResponse->end_time,
+
+                    'user_cid' => $workorderResponse->user_cid,
+                    'user_id' => $workorderResponse->user_id,
+                    'created_by' => $workorderResponse->created_by,
+                    'created_by_level' => $workorderResponse->created_by_level,
+
+                    'created_at' => $workorderResponse->created_at,
+                    'updated_at' => $workorderResponse->updated_at,
+                    'deleted_at' => $workorderResponse->deleted_at,
+
                 ]);
 
                 // Commit the transaction

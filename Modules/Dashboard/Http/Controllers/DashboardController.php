@@ -177,16 +177,16 @@ class DashboardController extends Controller
         if(isLocal()){
             $data = DB::table('itsm_reporteds')
             ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
-            ->whereMonth('created_at', '=', $selectedMonth)
-            ->whereYear('created_at', '=', $selectedYear)
+            ->whereMonth('report_time', '=', $selectedMonth)
+            ->whereYear('report_time', '=', $selectedYear)
             ->groupBy('source')
             ->get();
 
         }else{
             $data = DB::table('itsm_reporteds')
             ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
-            ->whereMonth('created_at', '=', $selectedMonth)
-            ->whereYear('created_at', '=', $selectedYear)
+            ->whereMonth('report_time', '=', $selectedMonth)
+            ->whereYear('report_time', '=', $selectedYear)
             ->where('user_cid',$user->cid)
             ->groupBy('source')
             ->get();
@@ -215,21 +215,81 @@ class DashboardController extends Controller
             ->get();
 
         }else{
-            $data = DB::table('itsm_reporteds')
-            ->select(DB::raw('category, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
-            ->where(function ($query) {
-                $query->where('category', 'LIKE', '%SIMRS%')
-                    ->orWhere('category', 'LIKE', '%HIS%');
-            })
-            ->whereMonth('created_at', '=', $selectedMonth)
-            ->whereYear('created_at', '=', $selectedYear)
-            ->where('user_cid',$user->cid)
-            ->groupBy('category')
+            // $data = DB::table('itsm_incidents')
+            // ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+            // ->select(DB::raw('itsm_reporteds.category, AVG(ABS(TIMESTAMPDIFF(MINUTE, itsm_reporteds.report_time, itsm_reporteds.resolved_time))) as avg_time'))
+            // // ->whereIn('itsm_reporteds.category',['HIS'])
+            // ->where(function ($query) {
+            //     $query->where('itsm_reporteds.category', 'LIKE', '%SIMRS%')
+            //         ->orWhere('itsm_reporteds.category', 'LIKE', '%HIS%');
+            // })
+            // ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+            // ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+            // ->where('itsm_incidents.user_cid',$user->cid)
+            // ->groupBy('itsm_reporteds.category')
+            // ->havingRaw('avg_time < 300')
+            // ->get();
+            // $data = DB::table('itsm_reporteds')
+            // ->select(DB::raw('category, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+            // ->where(function ($query) {
+            //     $query->where('category', 'LIKE', '%SIMRS%')
+            //         ->orWhere('category', 'LIKE', '%HIS%');
+            // })
+            // ->whereMonth('created_at', '=', $selectedMonth)
+            // ->whereYear('created_at', '=', $selectedYear)
+            // ->where('user_cid',$user->cid)
+            // ->groupBy('category')
+            // ->get();
+
+            $data = DB::table('itsm_incidents')
+            ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+            ->select(['itsm_reporteds.category', 'itsm_reporteds.report_time', 'itsm_reporteds.resolved_time'])
+            // ->whereIn('itsm_reporteds.category',['HIS'])
+            // ->where(function ($query) {
+            //     $query->where('itsm_reporteds.category', 'LIKE', '%SIMRS%')
+            //         ->orWhere('itsm_reporteds.category', 'LIKE', '%HIS%');
+            // })
+            ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+            ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+            ->where('itsm_incidents.user_cid',$user->cid)
+            // ->groupBy('itsm_reporteds.category')
             ->get();
+
+            // Filter the results where avg_time is less than 300 minutes
+            $filteredData = $data->filter(function ($item) {
+                return strpos($item->category, 'HIS') !== false;
+            })->map(function ($item) {
+                // Calculate avg_time from report_time and resolved_time
+                $avgTime = Carbon::parse($item->report_time)->diffInMinutes(Carbon::parse($item->resolved_time));
+            
+                // Add avg_time to the item
+                $item->avg_time = $avgTime;
+            
+                return $item;
+            });
+
+            // Convert the collection to a plain array
+            $filteredArray = $filteredData->values()->all();
+            
+
+            // // Get the count of filtered results
+            $count = $filteredData->count();
+
+            $result = [
+                'name' => 'HIS',
+                'total' => $count,
+            ];
+
+            // $data = $filteredData;
+
+            // return response()->json(['count' => $count]);
 
         }
 
-        return response()->json($data);
+        // return response()->json(['count' => $count]);
+        // return response()->json($data);
+        // return response()->json(['filteredData' => $filteredArray]);
+        return response()->json([$result]);
     }
 
     public function fetchDataAverageTimeByStaff(Request $request)
@@ -248,11 +308,13 @@ class DashboardController extends Controller
 
         }else{
             $data = DB::table('itsm_work_orders')
-            ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
-            ->whereMonth('created_at', '=', $selectedMonth)
-            ->whereYear('created_at', '=', $selectedYear)
-            ->where('user_cid',$user->cid)
-            ->groupBy('staff')
+            ->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
+            ->select(DB::raw('itsm_work_orders.staff as staff, itsm_reporteds.category as category, AVG(ABS(TIMESTAMPDIFF(MINUTE, itsm_work_orders.end_time, itsm_work_orders.start_time))) as avg_time'))
+            ->whereNotIn('itsm_reporteds.category', ['HIS'])
+            ->whereMonth('itsm_work_orders.created_at', '=', $selectedMonth)
+            ->whereYear('itsm_work_orders.created_at', '=', $selectedYear)
+            ->where('itsm_work_orders.user_cid', $user->cid)
+            ->groupBy('staff', 'itsm_reporteds.category') // Include category in GROUP BY
             ->get();
 
         }
@@ -332,12 +394,23 @@ class DashboardController extends Controller
 
                 break;
             case 'month':
-                $startDate->startOfMonth();
-                $endDate->endOfMonth();
-                $incidentData = Incident::where('user_cid', $user->cid)
-                    ->whereBetween('created_at', [$startDate, $endDate])
-                    ->selectRaw('MONTHNAME(created_at) as month, COUNT(*) as total')
+                // $startDate->startOfMonth();
+                // $endDate->endOfMonth();
+                $startDate->startOfYear();
+                $endDate->endOfYear();
+                // $incidentData = Incident::where('user_cid', $user->cid)
+                //     ->whereBetween('created_at', [$startDate, $endDate])
+                //     ->selectRaw('MONTHNAME(created_at) as month, COUNT(*) as total')
+                //     ->groupBy('month')
+                //     ->get();
+                
+                $incidentData = Incident::join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                    ->where('itsm_incidents.user_cid', $user->cid)
+                    ->whereBetween('itsm_reporteds.report_time', [$startDate, $endDate])
+                    ->selectRaw('MONTHNAME(itsm_reporteds.report_time) as month, COUNT(*) as total')
                     ->groupBy('month')
+                    // ->selectRaw('DAYNAME(itsm_reporteds.report_time) as day, COUNT(*) as total')
+                    // ->groupBy('day')
                     ->get();
         
                 $serviceData = Service::where('user_cid', $user->cid)
@@ -358,11 +431,24 @@ class DashboardController extends Controller
             case 'day':
                 $startDate->startOfDay();
                 $endDate->endOfDay();
-                $incidentData = Incident::where('user_cid', $user->cid)
-                    ->whereBetween('created_at', [$startDate, $endDate])
-                    ->selectRaw('DAYNAME(created_at) as day, COUNT(*) as total')
-                    ->groupBy('day')
-                    ->get();
+                // $incidentData = Incident::where('user_cid', $user->cid)
+                //     ->whereBetween('created_at', [$startDate, $endDate])
+                //     ->selectRaw('DAYNAME(created_at) as day, COUNT(*) as total')
+                //     ->groupBy('day')
+                //     ->get();
+                // $incidentData = Incident::with('reported')
+                //     ->where('user_cid', $user->cid)
+                //     ->whereBetween('reported.report_time', [$startDate, $endDate])
+                //     ->selectRaw('DAYNAME(reported.report_time) as day, COUNT(*) as total')
+                //     ->groupBy('day')
+                //     ->get();
+
+                $incidentData = Incident::join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                ->where('itsm_incidents.user_cid', $user->cid)
+                ->whereBetween('itsm_reporteds.report_time', [$startDate, $endDate])
+                ->selectRaw('DAYNAME(itsm_reporteds.report_time) as day, COUNT(*) as total')
+                ->groupBy('day')
+                ->get();
 
                 $serviceData = Service::where('user_cid', $user->cid)
                     ->whereBetween('created_at', [$startDate, $endDate])
