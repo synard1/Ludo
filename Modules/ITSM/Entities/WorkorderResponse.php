@@ -37,6 +37,10 @@ class WorkorderResponse extends Model
         'start_time',
         'end_time',
         'notes',
+        'user_cid',
+        'user_id',
+        'created_by',
+        'created_by_level',
     ];
 
     public function workorder()
