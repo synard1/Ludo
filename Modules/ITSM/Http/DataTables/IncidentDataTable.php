@@ -33,7 +33,7 @@ class IncidentDataTable extends DataTable
                     //     $incident->work_order_id .
                     //     '" target="_blank" class="text-info view-work-order" data-id="' .
                     //     $incident->id . '">View</a></span>';
-                    return '<span class="badge badge-primary"<a href="#" class="view-wo" target="_blank" data-number="' . $incident->workorder()->workorder_number . '">View</a></span>';
+                    return '<span class="badge badge-primary"><a href="#" class="text-info view-wo" target="_blank" data-number="' . $incident->workorder->workorder_number . '">View</a></span>';
                 } else {
                     if ($isSupervisor) {
                         return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
