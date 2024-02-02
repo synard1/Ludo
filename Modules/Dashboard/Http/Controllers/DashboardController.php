@@ -20,6 +20,7 @@ use App\Models\Company;
 
 use Modules\ITSM\Entities\Service;
 use Modules\ITSM\Entities\Incident;
+use Modules\ITSM\Entities\WorkOrder as EntitiesWorkOrder;
 
 class DashboardController extends Controller
 {
@@ -29,67 +30,64 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $company = Company::where('cid',$user->cid)->first();
+        $company = Company::where('cid', $user->cid)->first();
 
-        if($user){
+        if ($user) {
             $firstDayOfMonth = Carbon::now()->startOfMonth();
             $lastDayOfMonth = Carbon::now()->endOfMonth();
 
-        // Split Env local data
-        if (isLocal()) {
-            // Code for local environment
-            $workOrders = WorkOrder::where('status','Resolved')->get();
-            $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
-                            ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
-                            ->groupBy('source_report')
-                            ->get();
-        }else{
-            $workOrders = WorkOrder::where('user_cid',$user->cid)->where('status','Resolved')->get();
-            $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
-                            ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
-                            ->where('user_cid',$user->cid)
-                            ->groupBy('source_report')
-                            ->get();
-        } 
-        // return view('dashboard::index');
-        
-
-        $months = Config::get('onexolution.months');
-            $staffTimes = [];
-
-            foreach ($workOrders as $workOrder) {
-                $staff = json_encode($workOrder['staff']);
-                $startTime = Carbon::parse($workOrder['start_time']);
-                $endTime = Carbon::parse($workOrder['end_time']);
-                $timeDiff = $endTime->diffInMinutes($startTime);
-    
-                if (!isset($staffTimes[$staff])) {
-                    $staffTimes[$staff] = [];
-                }
-    
-                $staffTimes[$staff][] = $timeDiff;
+            // Split Env local data
+            if (isLocal()) {
+                // Code for local environment
+                $workOrders = WorkOrder::where('status', 'Resolved')->get();
+                $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
+                    ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
+                    ->groupBy('source_report')
+                    ->get();
+            } else {
+                $workOrders = WorkOrder::where('user_cid', $user->cid)->where('status', 'Resolved')->get();
+                $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
+                    ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
+                    ->where('user_cid', $user->cid)
+                    ->groupBy('source_report')
+                    ->get();
             }
-    
-            $avgTimes = [];
-    
-            foreach ($staffTimes as $staff => $times) {
-                $avgTime = count($times) > 0 ? array_sum($times) / count($times) : 0;
-                $avgTimes[] = [
-                    'staff' => $staff,
-                    'avg_time' => $avgTime,
-                ];
-            }
+            // return view('dashboard::index');
 
-        // $data = WorkOrder::selectRaw('staff, AVG(TIMESTAMPDIFF(MINUTE, end_time, start_time)) as avg_time')
-        //     ->groupBy('staff')
-        //     ->get();
 
-        return view('dashboard::index', compact(['tickets','months','avgTimes','company']));
-        }else{
+            $months = Config::get('onexolution.months');
+            // $staffTimes = [];
 
+            // foreach ($workOrders as $workOrder) {
+            //     $staff = json_encode($workOrder['staff']);
+            //     $startTime = Carbon::parse($workOrder['start_time']);
+            //     $endTime = Carbon::parse($workOrder['end_time']);
+            //     $timeDiff = $endTime->diffInMinutes($startTime);
+
+            //     if (!isset($staffTimes[$staff])) {
+            //         $staffTimes[$staff] = [];
+            //     }
+
+            //     $staffTimes[$staff][] = $timeDiff;
+            // }
+
+            // $avgTimes = [];
+
+            // foreach ($staffTimes as $staff => $times) {
+            //     $avgTime = count($times) > 0 ? array_sum($times) / count($times) : 0;
+            //     $avgTimes[] = [
+            //         'staff' => $staff,
+            //         'avg_time' => $avgTime,
+            //     ];
+            // }
+
+            // $data = WorkOrder::selectRaw('staff, AVG(TIMESTAMPDIFF(MINUTE, end_time, start_time)) as avg_time')
+            //     ->groupBy('staff')
+            //     ->get();
+
+            return view('dashboard::index', compact(['tickets', 'months', 'company']));
+        } else {
         }
-
-        
     }
 
     /**
@@ -165,7 +163,7 @@ class DashboardController extends Controller
             ->groupBy('source_report')
             ->get();
 
-        return view('dashboard::charts.average_time_by_source_report', compact(['data','months']));
+        return view('dashboard::charts.average_time_by_source_report', compact(['data', 'months']));
     }
 
     public function fetchDataAverageTimeBySourceReport(Request $request)
@@ -174,23 +172,21 @@ class DashboardController extends Controller
         $selectedYear = $request->input('year');
         $user = auth()->user();
 
-        if(isLocal()){
+        if (isLocal()) {
             $data = DB::table('itsm_reporteds')
-            ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
-            ->whereMonth('report_time', '=', $selectedMonth)
-            ->whereYear('report_time', '=', $selectedYear)
-            ->groupBy('source')
-            ->get();
-
-        }else{
+                ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+                ->whereMonth('report_time', '=', $selectedMonth)
+                ->whereYear('report_time', '=', $selectedYear)
+                ->groupBy('source')
+                ->get();
+        } else {
             $data = DB::table('itsm_reporteds')
-            ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
-            ->whereMonth('report_time', '=', $selectedMonth)
-            ->whereYear('report_time', '=', $selectedYear)
-            ->where('user_cid',$user->cid)
-            ->groupBy('source')
-            ->get();
-
+                ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+                ->whereMonth('report_time', '=', $selectedMonth)
+                ->whereYear('report_time', '=', $selectedYear)
+                ->where('user_cid', $user->cid)
+                ->groupBy('source')
+                ->get();
         }
 
         return response()->json($data);
@@ -202,19 +198,18 @@ class DashboardController extends Controller
         $selectedYear = $request->input('year');
         $user = auth()->user();
 
-        if(isLocal()){
+        if (isLocal()) {
             $data = DB::table('itsm_reporteds')
-            ->select(DB::raw('category, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
-            ->where(function ($query) {
-                $query->where('category', 'LIKE', '%SIMRS%')
-                    ->orWhere('category', 'LIKE', '%HIS%');
-            })
-            ->whereMonth('created_at', '=', $selectedMonth)
-            ->whereYear('created_at', '=', $selectedYear)
-            ->groupBy('category')
-            ->get();
-
-        }else{
+                ->select(DB::raw('category, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
+                ->where(function ($query) {
+                    $query->where('category', 'LIKE', '%SIMRS%')
+                        ->orWhere('category', 'LIKE', '%HIS%');
+                })
+                ->whereMonth('created_at', '=', $selectedMonth)
+                ->whereYear('created_at', '=', $selectedYear)
+                ->groupBy('category')
+                ->get();
+        } else {
             // $data = DB::table('itsm_incidents')
             // ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
             // ->select(DB::raw('itsm_reporteds.category, AVG(ABS(TIMESTAMPDIFF(MINUTE, itsm_reporteds.report_time, itsm_reporteds.resolved_time))) as avg_time'))
@@ -242,42 +237,44 @@ class DashboardController extends Controller
             // ->get();
 
             $data = DB::table('itsm_incidents')
-            ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
-            ->select(['itsm_reporteds.category', 'itsm_reporteds.report_time', 'itsm_reporteds.resolved_time'])
-            // ->whereIn('itsm_reporteds.category',['HIS'])
-            // ->where(function ($query) {
-            //     $query->where('itsm_reporteds.category', 'LIKE', '%SIMRS%')
-            //         ->orWhere('itsm_reporteds.category', 'LIKE', '%HIS%');
-            // })
-            ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
-            ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
-            ->where('itsm_incidents.user_cid',$user->cid)
-            // ->groupBy('itsm_reporteds.category')
-            ->get();
+                ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                ->select(['itsm_reporteds.category', 'itsm_reporteds.report_time', 'itsm_reporteds.resolved_time'])
+                // ->whereIn('itsm_reporteds.category',['HIS'])
+                ->where(function ($query) {
+                    $query->where('itsm_reporteds.category', 'LIKE', '%SIMRS%')
+                        ->orWhere('itsm_reporteds.category', 'LIKE', '%HIS%');
+                })
+                ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+                ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+                ->where('itsm_incidents.user_cid', $user->cid)
+                // ->groupBy('itsm_reporteds.category')
+                ->get();
 
             // Filter the results where avg_time is less than 300 minutes
             $filteredData = $data->filter(function ($item) {
                 return strpos($item->category, 'HIS') !== false;
             })->map(function ($item) {
                 // Calculate avg_time from report_time and resolved_time
-                $avgTime = Carbon::parse($item->report_time)->diffInMinutes(Carbon::parse($item->resolved_time));
-            
+                $diff = Carbon::parse($item->report_time)->diffInMinutes(Carbon::parse($item->resolved_time));
+
                 // Add avg_time to the item
-                $item->avg_time = $avgTime;
-            
+                $item->duration = $diff;
+
                 return $item;
             });
 
             // Convert the collection to a plain array
             $filteredArray = $filteredData->values()->all();
-            
+
 
             // // Get the count of filtered results
-            $count = $filteredData->count();
+            $countA = $filteredData->where('duration', '<', 300)->count();
+            $countB = $filteredData->where('duration', '>', 300)->count();
 
             $result = [
                 'name' => 'HIS',
-                'total' => $count,
+                'total_under' => $countA,
+                'total_upper' => $countB,
             ];
 
             // $data = $filteredData;
@@ -298,28 +295,71 @@ class DashboardController extends Controller
         $selectedYear = $request->input('year');
         $user = auth()->user();
 
-        if(isLocal()){
-            $data = DB::table('itsm_work_orders')
-            ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
-            ->whereMonth('created_at', '=', $selectedMonth)
-            ->whereYear('created_at', '=', $selectedYear)
-            ->groupBy('staff')
-            ->get();
+        // dd($selectedMonth .'-'. $selectedYear);
 
-        }else{
-            $data = DB::table('itsm_work_orders')
-            ->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
-            ->select(DB::raw('itsm_work_orders.staff as staff, itsm_reporteds.category as category, AVG(ABS(TIMESTAMPDIFF(MINUTE, itsm_work_orders.end_time, itsm_work_orders.start_time))) as avg_time'))
-            ->whereNotIn('itsm_reporteds.category', ['HIS'])
-            ->whereMonth('itsm_work_orders.created_at', '=', $selectedMonth)
-            ->whereYear('itsm_work_orders.created_at', '=', $selectedYear)
-            ->where('itsm_work_orders.user_cid', $user->cid)
-            ->groupBy('staff', 'itsm_reporteds.category') // Include category in GROUP BY
-            ->get();
+        if (isLocal()) {
+            // $data = DB::table('itsm_work_orders')
+            // ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
+            // ->whereMonth('created_at', '=', $selectedMonth)
+            // ->whereYear('created_at', '=', $selectedYear)
+            // ->groupBy('staff')
+            // ->get();
 
+        } else {
+            // $data = DB::table('itsm_work_orders')
+            // ->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
+            // // ->select(DB::raw('itsm_work_orders.staff as staff, itsm_reporteds.category as category,  AVG(ABS(TIMESTAMPDIFF(MINUTE, itsm_work_orders.end_time, itsm_work_orders.start_time))) as avg_time'), 'itsm_reporteds.resolved_time')
+            // ->select(['itsm_work_orders.staff', 'itsm_reporteds.category', 'itsm_work_orders.end_time', 'itsm_work_orders.start_time', 'itsm_reporteds.resolved_time'])
+            // // ->whereIn('itsm_reporteds.category', ['Hardware','Network'])
+            // // ->whereMonth('itsm_reporteds.resolved_time', '=', $selectedMonth)
+            // // ->whereYear('itsm_reporteds.resolved_time', '=', $selectedYear)
+            // ->where('itsm_work_orders.status', 'Resolved')
+            // ->where('itsm_work_orders.user_cid', $user->cid)
+            // // ->groupBy('staff', 'itsm_reporteds.category') // Include category in GROUP BY
+            // ->get();
+
+            $data = DB::table('itsm_work_orders')->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
+                ->where('itsm_work_orders.user_cid', $user->cid)
+                ->whereMonth('itsm_work_orders.start_time', '=', $selectedMonth)
+                ->whereYear('itsm_work_orders.start_time', '=', $selectedYear)
+                ->where('itsm_work_orders.status', 'Resolved')
+                ->where(function ($query) {
+                    $query->where('itsm_reporteds.category', 'LIKE', '%Network%')
+                        ->orWhere('itsm_reporteds.category', 'LIKE', '%Hardware%');
+                })
+                ->get(['itsm_work_orders.start_time', 'itsm_work_orders.resolved_time', 'itsm_work_orders.staff']);
+
+
+
+            $staffTimes = [];
+
+            foreach ($data as $workOrder) {
+                // $category = $workOrder->reported->category; // Access the category from the related 'reported' entity
+                // $staff = json_encode($workOrder['staff']);
+                $staff = $workOrder->staff;
+                $startTime = Carbon::parse($workOrder->start_time);
+                $endTime = Carbon::parse($workOrder->resolved_time);
+                $timeDiff = $endTime->diffInMinutes($startTime);
+
+                if (!isset($staffTimes[$staff])) {
+                    $staffTimes[$staff] = [];
+                }
+
+                $staffTimes[$staff][] = $timeDiff;
+            }
+
+            $avgTimes = [];
+
+            foreach ($staffTimes as $staff => $times) {
+                $avgTime = count($times) > 0 ? array_sum($times) / count($times) : 0;
+                $avgTimes[] = [
+                    'staff' => $staff,
+                    'avg_time' => $avgTime,
+                ];
+            }
         }
 
-        return response()->json($data);
+        return response()->json($avgTimes);
     }
 
     // public function getDataIncidentService(Request $request)
@@ -363,7 +403,7 @@ class DashboardController extends Controller
         $data = $this->getData($user, $timeRange);
 
         // return response()->json(['data' => $data]);
-            //     // Format data as needed
+        //     // Format data as needed
         // $formattedData = [
         //     'incidentData' => $incidentData,
         //     'serviceData' => $serviceData,
@@ -403,7 +443,7 @@ class DashboardController extends Controller
                 //     ->selectRaw('MONTHNAME(created_at) as month, COUNT(*) as total')
                 //     ->groupBy('month')
                 //     ->get();
-                
+
                 $incidentData = Incident::join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
                     ->where('itsm_incidents.user_cid', $user->cid)
                     ->whereBetween('itsm_reporteds.report_time', [$startDate, $endDate])
@@ -412,22 +452,22 @@ class DashboardController extends Controller
                     // ->selectRaw('DAYNAME(itsm_reporteds.report_time) as day, COUNT(*) as total')
                     // ->groupBy('day')
                     ->get();
-        
+
                 $serviceData = Service::where('user_cid', $user->cid)
                     ->whereBetween('created_at', [$startDate, $endDate])
                     ->selectRaw('MONTHNAME(created_at) as month, COUNT(*) as total')
                     ->groupBy('month')
                     ->get();
                 break;
-            // case 'month':
-            //     $startDate->startOfMonth();
-            //     $endDate->endOfMonth();
-            //     break;
+                // case 'month':
+                //     $startDate->startOfMonth();
+                //     $endDate->endOfMonth();
+                //     break;
             case 'year':
                 $startDate->startOfYear();
                 $endDate->endOfYear();
                 break;
-            // Add more cases for additional time ranges if needed
+                // Add more cases for additional time ranges if needed
             case 'day':
                 $startDate->startOfDay();
                 $endDate->endOfDay();
@@ -444,11 +484,11 @@ class DashboardController extends Controller
                 //     ->get();
 
                 $incidentData = Incident::join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
-                ->where('itsm_incidents.user_cid', $user->cid)
-                ->whereBetween('itsm_reporteds.report_time', [$startDate, $endDate])
-                ->selectRaw('DAYNAME(itsm_reporteds.report_time) as day, COUNT(*) as total')
-                ->groupBy('day')
-                ->get();
+                    ->where('itsm_incidents.user_cid', $user->cid)
+                    ->whereBetween('itsm_reporteds.report_time', [$startDate, $endDate])
+                    ->selectRaw('DAYNAME(itsm_reporteds.report_time) as day, COUNT(*) as total')
+                    ->groupBy('day')
+                    ->get();
 
                 $serviceData = Service::where('user_cid', $user->cid)
                     ->whereBetween('created_at', [$startDate, $endDate])
@@ -458,7 +498,7 @@ class DashboardController extends Controller
                 break;
         }
 
-        
+
 
         // dd($startDate->toDateTimeString() . ' - ' . $endDate->toDateTimeString());
 
@@ -564,55 +604,54 @@ class DashboardController extends Controller
     // }
 
     private function getDataByWeek($model, $userCid, $startDate, $endDate)
-{
-    // Get data for existing weeks
-    $existingWeeks = $model::where('user_cid', $userCid)
-        ->whereBetween('created_at', [$startDate, $endDate])
-        // ->selectRaw('WEEK(created_at) as week, COUNT(*) as total')
-        ->selectRaw('WEEK(created_at, 1) as week, COUNT(*) as total')
-        ->groupBy('week')
-        ->get();
+    {
+        // Get data for existing weeks
+        $existingWeeks = $model::where('user_cid', $userCid)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            // ->selectRaw('WEEK(created_at) as week, COUNT(*) as total')
+            ->selectRaw('WEEK(created_at, 1) as week, COUNT(*) as total')
+            ->groupBy('week')
+            ->get();
 
-    // Get all week numbers in the date range
-    $allWeeks = $this->getAllWeekNumbers($startDate, $endDate);
+        // Get all week numbers in the date range
+        $allWeeks = $this->getAllWeekNumbers($startDate, $endDate);
 
-    // Merge the existing weeks with all weeks, filling in zero for missing weeks
-    $mergedData = $this->mergeWeeksData($existingWeeks, $allWeeks);
+        // Merge the existing weeks with all weeks, filling in zero for missing weeks
+        $mergedData = $this->mergeWeeksData($existingWeeks, $allWeeks);
 
-    return $mergedData;
-}
-
-private function getAllWeekNumbers($startDate, $endDate)
-{
-    $allWeeks = [];
-
-    // Start from the Sunday of the first week
-    $currentDate = $startDate->copy()->startOfWeek();
-
-    while ($currentDate->lte($endDate)) {
-        $allWeeks[] = $currentDate->weekOfYear;
-        $currentDate->addWeek();
+        return $mergedData;
     }
 
-    return $allWeeks;
-}
+    private function getAllWeekNumbers($startDate, $endDate)
+    {
+        $allWeeks = [];
 
-private function mergeWeeksData($existingWeeks, $allWeeks)
-{
-    $mergedData = [];
+        // Start from the Sunday of the first week
+        $currentDate = $startDate->copy()->startOfWeek();
 
-    // Fill in zero for missing weeks
-    foreach ($allWeeks as $week) {
-        $existing = $existingWeeks->firstWhere('week', $week);
-
-        if ($existing) {
-            $mergedData[] = $existing;
-        } else {
-            $mergedData[] = ['week' => $week, 'total' => 0];
+        while ($currentDate->lte($endDate)) {
+            $allWeeks[] = $currentDate->weekOfYear;
+            $currentDate->addWeek();
         }
+
+        return $allWeeks;
     }
 
-    return collect($mergedData);
-}
+    private function mergeWeeksData($existingWeeks, $allWeeks)
+    {
+        $mergedData = [];
 
+        // Fill in zero for missing weeks
+        foreach ($allWeeks as $week) {
+            $existing = $existingWeeks->firstWhere('week', $week);
+
+            if ($existing) {
+                $mergedData[] = $existing;
+            } else {
+                $mergedData[] = ['week' => $week, 'total' => 0];
+            }
+        }
+
+        return collect($mergedData);
+    }
 }
