@@ -91,20 +91,23 @@
             </tr>
             <tr>
                 <th>Issue Type</th>
-                @php $jumlah = count($ticket->issue_category) @endphp
+                @if( !empty($data->category))
+                    @php $jumlah = count($data->category) @endphp
 
-                @if ($jumlah > 1)
-                <td>
-                    @for ($x = 0; $x < $jumlah; $x++) {{ $x+1 .'. '. $ticket->issue_category[$x] ?? ' Nama Pemberi
-                        Tugas'}}<br>
-                        @endfor
-                </td>
-                @else
-                <td>
-                    @for ($x = 0; $x < $jumlah; $x++) {{ $ticket->issue_category[$x] ?? 'Nama Pemberi Tugas'}}
-                        @endfor
-                </td>
+                    @if ($jumlah > 1)
+                    <td>
+                        @for ($x = 0; $x < $jumlah; $x++) {{ $x+1 .'. '. $data->category[$x] ?? ' Nama Pemberi
+                            Tugas'}}<br>
+                            @endfor
+                    </td>
+                    @else
+                    <td>
+                        @for ($x = 0; $x < $jumlah; $x++) {{ $data->category[$x] ?? 'Nama Pemberi Tugas'}}
+                            @endfor
+                    </td>
+                    @endif
                 @endif
+
             </tr>
             <tr>
                 <th>Issue Description</th>

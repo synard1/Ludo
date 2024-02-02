@@ -229,5 +229,21 @@ return [
         'mttr' => '30', // Mean Time To Response in Minutes
 
         'art' => '120', // Average Resolution Time in Minutes
+
+        'arth' => '300', // Average Resolution Time HIS in Minutes Max 5 Hours
+    ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ITSM settings
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+    'incidentSeverity' => [
+        'High' => 'High',
+        'Medium' => 'Medium',
+        'Low' => 'Low',
     ],
 ];

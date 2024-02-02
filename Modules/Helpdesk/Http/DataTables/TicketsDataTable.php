@@ -72,7 +72,7 @@ class TicketsDataTable extends DataTable
             })
             ->editColumn('user_cid', function (Ticket $ticket, Company $company) {
                 $data = $company->where('cid',$ticket->user_cid)->first();
-                return $data->name;
+                return $data->name ?? '-';
             })
             ->editColumn('count_kpi', function (Ticket $ticket) {
                 if($ticket->count_kpi){

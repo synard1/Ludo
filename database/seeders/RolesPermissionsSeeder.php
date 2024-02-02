@@ -50,6 +50,11 @@ class RolesPermissionsSeeder extends Seeder
                 'user sign helpdesk',
                 'sla',
                 'service management',
+                'itsm',
+                'itsm-incident',
+                'itsm-incident-category',
+                'itsm-service',
+                'itsm-service-category',
 
             ],
             'Administrator' => [
@@ -61,6 +66,11 @@ class RolesPermissionsSeeder extends Seeder
                 'workorder',
                 'sla',
                 'service management',
+                'itsm',
+                'itsm-incident',
+                'itsm-incident-category',
+                'itsm-service',
+                'itsm-service-category',
             ],
             'developer' => [
                 'api controls',
@@ -78,6 +88,11 @@ class RolesPermissionsSeeder extends Seeder
                 'ticket',
                 'workorder',
                 'service management',
+                'itsm',
+                'itsm-incident',
+                'itsm-incident-category',
+                'itsm-service',
+                'itsm-service-category',
             ],
             'Trial' => [
                 'setting management',
@@ -115,20 +130,20 @@ class RolesPermissionsSeeder extends Seeder
         $user1 = User::where('email', 'admin@demo.com')->first();
         $user1->assignRole('Administrator');
 
-        $user11 = User::where('email', 'support@demo.com')->first();
-        $user11->assignRole('Support');
+        // $user11 = User::where('email', 'support@demo.com')->first();
+        // $user11->assignRole('Support');
 
-        $user12 = User::where('email', 'supervisor@demo.com')->first();
-        $user12->assignRole('Support');
+        // $user12 = User::where('email', 'supervisor@demo.com')->first();
+        // $user12->assignRole('Support');
 
-        $user2 = User::where('email', 'admin@demo2.com')->first();
-        $user2->assignRole('Administrator');
+        // $user2 = User::where('email', 'admin@demo2.com')->first();
+        // $user2->assignRole('Administrator');
 
-        $user21 = User::where('email', 'support@demo2.com')->first();
-        $user21->assignRole('Support');
+        // $user21 = User::where('email', 'support@demo2.com')->first();
+        // $user21->assignRole('Support');
 
-        $user22 = User::where('email', 'supervisor@demo2.com')->first();
-        $user22->assignRole('Support');
+        // $user22 = User::where('email', 'supervisor@demo2.com')->first();
+        // $user22->assignRole('Support');
     }
 
 }
