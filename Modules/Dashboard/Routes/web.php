@@ -31,7 +31,7 @@ Route::prefix('apps/dashboard')->name('dashboard.')->middleware(config('onexolut
     Route::prefix('api')->name('api.')->group(function () {
         Route::get('/fetch-data/AverageTimeHisReport', [DashboardController::class, 'fetchDataAverageTimeHisReport'])->name('fetchDataAverageTimeHisReport');
         Route::get('/fetch-data/AverageTimeBySourceReport', [DashboardController::class, 'fetchDataAverageTimeBySourceReport'])->name('fetchDataAverageTimeBySourceReport');
-        Route::get('/fetch-data/AverageTimeByStaff', [DashboardController::class, 'fetchDataAverageTimeByStaff'])->name('fetchDataAverageTimeByStaff');
+        Route::get('/fetch-data/chart', [DashboardController::class, 'fetchDataAverageTimeByStaff'])->name('fetchDataAverageTimeByStaff');
         Route::get('/fetch-data/IncidentService', [DashboardController::class, 'getDataIncidentService'])->name('getDataIncidentService');
 
 
