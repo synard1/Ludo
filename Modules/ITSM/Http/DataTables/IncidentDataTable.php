@@ -14,6 +14,9 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Services\DataTable;
 use Nwidart\Modules\Facades\Module;
 
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+
 
 class IncidentDataTable extends DataTable
 {
@@ -57,6 +60,67 @@ class IncidentDataTable extends DataTable
             })
             ->editColumn('reported_date', function (Incident $incident) {
                 return $incident->reported->report_time;
+            })
+            ->editColumn('response_time', function (Incident $incident) {
+                return $incident->reported->response_time;
+            })
+            ->editColumn('duration', function (Incident $incident) {
+                // Calculate avg_time from report_time and response_time
+                $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
+
+                return $diff . ' Minutes';
+            })
+            ->editColumn('under', function (Incident $incident) {
+                // Calculate avg_time from report_time and response_time
+                $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
+                
+                if($diff < 30){
+                    return 'Y';
+                }else{
+                    return 'N';
+                }
+            })
+            ->editColumn('under2', function (Incident $incident) {
+                
+
+                $allowedCategories = ['Hardware', 'Network'];
+
+                // if (in_array($incident->reported->category, $allowedCategories)) {
+                    // $category = $incident->reported->category;
+
+                    // if (collect(["Hardware", "Software"])->contains($category)) {
+                        // Your code here if the category contains "Hardware" or "Network"
+
+                    // Calculate avg_time from report_time and response_time
+                    // $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
+
+                    // if($diff < 120){
+                    //     return 'Y';
+                    // }else{
+                    //     return 'N';
+                    // }
+
+                    $allowedCategories = ['Hardware', 'Software'];
+
+                    if (!empty(array_intersect($incident->reported->category, $allowedCategories))) {
+                        // return 'Y';
+                        // Calculate avg_time from report_time and response_time
+                        $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
+
+                        if($diff < 120){
+                            return 'Y';
+                        }else{
+                            return 'N';
+                        }
+                    }
+                // } else {
+                //     // Your code here if the category does not contain "Hardware" or "Network"
+                //     // return '-';
+                //     return $incident->reported->category;
+                // }
+
+                
+                
             })
             // ->editColumn('itsm_reported_response', function (Incident $incident) {
             //     return $incident->itsm_reported_response->format('d M Y, h:i a');
@@ -153,6 +217,10 @@ class IncidentDataTable extends DataTable
             Column::make('reported_location')->title('Reported Location')->visible(false),
             Column::make('reported_source')->title('Report Source')->visible(false),
             Column::make('reported_date')->title('Report Time')->visible(true),
+            Column::make('response_time')->title('Response Time')->visible(false),
+            Column::make('duration')->title('Duration')->visible(false),
+            Column::make('under')->title('Status < 30')->visible(false),
+            Column::make('under2')->title('Status < 120')->visible(false),
             // Column::make('reported_response')->title('Response Time')->visible(false),
             // Column::make('resolved_date')->title('Resolved Time')->visible(false),
             Column::make('user_id')->title('Created By')->visible(false),

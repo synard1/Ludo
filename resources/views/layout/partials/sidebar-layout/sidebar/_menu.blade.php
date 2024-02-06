@@ -34,6 +34,20 @@
 			</a>
 			<!--end:Menu item-->
 
+			<!--begin:Menu item-->
+            <a class="menu-link {{ request()->routeIs('dashboard.report') ? 'active' : '' }}" href="{{ route('dashboard.report') }}">
+				<div class="menu-item {{ request()->routeIs('dashboard.report') ? 'here show' : '' }}">
+					<!--begin:Menu link-->
+					<span class="menu-link">
+						<span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+						<span class="menu-title">Dashboards Report</span>
+					</span>
+
+					<!--end:Menu link-->
+				</div>
+			</a>
+			<!--end:Menu item-->
+
 			@if($isActive)
 				<!--begin:Menu item-->
 				<div class="menu-item pt-5">
