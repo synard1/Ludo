@@ -27,6 +27,69 @@ class DashboardController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function indexReport()
+    {
+        $user = auth()->user();
+        $company = Company::where('cid', $user->cid)->first();
+
+        if ($user) {
+            $firstDayOfMonth = Carbon::now()->startOfMonth();
+            $lastDayOfMonth = Carbon::now()->endOfMonth();
+
+            // Split Env local data
+            if (isLocal()) {
+                // Code for local environment
+                $workOrders = WorkOrder::where('status', 'Resolved')->get();
+                $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
+                    ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
+                    ->groupBy('source_report')
+                    ->get();
+            } else {
+                $workOrders = WorkOrder::where('user_cid', $user->cid)->where('status', 'Resolved')->get();
+                $tickets = Ticket::selectRaw('source_report, AVG(ABS(TIMESTAMPDIFF(MINUTE, response_time, report_time))) as avg_time')
+                    ->whereBetween('response_time', [$firstDayOfMonth, $lastDayOfMonth])
+                    ->where('user_cid', $user->cid)
+                    ->groupBy('source_report')
+                    ->get();
+            }
+            // return view('dashboard::index');
+
+
+            $months = Config::get('onexolution.months');
+            // $staffTimes = [];
+
+            // foreach ($workOrders as $workOrder) {
+            //     $staff = json_encode($workOrder['staff']);
+            //     $startTime = Carbon::parse($workOrder['start_time']);
+            //     $endTime = Carbon::parse($workOrder['end_time']);
+            //     $timeDiff = $endTime->diffInMinutes($startTime);
+
+            //     if (!isset($staffTimes[$staff])) {
+            //         $staffTimes[$staff] = [];
+            //     }
+
+            //     $staffTimes[$staff][] = $timeDiff;
+            // }
+
+            // $avgTimes = [];
+
+            // foreach ($staffTimes as $staff => $times) {
+            //     $avgTime = count($times) > 0 ? array_sum($times) / count($times) : 0;
+            //     $avgTimes[] = [
+            //         'staff' => $staff,
+            //         'avg_time' => $avgTime,
+            //     ];
+            // }
+
+            // $data = WorkOrder::selectRaw('staff, AVG(TIMESTAMPDIFF(MINUTE, end_time, start_time)) as avg_time')
+            //     ->groupBy('staff')
+            //     ->get();
+
+            return view('dashboard::custom.index', compact(['tickets', 'months', 'company']));
+        } else {
+        }
+    }
+
     public function index()
     {
         $user = auth()->user();
@@ -653,5 +716,105 @@ class DashboardController extends Controller
         }
 
         return collect($mergedData);
+    }
+
+    public function report(Request $request)
+    {
+        $selectedMonth = $request->input('month');
+        $selectedYear = $request->input('year');
+        $type = $request->input('type');
+        $task = $request->input('task');
+        $user = auth()->user();
+
+        // dd($selectedMonth .'-'. $selectedYear);
+
+        if (isLocal()) {
+            // $data = DB::table('itsm_work_orders')
+            // ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
+            // ->whereMonth('created_at', '=', $selectedMonth)
+            // ->whereYear('created_at', '=', $selectedYear)
+            // ->groupBy('staff')
+            // ->get();
+
+        } else {
+
+            if ($type == 'chart') {
+                if ($task == 'GET_RESPONSE_TIME') {
+                    $data = DB::table('itsm_incidents')
+                        ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                        ->select(['itsm_reporteds.category', 'itsm_reporteds.report_time', 'itsm_reporteds.response_time'])
+                        // ->whereIn('itsm_reporteds.category',['HIS'])
+                        ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+                        ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+                        ->where('itsm_incidents.user_cid', $user->cid)
+                        // ->groupBy('itsm_reporteds.category')
+                        ->get();
+
+                    // Filter the results where avg_time is less than 300 minutes
+                    $filteredData = $data->map(function ($item) {
+                        // Calculate avg_time from report_time and response_time
+                        $diff = Carbon::parse($item->report_time)->diffInMinutes(Carbon::parse($item->response_time));
+
+                        // Add avg_time to the item
+                        $item->duration = $diff;
+
+                        return $item;
+                    });
+
+                    // // Convert the collection to a plain array
+                    $filteredArray = $filteredData->values()->all();
+
+
+                    // // // Get the count of filtered results
+                    $countA = $filteredData->where('duration', '<', 30)->count();
+                    $countB = $filteredData->where('duration', '>', 30)->count();
+
+
+                    $result = [
+                        'name' => 'Reponse Time',
+                        'under' => $countA,
+                        'upper' => $countB,
+                    ];
+                }elseif ($task == 'GET_RESOLVE_TIME_HN') {
+                    $data = DB::table('itsm_incidents')
+                        ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                        ->select(['itsm_reporteds.category', 'itsm_reporteds.report_time', 'itsm_reporteds.response_time'])
+                        ->where(function ($query) {
+                            $query->where('itsm_reporteds.category', 'LIKE', '%Network%')
+                                ->orWhere('itsm_reporteds.category', 'LIKE', '%Hardware%');
+                        })
+                        ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+                        ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+                        ->where('itsm_incidents.user_cid', $user->cid)
+                        // ->groupBy('itsm_reporteds.category')
+                        ->get();
+
+                         // Filter the results where avg_time is less than 300 minutes
+                        $filteredData = $data->map(function ($item) {
+                            // Calculate avg_time from report_time and response_time
+                            $diff = Carbon::parse($item->report_time)->diffInMinutes(Carbon::parse($item->response_time));
+
+                            // Add avg_time to the item
+                            $item->duration = $diff;
+
+                            return $item;
+                        });
+
+                        // Get the count of filtered results
+                        $countA = $filteredData->where('duration', '<', 120)->count();
+                        $countB = $filteredData->where('duration', '>', 120)->count();
+
+                        $result = [
+                            'name' => 'Resolve Time',
+                            'under' => $countA,
+                            'upper' => $countB,
+                        ];
+
+                }
+
+            }
+        }
+
+        return response()->json([$result]);
     }
 }
