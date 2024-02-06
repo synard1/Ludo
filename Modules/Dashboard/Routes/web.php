@@ -17,6 +17,7 @@ use Modules\Dashboard\Http\Controllers\DashboardController;
 // Route::group([], function () {
 //     Route::resource('dashboard', DashboardController::class)->names('dashboard');
 Route::get('/', [DashboardController::class, 'index'])->middleware('auth');
+Route::get('/dashboard-report', [DashboardController::class, 'indexReport'])->middleware('auth')->name('dashboard.report');
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 // });
 
@@ -29,22 +30,12 @@ Route::prefix('apps/dashboard')->name('dashboard.')->middleware(config('onexolut
 
     // // API
     Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/fetch-data/report', [DashboardController::class, 'report'])->name('report');
+        Route::get('/fetch-data/AverageTimeHisReport', [DashboardController::class, 'fetchDataAverageTimeHisReport'])->name('fetchDataAverageTimeHisReport');
         Route::get('/fetch-data/AverageTimeBySourceReport', [DashboardController::class, 'fetchDataAverageTimeBySourceReport'])->name('fetchDataAverageTimeBySourceReport');
-        Route::get('/fetch-data/AverageTimeByStaff', [DashboardController::class, 'fetchDataAverageTimeByStaff'])->name('fetchDataAverageTimeByStaff');
+        Route::get('/fetch-data/chart', [DashboardController::class, 'fetchDataAverageTimeByStaff'])->name('fetchDataAverageTimeByStaff');
         Route::get('/fetch-data/IncidentService', [DashboardController::class, 'getDataIncidentService'])->name('getDataIncidentService');
-        // Route::get('/fetch-data/IncidentService', [DashboardController::class, 'fetchDataBasedOnFilter'])->name('getDataIncidentService');
-    //     Route::get('/ticket/statushistory', [TicketController::class, 'getStatusHistory'])->name('getStatusHistory');
-    //     Route::post('/ticket/status', [TicketController::class, 'saveStatus'])->name('postStatus');
-    //     Route::post('/ticket', [TicketController::class, 'saveTicket'])->name('postTicket');
-    //     Route::delete('/deleteTicket/{id}', [TicketController::class, 'deleteTicket'])->name('deleteTicket');
-    //     Route::get('/woresponse/{id}', [WorkOrderResponseController::class, 'getData'])->name('getWoResponse');
-    //     Route::get('/workorder/staff', [WorkOrderController::class, 'getWorkOrderStaff'])->name('getWorkOrderStaff');
-    //     Route::post('/workorder/response', [WorkOrderController::class, 'saveWorkOrderResponse'])->name('postWorkOrderResponse');
-    //     Route::get('/workorder/notes', [WorkOrderNoteController::class, 'getWorkOrderNotes'])->name('getWorkOrderNotes');
-    //     Route::post('/workorder/notes', [WorkOrderNoteController::class, 'saveWorkOrderNotes'])->name('postWorkOrderNotes');
-    //     Route::get('/workorder', [WorkOrderController::class, 'getWorkOrderData'])->name('getWorkOrder');
-    //     Route::post('/workorder', [WorkOrderController::class, 'saveWorkOrder'])->name('postWorkOrder');
-    //     Route::delete('/deleteWorkOrder/{id}', [WorkOrderController::class, 'deleteWorkOrder'])->name('deleteWorkOrder');
+
 
     });
 

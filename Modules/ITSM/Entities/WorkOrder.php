@@ -62,8 +62,23 @@ class WorkOrder extends Model
         'staff' => 'array',
     ];
 
+    public function setStaffAttribute($value)
+    {
+        $this->attributes['staff'] = json_encode($value);
+    }
+
+    public function getStaffAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
     public function respons()
     {
         return $this->hasMany(WorkorderResponse::class, 'workorder_id','id');
+    }
+
+    public function reported()
+    {
+        return $this->belongsTo(Reported::class, 'data_id', 'data_id');
     }
 }
