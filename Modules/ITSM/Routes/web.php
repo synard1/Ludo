@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\ITSM\Http\Controllers\ITSMController;
 use Modules\ITSM\Http\Controllers\IncidentController;
 use Modules\ITSM\Http\Controllers\ServiceController;
+use Modules\ITSM\Http\Controllers\LogBookController;
 use Modules\ITSM\Http\Controllers\WorkOrderController;
 use Modules\ITSM\Http\Controllers\WorkorderResponseController;
 
@@ -27,6 +28,7 @@ Route::prefix('apps/itsm')->name('itsm.')->middleware(config('onexolution.route.
     // Main Routes
     Route::get('/incidents', [IncidentController::class, 'index'])->name('incidents');
     Route::get('/services', [ServiceController::class, 'index'])->name('services');
+    Route::get('/logbooks', [LogBookController::class, 'index'])->name('logbooks');
     Route::get('/workorder', [WorkOrderController::class, 'index'])->name('workorder');
     // Route::get('/print/wo/{id}', [WorkOrderController::class, 'woPrint'])->name('woPrint');
     Route::get('/print/wo/{filename}', [WorkOrderController::class, 'printWorkOrder'])->name('print.workorder');
@@ -50,6 +52,9 @@ Route::prefix('apps/itsm')->name('itsm.')->middleware(config('onexolution.route.
 
         Route::get('/incidents', [IncidentController::class, 'edit'])->name('incident.edit');
         Route::post('/incidents', [IncidentController::class, 'store'])->name('incident.store');
+
+        Route::get('/logbooks', [LogBookController::class, 'edit'])->name('logbook.edit');
+        Route::post('/logbooks', [LogBookController::class, 'store'])->name('logbook.store');
 
         Route::get('/workorder/response/{id}', [WorkorderResponseController::class, 'show'])
             ->name('workorder.response.show');

@@ -47,6 +47,23 @@
         <!--begin:Menu item-->
         <div class="menu-item">
             <!--begin:Menu link-->
+            <a class="menu-link {{ request()->routeIs('itsm.logbooks') ? 'active' : '' }}"
+                href="{{ route('itsm.logbooks') }}">
+                <span class="menu-bullet">
+                    <span class="bullet bullet-dot"></span>
+                </span>
+                <span class="menu-title">LogBook</span>
+            </a>
+            <!--end:Menu link-->
+        </div>
+        <!--end:Menu item-->
+    </div>
+    <!--end:Menu sub-->
+    <!--begin:Menu sub-->
+    <div class="menu-sub menu-sub-accordion">
+        <!--begin:Menu item-->
+        <div class="menu-item">
+            <!--begin:Menu link-->
             <a class="menu-link {{ request()->routeIs('itsm.workorder') ? 'active' : '' }}"
                 href="{{ route('itsm.workorder') }}">
                 <span class="menu-bullet">
