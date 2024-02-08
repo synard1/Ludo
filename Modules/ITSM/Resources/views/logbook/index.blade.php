@@ -8,11 +8,11 @@
                 <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_logbook_overview">Overview</a>
             </li>
             <!--end:::Tab item-->
-            <!--begin:::Tab item-->
+            {{-- <!--begin:::Tab item-->
             <li class="nav-item">
                 <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_logbook_general">General Settings</a>
             </li>
-            <!--end:::Tab item-->
+            <!--end:::Tab item--> --}}
         </ul>
         <!--end:::Tabs-->
         <!--begin:::Tab content-->
@@ -76,6 +76,7 @@
     <script>
         // Pass data to JavaScript
         var canCreateLogbook = @json($canCreateLogbook);
+        var isSupervisor = @json($isSupervisor);
 
 
         $(document).ready(function () {

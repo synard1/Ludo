@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('itsm_log_books', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
+            $table->uuid('parent_id')->nullable();
             $table->string('title');
             $table->longText('description');
             $table->string('status');
@@ -20,6 +21,13 @@ return new class extends Migration
             $table->datetime('start_time')->nullable();
             $table->datetime('end_time')->nullable();
             
+            $table->string('approved_cid')->nullable();
+            $table->unsignedBigInteger('approved_id')->nullable();
+            $table->foreign('approved_id')->references('id')->on('users');
+            $table->string('approved_by')->nullable();
+            $table->string('approved_by_level')->nullable();
+            $table->datetime('approved_time')->nullable();
+
             $table->string('user_cid');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');

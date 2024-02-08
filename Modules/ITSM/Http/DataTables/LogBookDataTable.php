@@ -27,6 +27,9 @@ class LogBookDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->editColumn('title', function (LogBook $logbook) {
+                return '<a href="#" class="history" target="_blank">'.$logbook->title.'</a>';
+            })
             ->editColumn('created_at', function (LogBook $logbook) {
                 return $logbook->created_at->format('d M Y, h:i a');
             })
@@ -50,10 +53,10 @@ class LogBookDataTable extends DataTable
             })
             ->addColumn('action', function (LogBook $logbook) {
                 // $isOwner = auth()->check() && auth()->user()->level_access === 'Owner';
-                $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-                return $isSupervisor ? view('itsm::logbook._actions', compact(['logbook','isSupervisor'])) : '';
+                $isEditor = auth()->check() && auth()->user()->level_access === 'Supervisor' || auth()->user()->level_access === 'Staff';
+                return $isEditor ? view('itsm::logbook._actions', compact(['logbook','isEditor'])) : '';
             })
-            ->rawColumns(['action','description'])
+            ->rawColumns(['action','description','title'])
             ->setRowId('id');
     }
 
@@ -67,10 +70,19 @@ class LogBookDataTable extends DataTable
                             ->newQuery();
         }elseif(auth()->user()->level_access == 'Owner'){
             $query = $model->where('user_cid', $user->cid)
+                            ->where('publish','1')
                             ->newQuery();
+        }elseif(auth()->user()->level_access == 'Staff'){
+            // Get a new query builder instance
+            $query = $model
+                ->where('user_id',$user->id)
+                ->where('publish','1')
+                ->newQuery();
         }else{
             // Get a new query builder instance
-            $query = $model->newQuery();
+            $query = $model
+                ->where('publish','1')
+                ->newQuery();
         }
     
         return $query;

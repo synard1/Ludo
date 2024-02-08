@@ -56,4 +56,13 @@ return [
             'Overdue' => 'Overdue',
         ],
     ],
+
+    'logbook' => [
+        'status' => [
+            'Cancelled' => 'Cancelled',
+            'Needs Changes' => 'Needs Changes',
+            'Needs Review' => 'Needs Review',
+            'Approved' => 'Approved',
+        ],
+    ],
 ];

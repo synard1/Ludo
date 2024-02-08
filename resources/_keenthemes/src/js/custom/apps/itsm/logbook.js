@@ -73,6 +73,16 @@ var KTLogbook = function () {
         xButton.addEventListener('click', function (e) {
             e.preventDefault();
             form.reset();
+
+            // Find the input element by its ID
+            var hiddenInput = document.getElementById("logbook_id");
+
+            // Check if the input element exists
+            if (hiddenInput) {
+                // Remove the input element
+                hiddenInput.remove();
+            }
+            
             // Close kt_docs_card_logbook_new
             $('#kt_docs_card_logbook_new').collapse('hide');
             // Show kt_docs_card_logbook_list
@@ -120,16 +130,16 @@ var KTLogbook = function () {
                     }
 
                     // var formData = new FormData(document.getElementById('kt_new_logbook_form'));
-                    var formData = {
+                    // var formData = {
                         // Assuming your textarea has an ID, replace 'yourTextareaId' with the actual ID
-                        'description': tinymce.get('description').getContent(),
-                        'logbook_id': $('#logbook_id').val(),
-                        'start_time': $('#start_time').val(),
-                        'end_time': $('#end_time').val(),
+                        // 'description': tinymce.get('description').getContent(),
+                        // 'logbook_id': $('#logbook_id').val(),
+                        // 'start_time': $('#start_time').val(),
+                        // 'end_time': $('#end_time').val(),
                         // 'start_time': formattedStartTime,
                         // 'end_time': formattedEndTime,
                         // Add other form fields if needed
-                    };
+                    // };
 
                     // console.log(formData);
 
@@ -139,6 +149,7 @@ var KTLogbook = function () {
                         // data: formData,
                         data: {
                             id: $('#logbook_id').val(),
+                            status: $('#status').val(),
                             title: $('#title').val(),
                             description: tinymce.get('description').getContent(),
                             start_time: $('#start_time_input').val(),
@@ -176,6 +187,15 @@ var KTLogbook = function () {
                                 // dtLogbook.ajax.reload();
                                 $('#logbooks-table').DataTable().ajax.reload();
                                 form.reset();
+
+                                // Find the input element by its ID
+                                var hiddenInput = document.getElementById("logbook_id");
+
+                                // Check if the input element exists
+                                if (hiddenInput) {
+                                    // Remove the input element
+                                    hiddenInput.remove();
+                                }
                             });
                         },
                         error: function (xhr) {
@@ -218,6 +238,13 @@ var KTLogbook = function () {
             form = document.querySelector('#kt_new_logbook_form');
             form.reset();
             e.preventDefault();
+
+            if(isSupervisor){
+                var div = document.getElementById("edit-status");
+                if (div.style.display === "block") {
+                    div.style.display = "none";
+                }
+            }
 
             // Change the title text when the button is clicked
             logbookTitleForm.innerText = 'New Logbook';
@@ -265,14 +292,11 @@ var KTLogbook = function () {
 
         $('#logbooks-table').on('click', '.delete-row', function(e) {
             e.preventDefault();
-            var id = $(this).data('id');
-            // console.log('delete row click!');
-
             // Select parent row
             const parent = e.target.closest('tr');
 
             // Get subject name
-            const logbookTitle = parent.querySelectorAll('td')[2].innerText;
+            const logbookTitle = parent.querySelectorAll('td')[1].innerText;
             const logbookId = $(this).data('id');
             // console.log(logbookId +' '+ logbookTitle);
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
@@ -298,8 +322,13 @@ var KTLogbook = function () {
                         timer: 2000
                     }).then(function () {
                         $.ajax({
-                            url: '/apps/itsm/api/deleteLogbook/' + logbookId,
+                            url: '/apps/itsm/api/logbooks/',
                             type: 'DELETE',
+                            data: {
+                                id: logbookId,
+                                task: 'DELETE_LOGBOOK',
+                                // description: tinymce.get('description_wo').getContent(),
+                            },
                             success: function(response) {
                                 // Refresh the DataTable or remove the row from the table
                                 // depending on your implementation
@@ -397,6 +426,49 @@ var KTLogbook = function () {
                         if(response.data.end_time){
                             $('#finish_time_input').val(formatDateTime(response.data.end_time));
                         }
+
+                        // Format date and set values for report_time and respond_date
+                        $('#start_time').val(formatDateTime(response.data.start_time));
+                        $('#finish_time').val(formatDateTime(response.data.end_time));
+
+                        if(isSupervisor){
+                            var div = document.getElementById("edit-status");
+                            if (div.style.display === "none") {
+                                div.style.display = "block";
+                            } 
+                        }
+
+                        selectStatus(response.data.status);
+
+
+                        const linkedPicker1Element = document.getElementById("start_time");
+                        const linked1 = new tempusDominus.TempusDominus(linkedPicker1Element);
+                        const linked2 = new tempusDominus.TempusDominus(document.getElementById("finish_time"), {
+                            useCurrent: false,
+                        });
+
+                        linked1.updateOptions({
+                                restrictions: {
+                                },
+                            });
+
+                        //using event listeners
+                        linkedPicker1Element.addEventListener(tempusDominus.Namespace.events.change, (e) => {
+                            linked2.updateOptions({
+                                restrictions: {
+                                minDate: e.detail.date,
+                                },
+                            });
+                        });
+
+                        //using subscribe method
+                        const subscription = linked2.subscribe(tempusDominus.Namespace.events.change, (e) => {
+                            linked1.updateOptions({
+                                restrictions: {
+                                maxDate: e.date,
+                                },
+                            });
+                        });
                         
 
                         // Find the input element by its id
@@ -472,6 +544,10 @@ var KTLogbook = function () {
         // return moment(dateTimeString, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm');
         // Format the date using moment.js
         return moment(dateTimeString).format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    function selectStatus(selectedStatus) {
+        $('#status').val(selectedStatus).trigger('change'); // Assuming you are using a library like Select2 for the dropdown
     }
 
     // Get the last day of the current month

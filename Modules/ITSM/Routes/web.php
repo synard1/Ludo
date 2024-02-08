@@ -55,6 +55,7 @@ Route::prefix('apps/itsm')->name('itsm.')->middleware(config('onexolution.route.
 
         Route::get('/logbooks', [LogBookController::class, 'edit'])->name('logbook.edit');
         Route::post('/logbooks', [LogBookController::class, 'store'])->name('logbook.store');
+        Route::delete('/logbooks', [LogBookController::class, 'deleteAjax'])->name('logbook.destroy');
 
         Route::get('/workorder/response/{id}', [WorkorderResponseController::class, 'show'])
             ->name('workorder.response.show');

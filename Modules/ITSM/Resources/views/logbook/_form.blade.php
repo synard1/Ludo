@@ -1,3 +1,8 @@
+@php
+    $user = auth()->user(); 
+    $mode = session('mode', ''); // Retrieve the mode from session
+@endphp
+
 @if ($canCreateLogbook)
 <div class="card shadow-sm mb-5">
     <div class="card-header collapsible cursor-pointer rotate">
@@ -27,6 +32,29 @@
                     </div>
                 </div>
                 <!--end::Input group-->
+
+                @if ($user->level_access == 'Supervisor')
+                
+                    <div class="edit-status" id="edit-status" style="display: none;">
+                        <!--begin::Input group-->
+                        <div class="row g-9 mb-8">
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="required fs-6 fw-semibold mb-2">Status</label>
+                                <select id="status" name="status" class="js-status form-control" placeholder="Enter / Select Status">
+                                    <option value="" selected>-- Select Status --</option>
+                                    @foreach ($status as $key => $value)
+                                        <option value="{{ $key }}">{{ $value }}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                            <!--end::Col-->
+                        </div>
+                        <!--end::Input group-->
+                    </div>
+                @endif
+                
 
                 <!--begin::Input group-->
                 <div class="row mb-2">

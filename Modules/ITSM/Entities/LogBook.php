@@ -27,12 +27,18 @@ class LogBook extends Model
     }
 
     protected $fillable = [
+        'parent_id',
         'title',
         'description',
         'status',
         'publish',
         'start_time',
         'end_time',
+        'approved_cid',
+        'approved_id',
+        'approved_by',
+        'approved_by_level',
+        'approved_time',
         'user_cid',
         'user_id',
         'created_by',
@@ -42,5 +48,6 @@ class LogBook extends Model
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        'approved_time' => 'datetime',
     ];
 }

@@ -4,7 +4,7 @@
 </a>
 <!--begin::Menu-->
 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4" data-kt-menu="true">
-    @if($logbook->status != 'Completed' && $logbook->status != 'Closed')
+    @if($logbook->status != 'Approved' && $logbook->status != 'Cancelled')
     <!--begin::Menu item-->
     <div class="menu-item px-3">
         <a href="#" class="menu-link px-3 edit-logbook" data-id="{{ $logbook->id }}">
@@ -13,7 +13,7 @@
     </div>
     <!--end::Menu item-->
 
-    
+    @if($logbook->user_id == auth()->user()->id)
     <!--begin::Menu item-->
     <div class="menu-item px-3">
         <a href="#" class="menu-link px-3 delete-row" data-kt-docs-table-filter="delete_row" data-id="{{ $logbook->id }}">
@@ -21,6 +21,7 @@
         </a>
     </div>
     <!--end::Menu item-->
+    @endif
     @endif
 
 
