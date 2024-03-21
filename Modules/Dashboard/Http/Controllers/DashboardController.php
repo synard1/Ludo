@@ -385,6 +385,79 @@ class DashboardController extends Controller
                 ->where('itsm_work_orders.user_cid', $user->cid)
                 ->whereMonth('itsm_work_orders.start_time', '=', $selectedMonth)
                 ->whereYear('itsm_work_orders.start_time', '=', $selectedYear)
+                // ->where('itsm_work_orders.status', 'Resolved')
+                ->orWhere('itsm_work_orders.status', 'Completed')
+                ->where(function ($query) {
+                    $query->where('itsm_reporteds.category', 'LIKE', '%Network%')
+                        ->orWhere('itsm_reporteds.category', 'LIKE', '%Hardware%');
+                })
+                ->get(['itsm_work_orders.start_time', 'itsm_work_orders.end_time', 'itsm_work_orders.staff']);
+
+
+            // return $data->toJson();
+
+            $staffTimes = [];
+
+            foreach ($data as $workOrder) {
+                // $category = $workOrder->reported->category; // Access the category from the related 'reported' entity
+                // $staff = json_encode($workOrder['staff']);
+                $staff = $workOrder->staff;
+                $startTime = Carbon::parse($workOrder->start_time);
+                $endTime = Carbon::parse($workOrder->end_time);
+                $timeDiff = $endTime->diffInMinutes($startTime);
+
+                if (!isset($staffTimes[$staff])) {
+                    $staffTimes[$staff] = [];
+                }
+
+                $staffTimes[$staff][] = $timeDiff;
+            }
+
+            $avgTimes = [];
+
+            foreach ($staffTimes as $staff => $times) {
+                $avgTime = count($times) > 0 ? array_sum($times) / count($times) : 0;
+                $avgTimes[] = [
+                    'staff' => $staff,
+                    'avg_time' => $avgTime,
+                ];
+            }
+        }
+
+        return response()->json($avgTimes);
+    }
+
+    public function chart(Request $request)
+    {
+        $selectedMonth = $request->input('month');
+        $selectedYear = $request->input('year');
+        $user = auth()->user();
+
+        if (isLocal()) {
+            // $data = DB::table('itsm_work_orders')
+            // ->select(DB::raw('staff, AVG(ABS(TIMESTAMPDIFF(MINUTE, end_time, start_time))) as avg_time'))
+            // ->whereMonth('created_at', '=', $selectedMonth)
+            // ->whereYear('created_at', '=', $selectedYear)
+            // ->groupBy('staff')
+            // ->get();
+
+        } else {
+            // $data = DB::table('itsm_work_orders')
+            // ->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
+            // // ->select(DB::raw('itsm_work_orders.staff as staff, itsm_reporteds.category as category,  AVG(ABS(TIMESTAMPDIFF(MINUTE, itsm_work_orders.end_time, itsm_work_orders.start_time))) as avg_time'), 'itsm_reporteds.resolved_time')
+            // ->select(['itsm_work_orders.staff', 'itsm_reporteds.category', 'itsm_work_orders.end_time', 'itsm_work_orders.start_time', 'itsm_reporteds.resolved_time'])
+            // // ->whereIn('itsm_reporteds.category', ['Hardware','Network'])
+            // // ->whereMonth('itsm_reporteds.resolved_time', '=', $selectedMonth)
+            // // ->whereYear('itsm_reporteds.resolved_time', '=', $selectedYear)
+            // ->where('itsm_work_orders.status', 'Resolved')
+            // ->where('itsm_work_orders.user_cid', $user->cid)
+            // // ->groupBy('staff', 'itsm_reporteds.category') // Include category in GROUP BY
+            // ->get();
+
+            $data = DB::table('itsm_work_orders')->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
+                ->where('itsm_work_orders.user_cid', $user->cid)
+                ->whereMonth('itsm_work_orders.start_time', '=', $selectedMonth)
+                ->whereYear('itsm_work_orders.start_time', '=', $selectedYear)
                 ->where('itsm_work_orders.status', 'Resolved')
                 ->where(function ($query) {
                     $query->where('itsm_reporteds.category', 'LIKE', '%Network%')
@@ -724,6 +797,8 @@ class DashboardController extends Controller
         $selectedYear = $request->input('year');
         $type = $request->input('type');
         $task = $request->input('task');
+        $role = $request->input('role');
+        $chart = $request->input('chart');
         $user = auth()->user();
 
         // dd($selectedMonth .'-'. $selectedYear);
@@ -809,6 +884,19 @@ class DashboardController extends Controller
                             'under' => $countA,
                             'upper' => $countB,
                         ];
+                }elseif ($task == 'GET_CATEGORY_COUNT') {
+                    $data = DB::table('itsm_incidents')
+                    ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                    ->select('itsm_incidents.category_name', DB::raw('count(*) as category_count'))
+                    ->where('itsm_incidents.user_cid', $user->cid)
+                    ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+                    ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+                    ->groupBy('itsm_incidents.category_name')
+                    ->get();
+
+                    // $result = $data;
+
+                    return response()->json($data);
 
                 }
 
@@ -816,5 +904,116 @@ class DashboardController extends Controller
         }
 
         return response()->json([$result]);
+    }
+
+    public function dumpData(Request $request)
+    {
+        $selectedMonth = $request->input('month');
+        $selectedYear = $request->input('year');
+        $role = $request->input('role');
+        $type = $request->input('type');
+        $chart = $request->input('chart');
+        $module = $request->input('module');
+
+        $user = auth()->user();
+
+        if($role == "it-support"){
+            if($chart == "staff"){
+                $data = DB::table('itsm_work_orders')
+                ->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
+                ->where('itsm_work_orders.user_cid', $user->cid)
+                ->whereMonth('itsm_work_orders.start_time', '=', $selectedMonth)
+                ->whereYear('itsm_work_orders.start_time', '=', $selectedYear)
+                ->where('itsm_work_orders.status', 'Completed')
+                ->where(function ($query) {
+                    $query->where('itsm_reporteds.category', 'LIKE', '%Network%')
+                        ->orWhere('itsm_reporteds.category', 'LIKE', '%Hardware%');
+                })
+                ->get(['itsm_work_orders.start_time', 'itsm_work_orders.end_time', 'itsm_work_orders.staff']);
+                // ->get();
+
+                // return $data;
+
+                if($type == 'rekap'){
+                    return response()->json($data);
+                    
+                }elseif($type == 'detail'){
+
+                    $staffTimes = [];
+        
+                    foreach ($data as $workOrder) {
+                        // $category = $workOrder->reported->category; // Access the category from the related 'reported' entity
+                        // $staff = json_encode($workOrder['staff']);
+                        $staff = $workOrder->staff;
+                        $startTime = Carbon::parse($workOrder->start_time);
+                        $endTime = Carbon::parse($workOrder->end_time);
+                        $timeDiff = $endTime->diffInMinutes($startTime);
+        
+                        if (!isset($staffTimes[$staff])) {
+                            $staffTimes[$staff] = [];
+                        }
+        
+                        $staffTimes[$staff][] = $timeDiff;
+                    }
+        
+                    $avgTimes = [];
+        
+                    foreach ($staffTimes as $staff => $times) {
+                        $avgTime = count($times) > 0 ? array_sum($times) / count($times) : 0;
+                        $avgTimes[] = [
+                            'staff' => $staff,
+                            'avg_time' => $avgTime,
+                        ];
+                    }
+
+                    return response()->json($avgTimes);
+                }
+            }elseif($chart == "category"){
+                $data = DB::table('itsm_incidents')
+                ->join('itsm_reporteds', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                ->select('itsm_incidents.category_name', DB::raw('count(*) as category_count'))
+                ->where('itsm_incidents.user_cid', $user->cid)
+                ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+                ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+                ->groupBy('itsm_incidents.category_name')
+                ->get();
+
+                    if($type == 'rekap'){
+                        return response()->json($data);
+                        
+                    }elseif($type == 'detail'){
+    
+                        $staffTimes = [];
+            
+                        // foreach ($data as $workOrder) {
+                        //     // $category = $workOrder->reported->category; // Access the category from the related 'reported' entity
+                        //     // $staff = json_encode($workOrder['staff']);
+                        //     $staff = $workOrder->staff;
+                        //     $startTime = Carbon::parse($workOrder->start_time);
+                        //     $endTime = Carbon::parse($workOrder->end_time);
+                        //     $timeDiff = $endTime->diffInMinutes($startTime);
+            
+                        //     if (!isset($staffTimes[$staff])) {
+                        //         $staffTimes[$staff] = [];
+                        //     }
+            
+                        //     $staffTimes[$staff][] = $timeDiff;
+                        // }
+            
+                        $avgTimes = [];
+            
+                        foreach ($staffTimes as $staff => $times) {
+                            $avgTime = count($times) > 0 ? array_sum($times) / count($times) : 0;
+                            $avgTimes[] = [
+                                'staff' => $staff,
+                                'avg_time' => $avgTime,
+                            ];
+                        }
+    
+                        return response()->json($avgTimes);
+                    }
+
+            }
+        }
     }
 }

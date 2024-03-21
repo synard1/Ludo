@@ -117,10 +117,10 @@ class WorkOrderDataTable extends DataTable
                 $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
                 if($isSuperAdmin){
                     $data = $company->where('cid',$workorder->user_cid)->first();
-                    return $data->name;
+                    return $data->name ?? '';
                 }else{
                     $data = $user->where('id',$workorder->user_id)->first();
-                    return $data->name;
+                    return $data->name ?? '';
 
                 }
                 

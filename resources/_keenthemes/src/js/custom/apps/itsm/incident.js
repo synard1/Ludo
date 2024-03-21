@@ -933,7 +933,7 @@ var KTIncident = function () {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
-        minDate: getSevenDaysAgo(),
+        minDate: getThirtyDaysAgo(),
         minuteIncrement: 1
     });
 
@@ -941,7 +941,13 @@ var KTIncident = function () {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         maxDate: new Date(),
-        minDate: getSevenDaysAgo(),
+        minDate: getThirtyDaysAgo(),
+        minuteIncrement: 1
+    });
+
+    $("#due_date").flatpickr({
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
         minuteIncrement: 1
     });
 
@@ -986,6 +992,14 @@ var KTIncident = function () {
         var sevenDaysAgo = new Date(today);
         sevenDaysAgo.setDate(today.getDate() - 7);
         return sevenDaysAgo;
+    }
+
+    // Get the date exactly 30 days ago
+    function getThirtyDaysAgo() {
+        var today = new Date();
+        var thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        return thirtyDaysAgo;
     }
 
     // Editor functions

@@ -68,7 +68,7 @@
                             <!--end::Icon-->
 
                             <!--begin::Datepicker-->
-                            <input class="form-control form-control-solid ps-12 flatpickr-input" placeholder="Select a date" name="due_date" id="due_date" type="text" readonly="readonly">
+                            <input class="form-control form-control-solid ps-12 flatpickr-input" placeholder="Select a date" name="due_date" id="due_date" type="text">
                             <!--end::Datepicker-->
                         </div>
                         <!--end::Input-->

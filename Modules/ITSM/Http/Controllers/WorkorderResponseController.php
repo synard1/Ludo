@@ -82,6 +82,8 @@ class WorkorderResponseController extends Controller
     $lastDataId = WorkorderResponse::latest()->value('id');
     $module = strtolower($request->input('module'));
     $status = $request->input('status');
+    $startTime = $request->input('start_time');
+    $endTime = $request->input('end_time');
 
     // Start a database transaction
     DB::beginTransaction();
@@ -95,7 +97,11 @@ class WorkorderResponseController extends Controller
         $workorder = WorkOrder::where('id', $request->input('workorder_id'))->first();
 
         WorkOrder::where('id', $request->input('workorder_id'))
-            ->update(['status' => $status]);
+            ->update([
+                'status' => $status,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+            ]);
 
         if (Str::contains($module, 'incident')) {
             $data = Incident::where('id', $workorder->data_id)

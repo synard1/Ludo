@@ -72,6 +72,33 @@ class ServiceController extends Controller
                             ->first(); // Use 'first' to get a single result or null if not found
 
 
+        // Tester
+        // if($request->input('service_id')){
+        //     // Update the service with the new data
+        //     $reported = Reported::where('data_id', $request->input('service_id'))
+        //             ->update([
+        //         'user' => $request->input('reportedBy'),
+        //         'location' => $request->input('location'),
+        //         'source' => $request->input('source'),
+        //         'report_time' => $request->input('report_time'),
+        //         'response_time' => $request->input('response_time'),
+        //         'category' => $request->input('category')
+        //     ]);
+
+        //     $service = Service::where('id', $request->input('service_id'))
+        //     ->update([
+        //         'category_id' => $serviceCategory->id,
+        //         'category_name' => $serviceCategory->name,
+        //         'description' => $request->input('description'),
+        //         // 'severity' => $request->input('severity'),
+        //         'kpi' => $request->input('kpi'),
+        //         // 'status' => 'Open',
+        //     ]);
+
+        //     return response()->json(['message' => 'Service saved or updated successfully']);
+
+        // }
+
         // Start a database transaction
         DB::beginTransaction();
 
@@ -94,7 +121,6 @@ class ServiceController extends Controller
                     'category_id' => $serviceCategory->id,
                     'category_name' => $serviceCategory->name,
                     'description' => $request->input('description'),
-                    'severity' => $request->input('severity'),
                     'kpi' => $request->input('kpi'),
                     // 'status' => 'Open',
                 ]);
