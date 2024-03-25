@@ -401,19 +401,6 @@ var KTWorkorder = function () {
             const workorderId = $(this).data('id');
             // console.log(workorderId +' '+ workorderNumber);
 
-            // Check if the input field with id "workorder_id" exists
-            var workorderIdInput = document.getElementById('workorder_id');
-            var workorderModuleInput = document.getElementById('module');
-            
-            // If the input field exists, remove it from the form
-            if (workorderIdInput !== null) {
-                workorderIdInput.parentNode.removeChild(workorderIdInput);
-            }
-            
-            if (workorderModuleInput !== null) {
-                workorderModuleInput.parentNode.removeChild(workorderModuleInput);
-            }
-
             // Simulate delete request -- for demo purpose only
             Swal.fire({
                 html: `Load Data <b>`+ workorderNumber +`</b>`,
@@ -440,12 +427,6 @@ var KTWorkorder = function () {
                         if(response.description){
                             // Set the content of the TinyMCE editor
                             tinymce.get('description_response').setContent(response.description);
-                        }
-                        if(response.report_time){
-                            $('#report_time_input').val(formatDateTime(response.report_time));
-                        }
-                        if(response.response_time){
-                            $('#response_time_input').val(formatDateTime(response.response_time));
                         }
                         if(response.start_time){
                             $('#start_time_input').val(formatDateTime(response.start_time));
@@ -702,11 +683,11 @@ var KTWorkorder = function () {
         $('#status').val(selectedStatus).trigger('change'); // Assuming you are using a library like Select2 for the dropdown
     }
 
-    $("#due_date").flatpickr({
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        minuteIncrement: 1
-    });
+    // $("#start_time").flatpickr({
+    //     enableTime: true,
+    //     dateFormat: "Y-m-d H:i",
+    //     minuteIncrement: 1
+    // });
 
     // Public functions
     return {

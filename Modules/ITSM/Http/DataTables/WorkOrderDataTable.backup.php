@@ -83,28 +83,7 @@ class WorkOrderDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->editColumn('created_at', function (WorkOrder $workorder) {
-                return $workorder->created_at->format('d M Y, h:i a') ?? '';
-            })
-            ->editColumn('start_time', function (WorkOrder $workorder) {
-                if($workorder->status == 'Completed'){
-                    if($workorder->start_time == null){
-                        return '';
-                    }else{
-                        return $workorder->start_time;
-                    }
-                    
-                }
-                
-            })
-            ->editColumn('end_time', function (WorkOrder $workorder) {
-                if($workorder->status == 'Completed'){
-                    if($workorder->end_time == null){
-                        return '';
-                    }else{
-                        return $workorder->end_time;
-                    }
-                    
-                }
+                return $workorder->created_at->format('d M Y, h:i a');
             })
             // ->editColumn('reported_by', function (WorkOrder $workorder) {
             //     return $workorder->reported->user;
@@ -125,9 +104,8 @@ class WorkOrderDataTable extends DataTable
                 // $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
                 $data = json_decode($workorder->data_details);
                 $category = $data->category_name ?? '';
-                $number = $data->incident_number ?? $data->service_number ?? '';
 
-                return $workorder->subject . ' '. WorkOrderDataTable::getPriorityBadge($workorder->priority) . '<br>[<b>' . $number . '</b>] [<b>' . $category . '</b>]';
+                return $workorder->subject . ' '. WorkOrderDataTable::getPriorityBadge($workorder->priority) . '<br>[<b>' . $category . '</b>]';
             })
             ->editColumn('status', function (WorkOrder $workorder) {
                 return WorkOrderDataTable::getStatusBadge($workorder->status);
@@ -139,10 +117,10 @@ class WorkOrderDataTable extends DataTable
                 $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
                 if($isSuperAdmin){
                     $data = $company->where('cid',$workorder->user_cid)->first();
-                    return $data->name;
+                    return $data->name ?? '';
                 }else{
                     $data = $user->where('id',$workorder->user_id)->first();
-                    return $data->name;
+                    return $data->name ?? '';
 
                 }
                 
@@ -150,7 +128,7 @@ class WorkOrderDataTable extends DataTable
             ->addColumn('action', function (WorkOrder $workorder) {
                 // $isOwner = auth()->check() && auth()->user()->level_access === 'Owner';
                 $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-                return $isSupervisor ? view('itsm::workorder._actions', compact(['workorder','isSupervisor'])) : view('itsm::workorder._actions', compact(['workorder','isSupervisor']));
+                return $isSupervisor ? view('itsm::workorder._actions', compact(['workorder','isSupervisor'])) : '';
             })
             ->rawColumns(['workorder_number','action','subject','description','status'])
             ->setRowId('id');
@@ -185,19 +163,14 @@ class WorkOrderDataTable extends DataTable
             ->setTableId('workorders-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('Bfrtlip')
+            ->dom('Bfrtip')
             ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
             ->orderBy('1')
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
-                'lengthMenu' => [
-                        [ 10, 25, 50, -1 ],
-                        [ '10 rows', '25 rows', '50 rows', 'Show all' ]
-                ],
-                // 'dom'          => 'Bfrtlip',
-                // 'buttons'      => ['pageLength', 'export', 'print', 'reload','colvis'],
+                'dom'          => 'Bfrtip',
                 'buttons'      => ['export', 'print', 'reload','colvis'],
             ])
             ->drawCallback("function() {" . file_get_contents($modulePath.'Resources/views/workorder/_draw-scripts.js') . "}");
@@ -217,7 +190,7 @@ class WorkOrderDataTable extends DataTable
                     ->orderable(false)
                     ->searchable(false)
                     ->printable(true),
-            Column::make('module')->title('Module')->visible(false),
+            // Column::make('category_name')->title('Classification'),
             Column::make('workorder_number')->title('Number'),
             Column::make('subject')->title('Title'),
             Column::make('description')->title('Description')->visible(false),
@@ -228,19 +201,10 @@ class WorkOrderDataTable extends DataTable
             Column::make('user')->title('Reported By')->visible(false),
             Column::make('location')->title('Reported Location')->visible(false),
             // Column::make('reported_source')->title('Report Source')->visible(false),
-            Column::computed('report_time')
-                ->searchable(true)
-                ->orderable(true)
-                ->title('Report Time')
-                ->visible(true),
-            Column::computed('start_time')->title('Start Time')->visible(false),
-            Column::computed('end_time')->title('Resolved Time')->visible(false),
+            // Column::make('reported_date')->title('Report Time')->visible(false),
             // Column::make('reported_response')->title('Response Time')->visible(false),
-            Column::computed('status')
-                ->searchable(true)
-                ->orderable(true)
-                ->title('Status')
-                ->visible(true),
+            Column::make('module')->title('Module')->visible(false),
+            Column::make('status')->title('Status')->visible(true),
             // Column::make('priority')->title('Priority')->visible(true),
             Column::make('staff')->title('Assign To')->visible(true),
             Column::make('user_id')->title('Created By')->visible(false),

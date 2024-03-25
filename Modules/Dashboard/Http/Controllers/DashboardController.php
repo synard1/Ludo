@@ -244,11 +244,13 @@ class DashboardController extends Controller
                 ->get();
         } else {
             $data = DB::table('itsm_reporteds')
-                ->select(DB::raw('source, AVG(ABS(TIMESTAMPDIFF(MINUTE, report_time, response_time))) as avg_time'))
-                ->whereMonth('report_time', '=', $selectedMonth)
-                ->whereYear('report_time', '=', $selectedYear)
-                ->where('user_cid', $user->cid)
-                ->groupBy('source')
+                ->join('itsm_incidents', 'itsm_incidents.reported_id', '=', 'itsm_reporteds.id')
+                ->select(DB::raw('itsm_reporteds.source, AVG(ABS(TIMESTAMPDIFF(MINUTE, itsm_reporteds.report_time, itsm_reporteds.response_time))) as avg_time'))
+                ->where('itsm_incidents.kpi', '1')
+                ->whereMonth('itsm_reporteds.report_time', '=', $selectedMonth)
+                ->whereYear('itsm_reporteds.report_time', '=', $selectedYear)
+                ->where('itsm_reporteds.user_cid', $user->cid)
+                ->groupBy('itsm_reporteds.source')
                 ->get();
         }
 
@@ -383,10 +385,10 @@ class DashboardController extends Controller
 
             $data = DB::table('itsm_work_orders')->join('itsm_reporteds', 'itsm_work_orders.data_id', '=', 'itsm_reporteds.data_id')
                 ->where('itsm_work_orders.user_cid', $user->cid)
+                ->Where('itsm_work_orders.status', 'Completed')
                 ->whereMonth('itsm_work_orders.start_time', '=', $selectedMonth)
                 ->whereYear('itsm_work_orders.start_time', '=', $selectedYear)
                 // ->where('itsm_work_orders.status', 'Resolved')
-                ->orWhere('itsm_work_orders.status', 'Completed')
                 ->where(function ($query) {
                     $query->where('itsm_reporteds.category', 'LIKE', '%Network%')
                         ->orWhere('itsm_reporteds.category', 'LIKE', '%Hardware%');
@@ -1016,4 +1018,7 @@ class DashboardController extends Controller
             }
         }
     }
+
+        
+
 }
