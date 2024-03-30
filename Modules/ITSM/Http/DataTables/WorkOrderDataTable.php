@@ -117,10 +117,10 @@ class WorkOrderDataTable extends DataTable
                 $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
                 if($isSuperAdmin){
                     $data = $company->where('cid',$workorder->user_cid)->first();
-                    return $data->name;
+                    return $data->name ?? '';
                 }else{
                     $data = $user->where('id',$workorder->user_id)->first();
-                    return $data->name;
+                    return $data->name ?? '';
 
                 }
                 
@@ -163,14 +163,19 @@ class WorkOrderDataTable extends DataTable
             ->setTableId('workorders-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('Bfrtip')
+            ->dom('Bfrtlip')
             ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
             ->orderBy('1')
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
-                'dom'          => 'Bfrtip',
+                'lengthMenu' => [
+                        [ 10, 25, 50, -1 ],
+                        [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+                ],
+                'dom'          => 'Bfrtlip',
+                // 'buttons'      => ['pageLength', 'export', 'print', 'reload','colvis'],
                 'buttons'      => ['export', 'print', 'reload','colvis'],
             ])
             ->drawCallback("function() {" . file_get_contents($modulePath.'Resources/views/workorder/_draw-scripts.js') . "}");

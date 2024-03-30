@@ -53,8 +53,8 @@ class ServiceDataTable extends DataTable
             ->editColumn('reported_source', function (Service $service) {
                 return $service->reported->source;
             })
-            ->editColumn('reported_date', function (Service $service) {
-                return $service->reported->report_time;
+            ->editColumn('reported.report_time', function (Service $service) {
+                return $service->reported->report_time->format('Y-m-d H:i');
             })
             ->editColumn('reported_response', function (Service $service) {
                 return $service->reported->response_time->format('d M Y, h:i a');
@@ -84,20 +84,21 @@ class ServiceDataTable extends DataTable
 
     public function query(Service $model): QueryBuilder
     {
-        // Get a new query builder instance
         $user = auth()->user();
 
-        if(!auth()->user()->level_access == 'Super Admin'){
-            $query = $model->where('user_cid', $user->cid)
-                            ->newQuery();
-        }elseif(auth()->user()->level_access == 'Owner'){
-            $query = $model->where('user_cid', $user->cid)
-                            ->newQuery();
-        }else{
-            // Get a new query builder instance
-            $query = $model->newQuery();
+        $query = $model->newQuery();
+
+        // Adjust the query based on user's level_access
+        if ($user->level_access != 'Super Admin') {
+            $query->where('user_cid', $user->cid);
+        } elseif ($user->level_access == 'Owner') {
+            $query->where('user_cid', $user->cid);
         }
-    
+
+        $query = $model::with('reported')
+            ->orderBy('number', 'DESC')
+            ->newQuery();
+
         return $query;
     }
 
@@ -118,7 +119,12 @@ class ServiceDataTable extends DataTable
             // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
-                'dom'          => 'Bfrtip',
+                'lengthMenu' => [
+                        [ 10, 25, 50, -1 ],
+                        [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+                ],
+                'dom'          => 'Bfrtlip',
+                // 'buttons'      => ['pageLength', 'export', 'print', 'reload','colvis'],
                 'buttons'      => ['export', 'print', 'reload','colvis'],
             ])
             ->drawCallback("function() {" . file_get_contents($modulePath.'Resources/views/service/_draw-scripts.js') . "}");
@@ -142,17 +148,17 @@ class ServiceDataTable extends DataTable
             Column::make('service_number')->title('Number'),
             Column::make('title')->title('Title'),
             Column::make('description')->title('Description')->visible(true),
-            Column::make('kpi')->title('KPI')->visible(false),
-            Column::make('status')->title('Status')->visible(true),
-            Column::make('work_order')->title('Work Order')->printable(false),
-            Column::make('reported_by')->title('Reported By')->visible(false),
-            Column::make('reported_location')->title('Reported Location')->visible(false),
-            Column::make('reported_source')->title('Report Source')->visible(false),
-            Column::make('reported_date')->title('Report Time')->visible(true),
-            Column::make('reported_response')->title('Response Time')->visible(false),
+            Column::computed('kpi')->title('KPI')->visible(false),
+            Column::computed('status')->title('Status')->visible(true),
+            Column::computed('work_order')->title('Work Order')->printable(false),
+            Column::computed('reported_by')->title('Reported By')->visible(false),
+            Column::computed('reported_location')->title('Reported Location')->visible(false),
+            Column::computed('reported_source')->title('Report Source')->visible(false),
+            Column::computed('reported.report_time')->searchable()->title('Report Time')->visible(true),
+            Column::computed('reported_response')->title('Response Time')->visible(false),
             // Column::make('resolved_date')->title('Resolved Time')->visible(false),
-            Column::make('user_id')->title('Created By')->visible(false),
-            Column::make('created_at')->title('Created Date')->visible(false),
+            Column::make('user_id')->searchable(false)->title('Created By')->visible(false),
+            Column::make('created_at')->searchable(false)->title('Created Date')->visible(false),
             Column::computed('action')
                 ->addClass('text-end')
                 ->exportable(false)

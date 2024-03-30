@@ -36,6 +36,29 @@
                     <!--begin::Input group-->
                     <div class="row g-9 mb-8">
                         <div class="col-sm-6 fv-row">
+                            <label for="report_time_input" class="form-label">Report Time</label>
+                            <div class="input-group log-event" id="report_time" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                <input id="report_time_input"  name="report_time"  type="text" class="form-control" data-td-target="#report_time" readonly/>
+                                <span class="input-group-text" data-td-target="#report_time" data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 fv-row">
+                            <label for="response_time_input" class="form-label">Response Time</label>
+                            <div class="input-group log-event" id="response_time" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                <input id="response_time_input" name="response_time" type="text" class="form-control" data-td-target="#response_time" readonly/>
+                                <span class="input-group-text" data-td-target="#response_time" data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Input group-->
+
+                    <!--begin::Input group-->
+                    <div class="row g-9 mb-8">
+                        <div class="col-sm-6 fv-row">
                             <label for="start_time_input" class="form-label">From</label>
                             <div class="input-group log-event" id="start_time" data-td-target-input="nearest" data-td-target-toggle="nearest">
                                 <input id="start_time_input"  name="start_time"  type="text" class="form-control" data-td-target="#start_time"/>
@@ -55,6 +78,7 @@
                         </div>
                     </div>
                     <!--end::Input group-->
+
                     <!--begin::Input group-->
                     <div class="row g-9 mb-8">
                         <!--begin::Col-->

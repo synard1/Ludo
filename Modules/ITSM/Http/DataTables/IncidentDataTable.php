@@ -16,6 +16,7 @@ use Nwidart\Modules\Facades\Module;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Yajra\DataTables\Html\ColumnDefinition;
 
 
 class IncidentDataTable extends DataTable
@@ -58,8 +59,8 @@ class IncidentDataTable extends DataTable
             ->editColumn('reported_source', function (Incident $incident) {
                 return $incident->reported->source;
             })
-            ->editColumn('reported_date', function (Incident $incident) {
-                return $incident->reported->report_time;
+            ->editColumn('reported.report_time', function (Incident $incident) {
+                return $incident->reported->report_time->format('Y-m-d H:i');
             })
             ->editColumn('response_time', function (Incident $incident) {
                 return $incident->reported->response_time;
@@ -70,58 +71,58 @@ class IncidentDataTable extends DataTable
 
                 return $diff . ' Minutes';
             })
-            ->editColumn('under', function (Incident $incident) {
-                // Calculate avg_time from report_time and response_time
-                $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
+            // ->editColumn('under', function (Incident $incident) {
+            //     // Calculate avg_time from report_time and response_time
+            //     $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
                 
-                if($diff < 30){
-                    return 'Y';
-                }else{
-                    return 'N';
-                }
-            })
-            ->editColumn('under2', function (Incident $incident) {
+            //     if($diff < 30){
+            //         return 'Y';
+            //     }else{
+            //         return 'N';
+            //     }
+            // })
+            // ->editColumn('under2', function (Incident $incident) {
                 
 
-                $allowedCategories = ['Hardware', 'Network'];
+            //     $allowedCategories = ['Hardware', 'Network'];
 
-                // if (in_array($incident->reported->category, $allowedCategories)) {
-                    // $category = $incident->reported->category;
+            //     // if (in_array($incident->reported->category, $allowedCategories)) {
+            //         // $category = $incident->reported->category;
 
-                    // if (collect(["Hardware", "Software"])->contains($category)) {
-                        // Your code here if the category contains "Hardware" or "Network"
+            //         // if (collect(["Hardware", "Software"])->contains($category)) {
+            //             // Your code here if the category contains "Hardware" or "Network"
 
-                    // Calculate avg_time from report_time and response_time
-                    // $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
+            //         // Calculate avg_time from report_time and response_time
+            //         // $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
 
-                    // if($diff < 120){
-                    //     return 'Y';
-                    // }else{
-                    //     return 'N';
-                    // }
+            //         // if($diff < 120){
+            //         //     return 'Y';
+            //         // }else{
+            //         //     return 'N';
+            //         // }
 
-                    $allowedCategories = ['Hardware', 'Software'];
+            //         $allowedCategories = ['Hardware', 'Software'];
 
-                    if (!empty(array_intersect($incident->reported->category, $allowedCategories))) {
-                        // return 'Y';
-                        // Calculate avg_time from report_time and response_time
-                        $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
+            //         if (!empty(array_intersect($incident->reported->category, $allowedCategories))) {
+            //             // return 'Y';
+            //             // Calculate avg_time from report_time and response_time
+            //             $diff = Carbon::parse($incident->reported->report_time)->diffInMinutes(Carbon::parse($incident->reported->response_time));
 
-                        if($diff < 120){
-                            return 'Y';
-                        }else{
-                            return 'N';
-                        }
-                    }
-                // } else {
-                //     // Your code here if the category does not contain "Hardware" or "Network"
-                //     // return '-';
-                //     return $incident->reported->category;
-                // }
+            //             if($diff < 120){
+            //                 return 'Y';
+            //             }else{
+            //                 return 'N';
+            //             }
+            //         }
+            //     // } else {
+            //     //     // Your code here if the category does not contain "Hardware" or "Network"
+            //     //     // return '-';
+            //     //     return $incident->reported->category;
+            //     // }
 
                 
                 
-            })
+            // })
             // ->editColumn('itsm_reported_response', function (Incident $incident) {
             //     return $incident->itsm_reported_response->format('d M Y, h:i a');
             // })
@@ -132,10 +133,10 @@ class IncidentDataTable extends DataTable
                 $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
                 if($isSuperAdmin){
                     $data = $company->where('cid',$incident->user_cid)->first();
-                    return $data->name;
+                    return $data->name ?? '';
                 }else{
                     $data = $user->where('id',$incident->user_id)->first();
-                    return $data->name;
+                    return $data->name ?? '';
 
                 }
                 
@@ -145,28 +146,56 @@ class IncidentDataTable extends DataTable
                 $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
                 return $isSupervisor ? view('itsm::incident._actions', compact(['incident','isSupervisor'])) : '';
             })
+            // ->filterColumn('status', function($query, $keyword) {
+            //     $sql = "itsm_incidents.status  like ?";
+            //     $query->where($sql, ["%{$keyword}%"]);
+            // })
             ->rawColumns(['action', 'work_order'])
             ->setRowId('id');
     }
 
     public function query(Incident $model): QueryBuilder
     {
-        // Get a new query builder instance
         $user = auth()->user();
 
-        if(!auth()->user()->level_access == 'Super Admin'){
-            $query = $model->where('user_cid', $user->cid)
-                            ->newQuery();
-        }elseif(auth()->user()->level_access == 'Owner'){
-            $query = $model->where('user_cid', $user->cid)
-                            ->newQuery();
-        }else{
-            // Get a new query builder instance
-            $query = $model->newQuery();
+        $query = $model->newQuery();
+
+        // Adjust the query based on user's level_access
+        if ($user->level_access != 'Super Admin') {
+            $query->where('user_cid', $user->cid);
+        } elseif ($user->level_access == 'Owner') {
+            $query->where('user_cid', $user->cid);
         }
-    
+
+        // Include sorting by report_time from the reported relation
+        // $query->with(['reported' => function ($query) {
+        //     $query->orderBy('number', 'DESC');
+        // }]);
+        $query = $model::with('reported')
+            ->orderBy('number', 'DESC')
+            ->newQuery();
+
         return $query;
     }
+
+    // public function query(Incident $model): QueryBuilder
+    // {
+    //     // Get a new query builder instance
+    //     $user = auth()->user();
+
+    //     if(!auth()->user()->level_access == 'Super Admin'){
+    //         $query = $model->where('user_cid', $user->cid)
+    //                         ->newQuery();
+    //     }elseif(auth()->user()->level_access == 'Owner'){
+    //         $query = $model->where('user_cid', $user->cid)
+    //                         ->newQuery();
+    //     }else{
+    //         // Get a new query builder instance
+    //         $query = $model->newQuery();
+    //     }
+    
+    //     return $query;
+    // }
 
     /**
      * Optional method if you want to use the html builder.
@@ -174,18 +203,20 @@ class IncidentDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         $modulePath = Module::getModulePath('ITSM');
+
         return $this->builder()
             ->setTableId('incidents-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('Bfrtip')
+            ->dom('Bfrtlip')
             ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy('7')
-            // ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'scrollX'      =>  true,
-                'dom'          => 'Bfrtip',
+                'lengthMenu' => [
+                        [ 10, 25, 50, -1 ],
+                        [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+                ],
                 'buttons'      => ['export', 'print', 'reload','colvis'],
             ])
             ->drawCallback("function() {" . file_get_contents($modulePath.'Resources/views/incident/_draw-scripts.js') . "}");
@@ -205,26 +236,44 @@ class IncidentDataTable extends DataTable
                     ->orderable(false)
                     ->searchable(false)
                     ->printable(true),
-            Column::make('category_name')->title('Classification'),
-            Column::make('incident_number')->title('Number'),
-            Column::make('title')->title('Title'),
-            Column::make('description')->title('Description')->visible(true),
+            Column::make('category_name')
+                ->title('Classification'),
+            Column::make('incident_number')
+                ->searchable(true)
+                ->title('Number'),
+            Column::make('title')
+                ->title('Title'),
+            Column::make('description')
+                ->title('Description')->visible(true),
             Column::make('severity')->title('Severity')->visible(true),
-            Column::make('kpi')->title('KPI')->visible(false),
+            Column::make('kpi')
+                ->title('KPI')->visible(false),
             Column::make('status')->title('Status')->visible(true),
-            Column::make('work_order')->title('Work Order')->printable(false),
-            Column::make('reported_by')->title('Reported By')->visible(false),
-            Column::make('reported_location')->title('Reported Location')->visible(false),
-            Column::make('reported_source')->title('Report Source')->visible(false),
-            Column::make('reported_date')->title('Report Time')->visible(true),
-            Column::make('response_time')->title('Response Time')->visible(false),
-            Column::make('duration')->title('Duration')->visible(false),
-            Column::make('under')->title('Status < 30')->visible(false),
-            Column::make('under2')->title('Status < 120')->visible(false),
+            Column::computed('work_order')
+                ->title('Work Order')
+                ->searchable(false)
+                ->printable(false),
+            Column::make('reported_by')->searchable(false)->title('Reported By')->visible(false),
+            Column::computed('reported_location')->searchable(false)->title('Reported Location')->visible(false),
+            Column::computed('reported_source')->searchable(false)->title('Report Source')->visible(false),
+            Column::computed('reported.report_time')->searchable()->title('Report Time')->visible(true),
+            Column::computed('response_time')->searchable(false)->title('Response Time')->visible(false),
+            Column::make('duration')
+                ->title('Duration')
+                ->searchable(false)
+                ->visible(false),
+            // Column::make('under')
+            //     ->title('Status < 30')
+            //     ->searchable(false)
+            //     ->visible(false),
+            // Column::make('under2')
+            //     ->title('Status < 120')
+            //     ->searchable(false)
+            //     ->visible(false),
             // Column::make('reported_response')->title('Response Time')->visible(false),
             // Column::make('resolved_date')->title('Resolved Time')->visible(false),
-            Column::make('user_id')->title('Created By')->visible(false),
-            Column::make('created_at')->title('Created Date')->visible(false),
+            Column::make('user_id')->searchable(false)->title('Created By')->visible(false),
+            Column::make('created_at')->searchable(false)->title('Created Date')->visible(false),
             Column::computed('action')
                 ->addClass('text-end')
                 ->exportable(false)
