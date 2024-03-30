@@ -702,11 +702,11 @@ var KTWorkorder = function () {
         $('#status').val(selectedStatus).trigger('change'); // Assuming you are using a library like Select2 for the dropdown
     }
 
-    $("#due_date").flatpickr({
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        minuteIncrement: 1
-    });
+    // $("#due_date").flatpickr({
+    //     enableTime: true,
+    //     dateFormat: "Y-m-d H:i",
+    //     minuteIncrement: 1
+    // });
 
     // Public functions
     return {

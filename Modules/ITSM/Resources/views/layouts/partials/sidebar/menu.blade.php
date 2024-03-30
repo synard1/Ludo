@@ -47,8 +47,8 @@
         <!--begin:Menu item-->
         <div class="menu-item">
             <!--begin:Menu link-->
-            <a class="menu-link {{ request()->routeIs('itsm.logbook') ? 'active' : '' }}"
-                href="{{ route('itsm.logbook') }}">
+            <a class="menu-link {{ request()->routeIs('itsm.logbooks') ? 'active' : '' }}"
+                href="{{ route('itsm.logbooks') }}">
                 <span class="menu-bullet">
                     <span class="bullet bullet-dot"></span>
                 </span>
