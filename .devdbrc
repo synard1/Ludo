@@ -1,0 +1,11 @@
+[
+  {
+    "name": "Dev  database", // <-- to identify the connection
+    "type": "mysql", // <- or "mariadb" if you are using MariaDB
+    "host": "localhost",
+    "port": "3306",
+    "username": "ludomyi_dev",
+    "password": "ROttpStvmYWA0l4",
+    "database": "ludomyi_dev" // <-- the database to show in VS Code DevDb view
+  }
+]

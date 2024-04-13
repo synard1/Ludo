@@ -184,6 +184,11 @@ return [
         'dev_disk' => 'contabo', // set system disk in filesystem.php
         
         'prod_disk' => 'contabo', // set system disk in filesystem.php
+
+        'notification' => [
+            'telegram' => 'Only Premium Account can use private Bot', // bot placeholder
+            'telegram_instruction' => 'Register your telegram account to our bot : <a href="https://t.me/ludoapps_bot" target="_blank">https://t.me/ludoapps_bot</a>', // bot instruction
+        ],
     ],
 
     /*

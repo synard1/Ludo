@@ -11,5 +11,6 @@
     "Semver": true,
     "Dashboard": true,
     "SLA": true,
-    "ITSM": true
+    "ITSM": true,
+    "Notification": true
 }
