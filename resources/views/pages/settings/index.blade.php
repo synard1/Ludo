@@ -3,6 +3,8 @@
         $jsonData = json_decode($company->payload, true);
         $mttrValue = $jsonData['mttr'] ?? Config::get('onexolution.dashboard.mttr');
         $artValue = $jsonData['art'] ?? Config::get('onexolution.dashboard.art');
+        $tokenTele = $jsonData['telegram']['bot_token'] ?? 'Belum Ada Data';
+        $teleRecipient = $jsonData['telegram']['recipient'] ?? 'Belum Ada Data';
 
     }else{
         $mttrValue = Config::get('onexolution.dashboard.mttr');
@@ -26,11 +28,11 @@
                             <a class="nav-link" data-bs-toggle="tab" href="#kt_tab_pane_8" aria-selected="false"
                                 tabindex="-1" role="tab">SLA Dashboard</a>
                         </li>
-                        {{--<li class="nav-item" role="presentation">
-                            <a class="nav-link" data-bs-toggle="tab" href="#kt_tab_pane_9" aria-selected="false"
-                                tabindex="-1" role="tab">Link 3</a>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#kt_tab_notification" aria-selected="false"
+                                tabindex="-1" role="tab">Notification</a>
                         </li>
-                        <li class="nav-item dropdown" role="presentation">
+                       {{-- <li class="nav-item dropdown" role="presentation">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                                 aria-expanded="false">Dropdown</a>
                             <ul class="dropdown-menu">
@@ -432,18 +434,7 @@
                             <!--end::Form-->
                         </div>
 
-                        <div class="tab-pane fade" id="kt_tab_pane_9" role="tabpanel">
-                            Sint sit mollit irure quis est nostrud cillum consequat Lorem esse do quis dolor esse fugiat
-                            sunt do.
-                            Eu ex commodo veniam Lorem aliquip laborum occaecat qui Lorem esse mollit dolore anim
-                            cupidatat.
-                            eserunt officia id Lorem nostrud aute id commodo elit eiusmod enim irure amet eiusmod qui
-                            reprehenderit nostrud tempor.
-                            Fugiat ipsum excepteur in aliqua non et quis aliquip ad irure in labore cillum elit enim.
-                            Consequat aliquip incididunt
-                            ipsum et minim laborum laborum laborum et cillum labore. Deserunt adipisicing cillum id
-                            nulla minim nostrud labore eiusmod et amet.
-                        </div>
+                        @include('pages.settings.notification')
 
                         <div class="tab-pane fade" id="kt_tab_pane_10" role="tabpanel">
                             Et et consectetur ipsum labore excepteur est proident excepteur ad velit occaecat qui minim

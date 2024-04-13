@@ -129,6 +129,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/version', [SettingController::class, 'getVersion'])->name('getVersion');
             Route::post('/company', [SettingController::class, 'saveCompany'])->name('postCompany');
             Route::post('/sla', [SettingController::class, 'saveSla'])->name('postSla');
+            Route::get('/notification', [SettingController::class, 'getNotification'])->name('getNotification');
+            Route::post('/notification', [SettingController::class, 'saveNotification'])->name('postNotification');
             Route::put('/update-company-status/{id}', [SettingController::class, 'updateStatus'])->name('update-company-status');
             // Route::put('/update-company-status/{id}', 'SettingController@updateStatus')->name('update-company-status');
             // Route::post('/company', 'SettingController@saveCompany');

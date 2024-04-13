@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use $MODULE_NAMESPACE$\Notification\$CONTROLLER_NAMESPACE$\NotificationController;
+use Modules\Notification\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------

@@ -18,7 +18,7 @@ var KTAccountOverview = function () {
                 url: apiUrl,
                 method: 'GET',
                 success: function(response) {
-                    console.log('URL loaded successfully:', apiUrl);
+                    // console.log('URL loaded successfully:', apiUrl);
                     // You can handle the response here if needed
                 },
                 error: function(error) {
