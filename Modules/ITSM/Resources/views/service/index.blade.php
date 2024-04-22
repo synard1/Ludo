@@ -99,37 +99,6 @@
                 }
             });
         });
-
-        $('#services-table').on('click', '.view-wo', function(e) {
-            e.preventDefault();
-            const parent = e.target.closest('tr');
-
-            // Get subject name
-            // const workorderNumber = parent.querySelectorAll('td')[2].innerText;
-            const workorderNumber = $(this).data('number');
-            var outputType = "PRINT";
-            // var number = workorderNumber;
-
-            $.ajax({
-                    // url: '/apps/itsm/api/workorder',
-                    // url: '/apps/itsm/api/workorder/' + workorderId,
-                    url: '/apps/itsm/api/workorder',
-                    type: 'POST',
-                    data: {
-                        number: workorderNumber,
-                        task: 'WORK_ORDER_PRINT',
-                        outputType: outputType,
-                    },
-                    success: function(result) {
-                        console.log(workorderNumber);
-                        if(result == '1'){
-                            window.open('./print/wo/WorkOrder_'+workorderNumber+'.html?random='+new Date().getTime(),'workorder','height=600,width=800,resizable=1,scrollbars=1, menubar=0');
-                        }else{
-                            console.log('Error');
-                        }
-                    }
-                });
-        });
     </script>
     @endpush
 

@@ -491,7 +491,7 @@ public function clearCache($cacheType = 'all')
         if($task == 'SAVE'){
             // Check User Subscription
             if($user->subscription == 'Free'){
-                $botToken = env('BOT_TELEGRAM');
+                $botToken = config('notification.bot.Telegram');
             }else{
                 $botToken = $request->input('bot_token');
             }
