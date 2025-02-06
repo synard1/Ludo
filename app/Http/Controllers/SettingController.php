@@ -491,10 +491,14 @@ public function clearCache($cacheType = 'all')
         $type = $request->input('type');
         $platform = $request->input('platform');
 
-        // Handle SAVE task
-        if ($task == 'SAVE') {
-            $botToken = $user->subscription === 'Free' ? env('BOT_TELEGRAM') : $request->input('bot_token');
-
+        if($task == 'SAVE'){
+            // Check User Subscription
+            if($user->subscription == 'Free'){
+                $botToken = config('notification.bot.Telegram');
+            }else{
+                $botToken = $request->input('bot_token');
+            }
+          
             // Handle CONFIG type
             if ($type == 'CONFIG') {
                 // Build payload data for update

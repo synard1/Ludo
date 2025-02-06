@@ -28,11 +28,10 @@ class ServiceDataTable extends DataTable
                 $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
 
                 if ($service->work_order_id) {
-                    // return '<span class="badge badge-primary"><a href="/apps/itsm/print/wo/' .
-                    //     $service->work_order_id .
-                    //     '" target="_blank" class="text-info view-work-order" data-id="' .
-                    //     $service->id . '">View</a></span>';
-                    return '<span class="badge badge-primary"><a href="#" class="text-info view-wo" target="_blank" data-number="' . $service->workorder->workorder_number . '">View</a></span>';
+                    return '<span class="badge badge-primary"><a href="/apps/itsm/print/wo/' .
+                        $service->work_order_id .
+                        '" target="_blank" class="text-info view-work-order" data-id="' .
+                        $service->id . '">View</a></span>';
                 } else {
                     if ($isSupervisor) {
                         return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
@@ -42,23 +41,6 @@ class ServiceDataTable extends DataTable
                     return '<a href="#">N/A</a>';
                 }
             })
-            // ->editColumn('work_order', function (Service $service) {
-            //     $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
-
-            //     if ($service->work_order_id) {
-            //         return '<span class="badge badge-primary"><a href="/apps/itsm/print/wo/' .
-            //             $service->work_order_id .
-            //             '" target="_blank" class="text-info view-work-order" data-id="' .
-            //             $service->id . '">View</a></span>';
-            //     } else {
-            //         if ($isSupervisor) {
-            //             return '<a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_work_order" class="generate-work-order"  data-id="' .
-            //                 $service->id . '" data-report-time="' . $service->report_time . '" data-title="' . $service->title . '">Generate Work Order</a>';
-            //         }
-
-            //         return '<a href="#">N/A</a>';
-            //     }
-            // })
             ->editColumn('created_at', function (Service $service) {
                 return $service->created_at->format('d M Y, h:i a');
             })
