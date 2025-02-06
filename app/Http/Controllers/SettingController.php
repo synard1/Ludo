@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Notification\Services\TelegramService;
 use Modules\Notification\Http\Controllers\TelegramController;
 
+use Modules\Notification\Entities\CategoryNotif;
+use Modules\Notification\Entities\PlatformNotif;
+use Modules\Notification\Entities\UserNotif;
+
 class SettingController extends Controller
 {
 
@@ -456,34 +460,33 @@ public function clearCache($cacheType = 'all')
     public function getNotification(Request $request)
     {
         $user = auth()->user();
-        return response()->json(['message' => 'Error']);
+        // return response()->json(['message' => 'Error']);
         
-        // $data = UserCom::where('user_cid',$user->cid)->get();
+        $data = UserNotif::where('user_cid',$user->cid)->get();
 
-        // if ($data->isNotEmpty()) {
-        //     // Transform the incident data to include user names
-        //     $formattedData = $data->map(function ($com) {
-        //         return $com->platformCom->name.'_'.$com->module.'_'.$com->sub_module;
-        //     });
+        if ($data->isNotEmpty()) {
+            // Transform the incident data to include user names
+            $formattedData = $data->map(function ($com) {
+                return $com->platformCom->name.'_'.$com->module.'_'.$com->sub_module;
+            });
 
-        //     return response()->json(['notif' => $formattedData]);
+            return response()->json(['notif' => $formattedData]);
 
-        // // return response()->json(['data' => $data]);
-        // // return response()->json(['message' => 'Notification saved or updated successfully']);
+        // return response()->json(['data' => $data]);
+        // return response()->json(['message' => 'Notification saved or updated successfully']);
 
-        // } else {
-        //     // Incident not found
-        //     return response()->json(['']);
-        //     // return response()->json(['message' => 'Incident not found'], 404);
-        // }
+        } else {
+            // Incident not found
+            return response()->json(['']);
+            // return response()->json(['message' => 'Incident not found'], 404);
+        }
     }
 
     public function saveNotification(Request $request)
     {
+        // Retrieve user data and form input
         $user = auth()->user();
-
         $formData = $request->all();
-
         $task = $request->input('task');
         $type = $request->input('type');
         $platform = $request->input('platform');
@@ -495,103 +498,210 @@ public function clearCache($cacheType = 'all')
             }else{
                 $botToken = $request->input('bot_token');
             }
+          
+            // Handle CONFIG type
+            if ($type == 'CONFIG') {
+                // Build payload data for update
+                $payloadData = $this->buildPayloadData($request, $platform, $botToken);
+                // Update company payload
+                $this->updateCompanyPayload($user, $payloadData);
 
-            if($type == 'CONFIG'){
-                $payloadData = [
-                    $platform => [
-                        'bot_token' => $botToken,
-                        'recipient' => $request->input('recipient'),
-                        'recipient_type' => 'GROUP', // GROUP OR PERSONAL
-                        'active' => $request->input('active'),
-                    ]
-                ];
-        
-                // dd($payloadData);
-
-                Company::where('cid',$user->cid)
-                            ->update([
-                                'payload' => $payloadData,
-                            ]);
-
-                // dd($payloadData);
-
-                return response()->json(['message' => 'Notification ' .$type . ' for '.Uc($platform).' saved or updated successfully']);
+                return response()->json(['message' => 'Notification ' . ucfirst($type) . ' for ' . ucfirst($platform) . ' saved or updated successfully']);
             }
-        }elseif($task == 'TEST' && $type == 'CONFIG' && $platform == 'telegram'){
-            $payloadData = [
-                $platform => [
-                    'bot_token' => $request->input('bot_token'),
-                    'recipient' => $request->input('recipient'),
-                    'recipient_type' => 'GROUP', // GROUP OR PERSONAL
-                    'active' => $request->input('active'),
-                ]
-            ];
-
-            // Call the sendMessageToTelegram method
-            // $response = TelegramController::sendMessageToTelegram('Test Config');
-            // // // Handle the response
-            // return $response;
-
-            // Create an instance of the TelegramService
-            $telegramService = app(TelegramService::class);
-
-            // Create an instance of the TelegramController and pass the TelegramService instance
-            $telegramController = new TelegramController($telegramService);
-
-            // Call the sendMessageToTelegram method on the instance
-            $response = $telegramController->sendMessageToTelegram('Test Config');
-
-            // Handle the response
+        } 
+        // Handle TEST task for CONFIG type and telegram platform
+        elseif ($task == 'TEST' && $type == 'CONFIG' && $platform == 'telegram') {
+            // Send test telegram message
+            $response = $this->sendTestTelegramMessage($request);
             return $response;
         }
-        
-        // dd(count($request->input('notif')));
 
-        $count = count($request->input('notif'));
+        // Delete old user notifications
+        $deleted = $this->deleteOldUserNotifications($user);
 
-        // foreach ($request->input('notif') as $data) {
-        //     $parts = explode("_", $data);
-
-        //     // $parts is now an array containing ["Telegram", "ITSM", "Logbook"]
-
-        //     // Accessing individual parts
-        //     $platform = $parts[0]; // "Telegram"
-        //     $module = $parts[1]; // "ITSM"
-        //     $submodule = $parts[2]; // "Logbook"
-
-        //     $platform = PlatformCom::where('name',$platform)->first();
-        //     $category = CategoryCom::where('module',$module)
-        //         ->where('sub_module',$submodule)
-        //         ->first();
-        //     // print_r($platform .' '. $module .' '. $submodule );
-
-        //     $userCom = UserCom::create([
-        //                     'platform_id' => $platform->id,
-        //                     'category_id' => $category->id,
-        //                     'module' => $module,
-        //                     'sub_module' => $submodule,
-        //                     'name' => $category->name,
-        //                     'description' => $category->description,
-        //                 ]);
-        // }
-
-        // Assuming your form data is passed as an array in the 'payload' field
-        // $payloadData = [
-        //     'type' => $request->input('type'),
-        //     'bot_token' => $request->input('bot_token'),
-        //     'bot_recipient' => $request->input('bot_recipient'),
-        //     'active' => $request->input('active'),
-        //     // Add other fields as needed
-        // ];
-
-        
-
-        // Company::where('cid',$user->cid)
-        //             ->update([
-        //                 'payload' => $payloadData,
-        //             ]);
+        // Insert new user notifications
+        $this->insertNewUserNotifications($request->input('notif'), $user);
 
         return response()->json(['message' => 'Notification saved or updated successfully']);
-
     }
+
+    // Build payload data for update
+    private function buildPayloadData(Request $request, $platform, $botToken)
+    {
+        return [
+            $platform => [
+                'bot_token' => $botToken,
+                'recipient' => $request->input('recipient'),
+                'recipient_type' => 'GROUP', // GROUP OR PERSONAL
+                'active' => $request->input('active'),
+            ]
+        ];
+    }
+
+    // Update company payload
+    private function updateCompanyPayload($user, $payloadData)
+    {
+        Company::where('cid', $user->cid)->update([
+            'payload' => $payloadData,
+        ]);
+    }
+
+    // Send test telegram message
+    private function sendTestTelegramMessage(Request $request)
+    {
+        $telegramService = app(TelegramService::class);
+        $telegramController = new TelegramController($telegramService);
+        return $telegramController->sendMessageToTelegram('Test Config');
+    }
+
+    // Delete old user notifications
+    private function deleteOldUserNotifications($user)
+    {
+        return UserNotif::where('user_cid', $user->cid)->delete();
+    }
+
+    // Insert new user notifications
+    private function insertNewUserNotifications($notifData, $user)
+    {
+        foreach ($notifData as $data) {
+            $parts = explode("_", $data);
+            $platform = $parts[0];
+            $module = $parts[1];
+            $submodule = $parts[2];
+
+            $platform = PlatformNotif::where('name', $platform)->first();
+            $category = CategoryNotif::where('module', $module)->where('sub_module', $submodule)->first();
+
+            UserNotif::create([
+                'platform_id' => $platform->id,
+                'category_id' => $category->id,
+                'module' => $module,
+                'sub_module' => $submodule,
+                'name' => $category->name,
+                'description' => $category->description,
+                'user_cid' => $user->cid,
+            ]);
+        }
+    }
+
+
+    // public function saveNotification(Request $request)
+    // {
+    //     $user = auth()->user();
+
+    //     $formData = $request->all();
+
+    //     $task = $request->input('task');
+    //     $type = $request->input('type');
+    //     $platform = $request->input('platform');
+
+    //     if($task == 'SAVE'){
+    //         // Check User Subscription
+    //         if($user->subscription == 'Free'){
+    //             $botToken = env('BOT_TELEGRAM');
+    //         }else{
+    //             $botToken = $request->input('bot_token');
+    //         }
+
+    //         if($type == 'CONFIG'){
+    //             $payloadData = [
+    //                 $platform => [
+    //                     'bot_token' => $botToken,
+    //                     'recipient' => $request->input('recipient'),
+    //                     'recipient_type' => 'GROUP', // GROUP OR PERSONAL
+    //                     'active' => $request->input('active'),
+    //                 ]
+    //             ];
+        
+    //             // dd($payloadData);
+
+    //             Company::where('cid',$user->cid)
+    //                         ->update([
+    //                             'payload' => $payloadData,
+    //                         ]);
+
+    //             // dd($payloadData);
+
+    //             return response()->json(['message' => 'Notification ' .$type . ' for '.Uc($platform).' saved or updated successfully']);
+    //         }
+    //     }elseif($task == 'TEST' && $type == 'CONFIG' && $platform == 'telegram'){
+    //         $payloadData = [
+    //             $platform => [
+    //                 'bot_token' => $request->input('bot_token'),
+    //                 'recipient' => $request->input('recipient'),
+    //                 'recipient_type' => 'GROUP', // GROUP OR PERSONAL
+    //                 'active' => $request->input('active'),
+    //             ]
+    //         ];
+
+    //         // Call the sendMessageToTelegram method
+    //         // $response = TelegramController::sendMessageToTelegram('Test Config');
+    //         // // // Handle the response
+    //         // return $response;
+
+    //         // Create an instance of the TelegramService
+    //         $telegramService = app(TelegramService::class);
+
+    //         // Create an instance of the TelegramController and pass the TelegramService instance
+    //         $telegramController = new TelegramController($telegramService);
+
+    //         // Call the sendMessageToTelegram method on the instance
+    //         $response = $telegramController->sendMessageToTelegram('Test Config');
+
+    //         // Handle the response
+    //         return $response;
+    //     }
+        
+    //     // dd(count($request->input('notif')));
+
+    //     // Delete old data before insert new data
+    //     $deleted = UserNotif::where('user_cid',$user->cid)->delete();
+
+    //     $count = count($request->input('notif'));
+
+    //     foreach ($request->input('notif') as $data) {
+    //         $parts = explode("_", $data);
+
+    //         // $parts is now an array containing ["Telegram", "ITSM", "Logbook"]
+
+    //         // Accessing individual parts
+    //         $platform = $parts[0]; // "Telegram"
+    //         $module = $parts[1]; // "ITSM"
+    //         $submodule = $parts[2]; // "Logbook"
+
+    //         $platform = PlatformNotif::where('name',$platform)->first();
+    //         $category = CategoryNotif::where('module',$module)
+    //             ->where('sub_module',$submodule)
+    //             ->first();
+    //         // print_r($platform .' '. $module .' '. $submodule );
+
+    //         $userCom = UserNotif::create([
+    //                         'platform_id' => $platform->id,
+    //                         'category_id' => $category->id,
+    //                         'module' => $module,
+    //                         'sub_module' => $submodule,
+    //                         'name' => $category->name,
+    //                         'description' => $category->description,
+    //                     ]);
+    //     }
+
+    //     // Assuming your form data is passed as an array in the 'payload' field
+    //     // $payloadData = [
+    //     //     'type' => $request->input('type'),
+    //     //     'bot_token' => $request->input('bot_token'),
+    //     //     'bot_recipient' => $request->input('bot_recipient'),
+    //     //     'active' => $request->input('active'),
+    //     //     // Add other fields as needed
+    //     // ];
+
+        
+
+    //     // Company::where('cid',$user->cid)
+    //     //             ->update([
+    //     //                 'payload' => $payloadData,
+    //     //             ]);
+
+    //     return response()->json(['message' => 'Notification saved or updated successfully']);
+
+    // }
 }

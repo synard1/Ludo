@@ -82,7 +82,7 @@ class WorkOrderController extends Controller
 
         if($request->input('task') == 'WORK_ORDER_PRINT'){
             $workorder = WorkOrder::where('workorder_number', $request->input('number'))
-                                    ->where('user_cid', $user->cid)
+                                    // ->where('user_cid', $user->cid)
                                     ->first();
 
             return $this->woPrint($workorder->id);
@@ -290,13 +290,13 @@ class WorkOrderController extends Controller
         $woResponse = '';
 
         if (Str::contains($module, 'incident')) {
-            $data = Incident::where('user_cid',$user->cid)->where('id',$workorder->data_id)->first();
+            $data = Incident::where('id',$workorder->data_id)->first();
             // dd($data);
             $reporteds = Reported::where('data_id',$data->id)->first();
             // The string contains 'incident'
             // echo "String contains 'incident'";
         } else if (Str::contains($module, 'service')) {
-            $data = Service::where('user_cid',$user->cid)->where('id',$workorder->data_id)->first();
+            $data = Service::where('id',$workorder->data_id)->first();
             // dd($data);
             $reporteds = Reported::where('data_id',$data->id)->first();
             // dd($module);

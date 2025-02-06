@@ -3,13 +3,24 @@
         <div class="card-header collapsible cursor-pointer rotate">
             <h3 class="card-title">Work Order List</h3>
         </div>
-        {{-- <div id="kt_docs_card_ticket_list" class="collapse show">
-            <div class="card-body">
-                <div class="table-responsive">
-                    {{ $dataTable->table() }}
+        {{-- <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Filter By Status</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <select id="statusFilter" class="form-control">
+                                <option value="">Select Status</option>
+                                @foreach($statusWorkOrder as $status => $label)
+                                    <option value="{{ $status }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div> --}}
+            </div> --}}
         <div id="kt_docs_card_ticket_list" class="collapse show">
             <div class="card-body">
                 <div class="table-responsive">
@@ -19,36 +30,32 @@
                     <thead>
                         <tr class="fw-semibold fs-6 text-gray-800">
                             {{-- <th class="w-25px">#</th> --}}
-                            <th class="min-w-100px">Module</th>
-                            <th class="min-w-140px">Number</th>
-                            <th class="min-w-120px">Category</th>
-                            <th class="min-w-100px">Title</th>
-                            <th class="min-w-160px">Description</th>
-                            <th class="min-w-100px">Reported By</th>
-                            <th class="min-w-100px">Reported Location</th>
-                            <th class="min-w-140px">Report Time</th>
-                            <th class="min-w-140px">Start Time</th>
-                            <th class="min-w-100px">Resolved Time</th>
+                            <th class="min-w-100px">Subject</th>
+                            <th class="min-w-140px">Staff Assign</th>
+                            <th class="min-w-120px">Reporter</th>
                             <th class="min-w-100px">Status</th>
-                            <th class="min-w-100px">Staff</th>
+                            <th class="min-w-160px">Description</th>
+                            <th class="min-w-100px">Due Date</th>
+                            <th class="min-w-100px">Due Date</th>
+                            <th class="min-w-140px">Staff Assign</th>
+                            <th class="min-w-140px">Staff Assign</th>
+                            <th class="min-w-100px">Created At</th>
                             <th class="min-w-100px text-end">Actions</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr class="fw-semibold fs-6 text-gray-800">
                             {{-- <th class="w-25px">#</th> --}}
-                            <th class="min-w-100px">Module</th>
-                            <th class="min-w-140px">Number</th>
-                            <th class="min-w-120px">Category</th>
-                            <th class="min-w-100px">Title</th>
-                            <th class="min-w-160px">Description</th>
-                            <th class="min-w-100px">Reported By</th>
-                            <th class="min-w-100px">Reported Location</th>
-                            <th class="min-w-140px">Report Time</th>
-                            <th class="min-w-140px">Start Time</th>
-                            <th class="min-w-100px">Resolved Time</th>
+                            <th class="min-w-100px">Subject</th>
+                            <th class="min-w-140px">Staff Assign</th>
+                            <th class="min-w-120px">Reporter</th>
                             <th class="min-w-100px">Status</th>
-                            <th class="min-w-100px">Staff</th>
+                            <th class="min-w-160px">Description</th>
+                            <th class="min-w-100px">Due Date</th>
+                            <th class="min-w-100px">Due Date</th>
+                            <th class="min-w-140px">Staff Assign</th>
+                            <th class="min-w-140px">Staff Assign</th>
+                            <th class="min-w-100px">Created At</th>
                             <th class="min-w-100px text-end">Actions</th>
                         </tr>
                     </tfoot>
@@ -204,69 +211,35 @@
     </script> --}}
 
     <script>
-        // $(document).ready(function () {
-        //     // Setup - add a text input to each footer cell
-        //     $('#workorders-table tfoot th').each(function (i) {
-        //         var title = $('#workorders-table thead th')
-        //             .eq($(this).index())
-        //             .text();
-        //         $(this).html(
-        //             '<input type="text" placeholder="' + title + '" data-index="' + i + '" />'
-        //         );
-        //     });
-        
-        //     // DataTable
-        //     var table = $('#workorders-table').DataTable();
+        $(document).ready(function() {
+            var table = $('#workorders-table').DataTable();
 
-        
-        //     // Filter event handler
-        //     $(table.table().container()).on('keyup', 'tfoot input', function () {
-        //         table
-        //             .column($(this).data('index'))
-        //             .search(this.value)
-        //             .draw();
-        //     });
-        // });
-        // $(document).ready(function() {
-        //     var table = $('#workorders-table').DataTable();
+            $('#statusFilter').change(function() {
+                table.draw();
+            });
 
-        //     $('#statusFilter').change(function() {
-        //         table.draw();
-        //         var status = $('#statusFilter').val();
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    var status = $('#statusFilter').val();
+                    var rowStatus = data[9]; // Adjust this index based on your table
 
-        //         console.log('Status filter value:', status);
-
-        //     });
-
-        //     $.fn.dataTable.ext.search.push(
-        //         function(settings, data, dataIndex) {
-        //             var status = $('#statusFilter').val();
-        //             var rowStatus = data[10]; // Adjust this index based on your table
-
-        //             console.log('Status filter value:', status);
-        //             console.log('Row status value:', rowStatus);
-
-        //             if (status == '' || rowStatus == status) {
-        //                 return true;
-        //             }
-        //             return false;
-        //         }
-        //     );
-        // });
+                    if (status == '' || rowStatus == status) {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        });
 
         $('#workorders-table').on('click', '.open-wo', function(e) {
             e.preventDefault();
             const parent = e.target.closest('tr');
 
             // Get subject name
-            // const workorderNumber = parent.querySelectorAll('td')[1].innerText;
-            const workorderNumber = $(this).data('wo');
+            const workorderNumber = parent.querySelectorAll('td')[1].innerText;
             // const workorderId = $(this).data('number');
             var outputType = "PRINT";
             // var number = workorderNumber;
-
-            console.log(workorderNumber);
-            
 
             $.ajax({
                     // url: '/apps/itsm/api/workorder',

@@ -191,6 +191,7 @@ return [
          Barryvdh\Debugbar\ServiceProvider::class,
          App\Providers\BladeDirectivesServiceProvider::class,
          Jenssegers\Agent\AgentServiceProvider::class,
+         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
 
 

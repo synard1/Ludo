@@ -140,7 +140,7 @@
         <!--begin::Content-->
         <div id="kt_account_settings_notifications" class="collapse show">
             <!--begin::Form-->
-            <form id="kt_notification_telegram_form" class="form fv-plugins-bootstrap5 fv-plugins-framework"
+            <form id="kt_notification_form" class="form fv-plugins-bootstrap5 fv-plugins-framework"
                 novalidate="novalidate" enctype="multipart/form-data">
                 <!--begin::Card body-->
                 <div class="card-body border-top px-9 pt-3 pb-4">
@@ -249,10 +249,28 @@
                 if (e.target.href.includes('#kt_tab_notification')) {
                     // Show an alert when kt_incident_general tab is clicked
 
-                    // getNotification();
+                    getNotification();
                 }
             });
         });
+
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": false,
+            "positionClass": "toastr-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
 
         // Get the last day of the current month
         function getNotification() {
@@ -304,6 +322,7 @@
                 processData: false,
                 success: function(response) {
                     console.log(response);
+                    toastr.success(response.message);
                     // Handle success response
                 },
                 error: function(xhr, status, error) {
