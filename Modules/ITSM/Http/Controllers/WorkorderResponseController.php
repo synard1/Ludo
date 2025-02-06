@@ -165,13 +165,6 @@ class WorkorderResponseController extends Controller
         // return view('itsm::edit');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
