@@ -64,7 +64,23 @@ class AuthenticatedSessionController extends Controller
             'last_login_ip' => $request->getClientIp()
         ]);
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // return redirect()->intended(RouteServiceProvider::HOME);
+
+        $user = Auth::user();
+
+        // Create a new Sanctum token for the user
+        $token = $user->createToken('access_token')->plainTextToken; // 'api-token' is the token name
+
+        // Store the token in the user's session
+        $request->session()->put('access_token', $token); // Store the token
+
+        // Return the token in the response (adjust the response format if needed)
+
+        if ($request->wantsJson()) { // Check if the request expects JSON (API request)
+            return response()->json(['access_token' => $token], 200);
+        } else { // Web request
+          return redirect()->intended(RouteServiceProvider::HOME);
+        }
     }
 
     // private function getUserAgent()
@@ -88,6 +104,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // return redirect('/');
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Logged out'], 200);
+          } else {
+            return redirect('/');
+          }
     }
 }
