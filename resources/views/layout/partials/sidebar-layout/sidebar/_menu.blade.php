@@ -48,7 +48,6 @@
 			</a>
 			<!--end:Menu item-->
 
-			@if($isActive)
 				<!--begin:Menu item-->
 				<div class="menu-item pt-5">
 					<!--begin:Menu content-->
@@ -58,9 +57,16 @@
 					<!--end:Menu content-->
 				</div>
 				<!--end:Menu item-->
+				{{-- @include('itsm::layouts.partials.sidebar.menu') --}}
+
 				@if(App\Helpers\ModuleHelper::isModuleActive('ITSM'))
 					@if(auth()->user()->can('access itsm'))
 						@include('itsm::layouts.partials.sidebar.menu')
+					@endif
+				@endif
+				@if(App\Helpers\ModuleHelper::isModuleActive('ITAM'))
+					@if(auth()->user()->can('access itam'))
+						@include('itam::layouts.menu')
 					@endif
 				@endif
 				@if(App\Helpers\ModuleHelper::isModuleActive('AdsPortal'))
@@ -83,7 +89,11 @@
 						@include('sla::layouts.partials.sidebar.menu')
 					@endif
 				@endif
-			@endif
+				@if(App\Helpers\ModuleHelper::isModuleActive('Reports'))
+					@if(auth()->user()->can('access reports') || auth()->user()->can('read reports'))
+						@include('reports::layouts.menu')
+					@endif
+				@endif
 
             @if(auth()->check() && auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Administrator'))
 			<!--begin:Menu item-->

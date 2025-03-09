@@ -1,0 +1,11 @@
+{
+    "name": "ITAM",
+    "alias": "itam",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ITAM\\Providers\\ITAMServiceProvider"
+    ],
+    "files": []
+}

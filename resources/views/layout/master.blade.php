@@ -78,7 +78,34 @@
 <!--end::Javascript-->
 
 <script>
-    document.addEventListener('livewire:load', () => {
+    window.livewireIsInitialized = false; // Initialize a flag
+
+    document.addEventListener('livewire:init', function () {
+        window.livewireIsInitialized = true; // Set the flag when Livewire is loaded
+        console.log("Livewire is initialized.");
+    });
+
+    // Optional: Check if Livewire is already loaded (for cases where it loads very quickly)
+    if (typeof Livewire !== 'undefined') {
+      window.livewireIsInitialized = true;
+      console.log("Livewire was already initialized.");
+    }
+
+
+    function checkLivewire() {
+      if (window.livewireIsInitialized) {
+        console.log("Livewire is running.");
+        // Perform actions that require Livewire to be loaded.
+      } else {
+        console.log("Livewire is not yet running.");
+        // Handle cases where Livewire is not yet loaded (e.g., show a loading message).
+      }
+    }
+
+</script>
+
+<script>
+    document.addEventListener('livewire:init', () => {
         Livewire.on('success', (message) => {
             toastr.success(message);
         });
@@ -86,6 +113,20 @@
             toastr.error(message);
         });
     });
+
+</script>
+
+<script>
+    window.accessToken = "{{ session('access_token') }}"; // Make it available globally, or
+    // For better scoping (if the token is only needed in a specific function):
+    function useAccessToken() {
+        const token = "{{ session('access_token') }}";
+        console.log('Token:', token);
+        // ... use the token in your function ...
+    }
+
+    // Call the function if needed or call it when you need the token
+    useAccessToken();
 
 </script>
 
