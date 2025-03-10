@@ -66,6 +66,7 @@ class AddAsset extends Component
         'update-manufacturer_id' => 'updateManufacturer',
         'update-category_id' => 'updateCategory',
         'updateAsset' => 'updateAsset',
+        'deleteAsset' => 'deleteAsset',
 
     ];
 
@@ -75,7 +76,7 @@ class AddAsset extends Component
     {
         return [
             // 'ownership_type' => 'required|in:owned,leased,partner',
-            'partner_id' => 'nullable|exists:itam_partners,id', // Only required if ownership_type is 'partner' (handled in validation logic)
+            // 'partner_id' => 'nullable|exists:itam_partners,id', // Only required if ownership_type is 'partner' (handled in validation logic)
             // 'asset_tag' => 'required|unique:itam_assets,asset_tag', // Assuming 'assets' is your table name
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:itam_asset_categories,id',
@@ -114,12 +115,12 @@ class AddAsset extends Component
 
     public function mount()
     {
-        $this->partners = Partner::all(); // Fetch partners from the database
+        $this->partners = Partner::all() ?? collect(); // Ensure it's at least an empty collection
         
-        $this->categories = AssetCategory::all(); // Fetch manufacturers from the database
+        $this->categories = AssetCategory::all() ?? collect(); // Fetch manufacturers from the database
         // $this->manufacturers = Manufacture::all(); // Fetch manufacturers from the database
         // $this->locations = Location::all(); // Fetch locations from the database
-        $this->users = User::all(); // Fetch users from the database
+        $this->users = User::all() ?? collect(); // Fetch users from the database
         // $this->departments = Department::all(); // Fetch users from the database
         // $this->types = ['asdasd','qqqq','bbbb']; // Fetch users from the database
         // $this->types = []; // Fetch users from the database
@@ -395,10 +396,19 @@ class AddAsset extends Component
 
             DB::commit();
 
-    
+            // ✅ Reset Form Fields
+            // Reset only input fields (not collections)
+            $this->reset(['name', 'model', 'serial_number', 'purchase_cost', 'purchase_date', 'warranty_end_date', 'notes']);
+            $this->resetValidation();
+            // $this->reset(); // Clears all Livewire properties
+            // $this->resetValidation(); // Clears validation errors
+
             // Dispatch success notification
             $message = $isUpdating ? __('Data Asset Berhasil Diubah') : __('Data Asset Berhasil Dibuat');
             $this->dispatch('success', $message);
+
+            // ✅ Dispatch an event to refresh Select2 (if applicable)
+            $this->dispatch('refreshSelect2');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -412,6 +422,16 @@ class AddAsset extends Component
 
         // }
 
+    }
+
+    public function deleteAsset($assetId)
+    {
+        // Delete the asset record with the specified ID
+        $asset = Asset::where('id', $assetId)->firstOrFail();
+        $asset->delete();
+
+        // Emit a success event with a message
+        $this->dispatch('success', 'Asset successfully deleted');
     }
 
     private function resetForm()

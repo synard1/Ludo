@@ -75,13 +75,21 @@ const showLoadingSpinner = () => {
 // };
 
 // Add click event listener to delete buttons
-document.querySelectorAll('[data-kt-action="delete_row"]').forEach(function (element) {
-    element.addEventListener('click', function () {
-        if (confirm('Are you sure you want to remove?')) {
-            Livewire.emit('delete_user', this.getAttribute('data-kt-service-id'));
-        }
-    });
+$('#assets-table').on('click', '.delete-row', function(e) {
+    e.preventDefault();
+
+    if (confirm('Are you sure you want to remove?')) {
+        // Livewire.dispatch('deleteAsset', this.getAttribute('data-id'));
+        // Delay script execution to ensure elements exist
+    setTimeout(() => {
+        // initializeAssetForm(); // Run form initialization after DOM updates
+        const assetId = $(this).data('id');
+
+        Livewire.dispatch('deleteAsset', { assetId });
+    }, 500);
+    }
 });
+
 
 // Add click event listener to update buttons
 document.querySelectorAll('[data-kt-action="update_row"]').forEach(function (element) {

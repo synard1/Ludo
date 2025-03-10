@@ -17,9 +17,13 @@
                     <select wire:model="partner_id" id="partner_id" class="form-control" @if($ownership_type === 'owned' )
                         disabled @endif>
                         <option value="">-- Select Partner --</option>
-                        @foreach ($partners as $partner)
-                        <option value="{{ $partner->id }}">{{ $partner->name }}</option>
-                        @endforeach
+                        @if (!empty($partners) && $partners->count())
+                            @foreach ($partners as $partner)
+                                <option value="{{ $partner->id }}">{{ $partner->name }}</option>
+                            @endforeach
+                        @else
+                            <option value="">No partners available</option>
+                        @endif
                     </select>
                     @error('partner_id') <span class="text-danger">{{ $message }}</span> @enderror
 
@@ -771,6 +775,18 @@
                 assetTypeSelect.empty().append('<option value="">-- Loading... --</option>');
                 assetTypeSelect.prop('disabled', true);
             });
+
+            // Listen for 'success' event emitted by Livewire
+            Livewire.on('success', (message) => {
+                $('#kt_docs_card_asset_new').collapse('hide');
+                $('#kt_docs_card_asset_list').collapse('show');
+                LaravelDataTables['assets-table'].ajax.reload();
+            });
+
+            Livewire.on('refreshSelect2', () => {
+                $('.js-select2').val(null).trigger('change'); // Reset Select2 fields
+            });
+
         });
     </script>
     
