@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use Modules\ITAM\Entities\Asset;
 
 use Modules\ITAM\Services\AssetTagGenerator;
+use Carbon\Carbon;
 
 class AddAsset extends Component
 {
@@ -31,6 +32,8 @@ class AddAsset extends Component
     // {
     //     $this->assetTagGenerator = $assetTagGenerator;
     // }
+
+    public $editMode = false;
 
     public $partners, $categories, $users;
     public $partner_id, $asset_tag, $name, $category_id, $type_id, $manufacturer_id, $model, $serial_number, $purchase_date, $purchase_cost, $warranty_end_date, $status, $location_id, $assigned_to, $notes, $department_id;
@@ -62,7 +65,7 @@ class AddAsset extends Component
         'update-location_id' => 'updateLocation',
         'update-manufacturer_id' => 'updateManufacturer',
         'update-category_id' => 'updateCategory',
-        // 'updateDropdowns' => 'updateDropdowns', // Add this line
+        'updateAsset' => 'updateAsset',
 
     ];
 
@@ -353,42 +356,49 @@ class AddAsset extends Component
 
             $assetTagFormat = config('itam.asset_tag');
 
+            // Check if editing an existing asset
+            $isUpdating = !empty($this->asset_id);
 
+            // If editing, find existing asset
+            $asset = $isUpdating ? Asset::where('id',$this->asset_id)->first() : new Asset();
 
-            $asset = Asset::updateOrCreate(['id' => $this->asset_id], [
-                    'ownership_type' => $this->ownership_type,
-                    'partner_id' => $this->partner_id ?: NULL,
-                    'asset_tag' => $this->asset_tag ?? '-',
-                    'name' => $this->name,
-                    'category_id' => $this->category_id,
-                    'type_id' => $this->type_id,
-                    'manufacturer_id' => $this->manufacturer_id,
-                    'model' => $this->model,
-                    'serial_number' => $this->serial_number ?: NULL,
-                    'purchase_date' => $this->purchase_date ?: NULL,
-                    'purchase_cost' => $this->purchase_cost ?: NULL,
-                    'warranty_end_date' => $this->warranty_end_date ?: NULL,
-                    'location_id' => $this->location_id,
-                    'status' => $this->status,
-                    'assigned_to' => $this->assigned_to ?: NULL,
-                    'notes' => $this->notes ?: NULL,
-                    'specifications' => $this->specifications ?? NULL,
-                ]);
+            // Check for duplicate asset tag when creating a new asset
+            if (!$this->asset_id && Asset::where('asset_tag', $this->asset_tag)->exists()) {
+                throw new \Exception("Asset tag already exists.");
+            }
 
-            $assetTag = $this->generateAssetTag($assetTagFormat, $asset);
+            // Assign values
+            $asset->ownership_type = $this->ownership_type;
+            $asset->partner_id = $this->partner_id ?: NULL;
+            $asset->name = $this->name;
+            $asset->category_id = $this->category_id;
+            $asset->type_id = $this->type_id;
+            $asset->manufacturer_id = $this->manufacturer_id;
+            $asset->model = $this->model;
+            $asset->serial_number = $this->serial_number ?: NULL;
+            $asset->purchase_date = $this->purchase_date ?: NULL;
+            $asset->purchase_cost = $this->purchase_cost ?: NULL;
+            $asset->warranty_end_date = $this->warranty_end_date ?: NULL;
+            $asset->department_id = $this->department_id;
+            $asset->location_id = $this->location_id;
+            $asset->status = $this->status;
+            $asset->assigned_to = $this->assigned_to ?: NULL;
+            $asset->notes = $this->notes ?: NULL;
+            $asset->specifications = $this->specifications ?? NULL;
 
-            $asset->asset_tag = $assetTag;
+            // Only generate a new asset tag if creating a new asset
+            if (!$isUpdating) {
+                $asset->asset_tag = $this->generateAssetTag($assetTagFormat, $asset);
+            }
+
             $asset->save();
 
             DB::commit();
 
     
-            if($this->asset_id){
-                $this->dispatch('success', __('Data Asset Berhasil Diubah'));
-    
-            }else{
-                $this->dispatch('success', __('Data Asset Berhasil Dibuat'));
-            }
+            // Dispatch success notification
+            $message = $isUpdating ? __('Data Asset Berhasil Diubah') : __('Data Asset Berhasil Dibuat');
+            $this->dispatch('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -493,5 +503,41 @@ class AddAsset extends Component
     // {
     //     // This method can be empty, it's just a listener to trigger JS updates
     // }
+
+    public function updateAsset($assetId)
+    {
+        
+        $asset = Asset::where('id', $assetId)->first();
+
+        if ($asset) {
+            $this->asset_id = $asset->id;
+            $this->ownership_type = $asset->ownership_type;
+            $this->partner_id = $asset->partner_id;
+            // $this->asset_tag = $asset->asset_tag;
+            $this->name = $asset->name;
+            $this->category_id = $asset->category_id;
+            $this->assetTypes = AssetType::where('category_id', $this->category_id)->get();
+            $this->type_id = $asset->type_id;
+            $this->manufacturer_id = $asset->manufacturer_id;
+            $this->model = $asset->model;
+            $this->serial_number = $asset->serial_number;
+
+            // ✅ Convert Date Format (Fixes Date Format Error)
+            $this->purchase_date = $asset->purchase_date ? Carbon::parse($asset->purchase_date)->format('Y-m-d') : null;
+            $this->warranty_end_date = $asset->warranty_end_date ? Carbon::parse($asset->warranty_end_date)->format('Y-m-d') : null;
+
+            $this->purchase_cost = $asset->purchase_cost;
+            $this->department_id = $asset->department_id;
+            $this->location_id = $asset->location_id;
+            $this->status = $asset->status;
+            $this->assigned_to = $asset->assigned_to;
+            $this->notes = $asset->notes;
+            $this->editMode = true;
+
+            $this->dispatch('consoleLog', [
+                'assets' => $asset,
+            ]);
+        }
+    }
 
 }

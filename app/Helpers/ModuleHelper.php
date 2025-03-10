@@ -8,6 +8,12 @@ class ModuleHelper
 {
     public static function isModuleActive($moduleName)
     {
-        return Module::isEnabled($moduleName);
+
+        if(Module::has($moduleName)){
+          return Module::isEnabled($moduleName);
+        }else{
+        
+          return false;
+        }
     }
 }

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('status')->default('active'); // active, inactive, loaned, dll.
             $table->uuid('location_id')->nullable()->constrained('itam_locations');
             $table->uuid('assigned_to')->nullable()->constrained('itam_users');
+            $table->uuid('department_id')->nullable()->constrained('itam_departments');
             $table->text('notes')->nullable();
             $table->json('specifications')->nullable();
             

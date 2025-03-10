@@ -46,6 +46,7 @@ class Asset extends Model
         'warranty_end_date',
         'status',
         'location_id',
+        'department_id',
         'assigned_to',
         'notes',
         'specifications',

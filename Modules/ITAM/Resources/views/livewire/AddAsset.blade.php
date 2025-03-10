@@ -59,7 +59,7 @@
                         <select wire:model="type_id" id="assetTypeSelect" class="js-select2 form-control" required>
                             <option value="">-- Select Asset Type --</option>
                             @foreach ($assetTypes as $type)
-                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                <option value="{{ $type->id }}" @if($type_id == $type->id) selected @endif>{{ $type->name }}</option>
                             @endforeach
                         </select>
                         @error('type_id') <span class="text-danger">{{ $message }}</span> @enderror

@@ -131,6 +131,43 @@ document.querySelectorAll('[data-kt-action="update_row"]').forEach(function (ele
 //     });
 // });
 
+$('#assets-table').on('click', '.edit-asset', function(e) {
+    e.preventDefault();
+
+    // const cardChangeNew = document.getElementById("kt_docs_card_asset_spesification");
+    // const cardChangeList = document.getElementById("kt_docs_card_asset_list");
+    // const addButtons = document.getElementById('kt_new_asset');
+    // const viewButtons = document.getElementById('kt_view_asset'); // Ensure this exists
+
+    // Select parent row
+    const parent = e.target.closest('tr');
+
+    // addButtons.style.display = 'none';
+    // viewButtons.style.display = '';
+
+    // Get asset name & ID
+    const assetsTitle = parent.querySelectorAll('td')[1].innerText;
+    const assetsId = $(this).data('id');
+
+    showLoadingSpinner();
+
+    // // Update the title dynamically
+    // document.getElementById("assetTitle").innerText = 'Asset Specification - ' + assetsTitle;
+
+    // Close kt_docs_card_incident_new
+    $('#kt_docs_card_asset_new').collapse('show');
+    // Show kt_docs_card_incident_list
+    $('#kt_docs_card_asset_list').collapse('hide');
+
+    // Delay script execution to ensure elements exist
+    setTimeout(() => {
+        // initializeAssetForm(); // Run form initialization after DOM updates
+        const assetId = $(this).data('id');
+
+        Livewire.dispatch('updateAsset', { assetId });
+    }, 500);
+});
+
 $('#assets-table').on('click', '.add-spesification', function(e) {
     e.preventDefault();
 
