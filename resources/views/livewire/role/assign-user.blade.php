@@ -52,10 +52,10 @@
                     </label>
                     <!--end::Label-->
                     <!--begin::Input-->
-                    <select wire:model="role_id" class="form-control form-control-solid">
+                    <select wire:model="selectedRole" class="form-control form-control-solid">
                         <option value="">-- Choose Role --</option>
                         @foreach ($roles as $role)
-                            <option value="{{ $role->uuid }}">{{ $role->name }}</option>
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
                         @endforeach
                     </select>
                     <!-- <input class="form-control form-control-solid" placeholder="Enter a permission name" name="name" wire:model="name"/> -->
@@ -114,7 +114,7 @@
         const modAs = document.querySelector('#kt_modal_assign_role');
 
         modAs.addEventListener('show.bs.modal', (e) => {
-            Livewire.emit('modal.show.role_name', e.relatedTarget.getAttribute('data-role-id'));
+            // Livewire.emit('modal.show.role_name', e.relatedTarget.getAttribute('data-role-id'));
         });
     </script>
     <script>

@@ -128,6 +128,12 @@
     // Call the function if needed or call it when you need the token
     useAccessToken();
 
+    $.ajaxSetup({
+         headers: {
+             'Authorization': @json('Bearer ' . session('auth_token')),
+             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+         }
+     });
 </script>
 
 @livewireScripts
