@@ -21,6 +21,9 @@ class Manufacture extends Model
     {
         parent::boot();
 
+        static::bootUserTracking(); // Manually call the trait's boot method
+
+
         static::creating(function ($model) {
             $model->{$model->getKeyName()} = Uuid::uuid4()->toString();
         });
@@ -30,5 +33,6 @@ class Manufacture extends Model
         'name',
         'description',
         'created_by',
+        'user_cid',
     ];
 }

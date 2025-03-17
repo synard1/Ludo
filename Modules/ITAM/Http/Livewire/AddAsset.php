@@ -313,6 +313,10 @@ class AddAsset extends Component
             'name' => 'required|unique:itam_manufacturers,name|max:255',
         ])->validate();
 
+        $user = Auth::user();
+
+        // dd($user);
+
         $newManufacture = Manufacture::create($validatedData);
 
         // $this->departments = Department::all(); // Refresh departments list
