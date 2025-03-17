@@ -20,6 +20,20 @@ class AssetController extends Controller
         return $dataTable->render('itam::asset.index');
     }
 
+    public function indexCategory(AssetDataTable $dataTable)
+    {
+        addVendors(['datatables']);
+
+        return $dataTable->render('itam::category.index');
+    }
+
+    public function indexSettings(AssetDataTable $dataTable)
+    {
+        addVendors(['datatables']);
+
+        return $dataTable->render('itam::setting.index');
+    }
+
     /**
      * Show the form for creating a new resource.
      */

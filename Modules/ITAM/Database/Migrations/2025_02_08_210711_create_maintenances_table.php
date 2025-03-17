@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('cost', 10, 2)->nullable();
             $table->json('details')->nullable(); // For any task-specific details
             
+            $table->string('user_cid');
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users');
 

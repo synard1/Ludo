@@ -16,6 +16,7 @@ use Modules\ITAM\Http\Controllers\PartnerController;
 use Modules\ITAM\Http\Controllers\TechnicianController;
 use Modules\ITAM\Http\Controllers\UserController;
 use Modules\ITAM\Http\Controllers\AssetCategoryController;
+use Modules\ITAM\Http\Controllers\AssetTypeController;
 use Modules\ITAM\Http\Controllers\AssetController;
 use Modules\ITAM\Http\Controllers\AssetTrackingController;
 use Modules\ITAM\Http\Controllers\AssetHistoryController;
@@ -127,6 +128,11 @@ function generateForm($assetType, $template) {
     Route::get('/department', [DepartmentController::class, 'index'])->name('department');
     Route::get('/manufacturer', [ManufactureController::class, 'index'])->name('manufacturer');
     Route::get('/asset', [AssetController::class, 'index'])->name('asset');
+    Route::get('/category', [AssetCategoryController::class, 'index'])->name('category');
+    Route::get('/type', [AssetTypeController::class, 'index'])->name('type');
+    Route::get('/location', [LocationController::class, 'index'])->name('location');
+    Route::get('/manufacturer', [ManufactureController::class, 'index'])->name('manufacturer');
+    Route::get('/settings', [AssetController::class, 'indexSettings'])->name('settings');
     Route::get('/logbook', [LogBookController::class, 'index'])->name('logbook');
     Route::get('/workorder', [WorkOrderController::class, 'index'])->name('workorder');
     // Route::get('/workorder', function () {

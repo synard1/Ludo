@@ -51,6 +51,7 @@ class Asset extends Model
         'notes',
         'specifications',
         'created_by',
+        'user_cid',
     ];
 
     protected $casts = [

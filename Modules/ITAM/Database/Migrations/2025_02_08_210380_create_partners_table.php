@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('contact_email')->nullable();
             $table->text('address')->nullable();
             
+            $table->string('user_cid');
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users');
 

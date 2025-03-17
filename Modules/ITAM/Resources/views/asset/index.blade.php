@@ -98,27 +98,27 @@
     @push('styles')
         <style>
             .card-header {
-    background-color: #f0f0f0; /* Light grey background */
-    padding: 10px 15px; /* Consistent padding */
-    border-bottom: 1px solid #ddd; /* Add a subtle bottom border */
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Vertically align items */
-}
+                background-color: #f0f0f0; /* Light grey background */
+                padding: 10px 15px; /* Consistent padding */
+                border-bottom: 1px solid #ddd; /* Add a subtle bottom border */
+                display: flex; /* Use flexbox for alignment */
+                align-items: center; /* Vertically align items */
+            }
 
-.card-header h6 {
-    margin: 0; /* Remove default margin */
-    font-weight: 600; /* Slightly bolder font weight */
-    font-size: 16px; /* Consistent font size */
-    color: #333; /* Dark grey text */
-}
+            .card-header h6 {
+                margin: 0; /* Remove default margin */
+                font-weight: 600; /* Slightly bolder font weight */
+                font-size: 16px; /* Consistent font size */
+                color: #333; /* Dark grey text */
+            }
 
-.card-header svg {
-    width: 20px; /* Consistent icon size */
-    height: 20px;
-    margin-right: 10px; /* Spacing between icon and text */
-    fill: #333; /* Match icon color to text */
-}
-            </style>
+            .card-header svg {
+                width: 20px; /* Consistent icon size */
+                height: 20px;
+                margin-right: 10px; /* Spacing between icon and text */
+                fill: #333; /* Match icon color to text */
+            }
+        </style>
     @endpush
     
 

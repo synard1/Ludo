@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('task_description')->nullable();
             $table->string('frequency')->nullable(); // weekly, monthly, yearly, once
             
+            $table->string('user_cid');
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users');
 

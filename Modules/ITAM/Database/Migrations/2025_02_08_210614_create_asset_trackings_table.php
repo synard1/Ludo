@@ -21,6 +21,7 @@ return new class extends Migration
             $table->uuid('performed_by_id')->nullable()->constrained('itam_technicians');
             $table->string('performed_by_name');
             
+            $table->string('user_cid');
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users');
 

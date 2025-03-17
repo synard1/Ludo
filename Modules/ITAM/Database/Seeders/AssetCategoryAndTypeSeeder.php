@@ -70,6 +70,7 @@ class AssetCategoryAndTypeSeeder  extends Seeder
             'Consumable' => [
                 'Ink Cartridge',
                 'Toner Cartridge',
+                'Maintenance Cartridge',
                 'Paper',
                 'Cable',
                 // Add more consumable types
@@ -84,7 +85,7 @@ class AssetCategoryAndTypeSeeder  extends Seeder
             ],
             // Add more categories as needed
         ];
-        $user = User::where('email', 'synard1@gmail.com')->first();
+        $user = User::where('email', 'synard1@gmail.com')->whereNull('parent_id')->first();
 
 
         foreach ($categoriesAndTypes as $categoryName => $types) {
@@ -95,7 +96,8 @@ class AssetCategoryAndTypeSeeder  extends Seeder
             $category = AssetCategory::firstOrCreate([
                 'name' => $categoryName,
                 'prefix' => $categoryPrefix, // New prefix field
-                'created_by' => $user->id
+                'created_by' => $user->id,
+                'user_cid' => $user->cid,
             ]);
 
             // Ensure unique type prefixes within each category
@@ -112,6 +114,8 @@ class AssetCategoryAndTypeSeeder  extends Seeder
                     'prefix' => $typePrefix2, // New prefix field
                     'long_prefix' => $typePrefix.'-'.$typePrefix2, // New prefix field
                     'created_by' => $user->id,
+                    'user_cid' => $user->cid,
+
                 ]);
 
                 $counter++;

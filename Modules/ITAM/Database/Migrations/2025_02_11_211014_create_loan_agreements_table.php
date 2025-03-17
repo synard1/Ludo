@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('loan_end_date')->nullable();
             $table->text('loan_terms')->nullable();
             
+            $table->string('user_cid');
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users');
             
