@@ -74,6 +74,9 @@ class AuthenticatedSessionController extends Controller
         // Store the token in the user's session
         $request->session()->put('access_token', $token); // Store the token
 
+        $request->session()->put('auth_token', $token);
+
+
         // Return the token in the response (adjust the response format if needed)
 
         if ($request->wantsJson()) { // Check if the request expects JSON (API request)
