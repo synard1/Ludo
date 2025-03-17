@@ -14,7 +14,7 @@ trait UserTracking
             $user = Auth::user();
 
             if ($user) {
-                // $model->user_cid = $user->cid;
+                $model->user_cid = $user->cid;
                 $model->created_by = $user->id;
             }
         });
