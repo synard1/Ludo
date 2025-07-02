@@ -1,11 +1,12 @@
 {{--
-    //TODO: Make Form Validation
+//TODO: Make Form Validation
 --}}
 <div class="modal fade" tabindex="-1" id="kt_modal_work_order_response">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-body">
-                <form id="kt_modal_work_order_response_form" class="form fv-plugins-bootstrap5 fv-plugins-framework" action="#" data-select2-id="select2-data-kt_modal_work_order_response_form">
+                <form id="kt_modal_work_order_response_form" class="form fv-plugins-bootstrap5 fv-plugins-framework"
+                    action="#" data-select2-id="select2-data-kt_modal_work_order_response_form">
                     {{-- <input type="hidden" id="workorder_id" name="workorder_id"> --}}
                     <!--begin::Heading-->
                     <div class="mb-13 text-center">
@@ -13,11 +14,13 @@
                         <h1 class="mb-3">Response Work Order</h1>
                         <!--end::Title-->
 
+                        {{--
                         <!--begin::Description-->
                         <div class="text-gray-500 fw-semibold fs-5">
-                            If you need more info, please check <a href="" class="fw-bold link-primary">Support Guidelines</a>.
+                            If you need more info, please check <a href="" class="fw-bold link-primary">Support
+                                Guidelines</a>.
                         </div>
-                        <!--end::Description-->
+                        <!--end::Description--> --}}
                     </div>
                     <!--end::Heading-->
 
@@ -29,27 +32,39 @@
                         </label>
                         <!--end::Label-->
 
-                        <input type="text" class="form-control form-control-solid" name="workorder_subject" id="workorder_subject" readonly>
-                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                        <input type="text" class="form-control form-control-solid" name="workorder_subject"
+                            id="workorder_subject" readonly>
+                        <div
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                        </div>
+                    </div>
                     <!--end::Input group-->
 
                     <!--begin::Input group-->
                     <div class="row g-9 mb-8">
                         <div class="col-sm-6 fv-row">
                             <label for="report_time_input" class="form-label">Report Time</label>
-                            <div class="input-group log-event" id="report_time" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                <input id="report_time_input"  name="report_time"  type="text" class="form-control" data-td-target="#report_time" readonly/>
-                                <span class="input-group-text" data-td-target="#report_time" data-td-toggle="datetimepicker">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                            <div class="input-group log-event" id="report_time" data-td-target-input="nearest"
+                                data-td-target-toggle="nearest">
+                                <input id="report_time_input" name="report_time" type="text" class="form-control"
+                                    data-td-target="#report_time" readonly />
+                                <span class="input-group-text" data-td-target="#report_time"
+                                    data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span
+                                            class="path2"></span></i>
                                 </span>
                             </div>
                         </div>
                         <div class="col-sm-6 fv-row">
                             <label for="response_time_input" class="form-label">Response Time</label>
-                            <div class="input-group log-event" id="response_time" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                <input id="response_time_input" name="response_time" type="text" class="form-control" data-td-target="#response_time" readonly/>
-                                <span class="input-group-text" data-td-target="#response_time" data-td-toggle="datetimepicker">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                            <div class="input-group log-event" id="response_time" data-td-target-input="nearest"
+                                data-td-target-toggle="nearest">
+                                <input id="response_time_input" name="response_time" type="text" class="form-control"
+                                    data-td-target="#response_time" readonly />
+                                <span class="input-group-text" data-td-target="#response_time"
+                                    data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span
+                                            class="path2"></span></i>
                                 </span>
                             </div>
                         </div>
@@ -60,19 +75,27 @@
                     <div class="row g-9 mb-8">
                         <div class="col-sm-6 fv-row">
                             <label for="start_time_input" class="form-label">From</label>
-                            <div class="input-group log-event" id="start_time" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                <input id="start_time_input"  name="start_time"  type="text" class="form-control" data-td-target="#start_time"/>
-                                <span class="input-group-text" data-td-target="#start_time" data-td-toggle="datetimepicker">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                            <div class="input-group log-event" id="start_time" data-td-target-input="nearest"
+                                data-td-target-toggle="nearest">
+                                <input id="start_time_input" name="start_time" type="text" class="form-control"
+                                    data-td-target="#start_time" />
+                                <span class="input-group-text" data-td-target="#start_time"
+                                    data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span
+                                            class="path2"></span></i>
                                 </span>
                             </div>
                         </div>
                         <div class="col-sm-6 fv-row">
                             <label for="finish_time_input" class="form-label">To</label>
-                            <div class="input-group log-event" id="finish_time" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                <input id="finish_time_input" name="finish_time" type="text" class="form-control" data-td-target="#finish_time"/>
-                                <span class="input-group-text" data-td-target="#finish_time" data-td-toggle="datetimepicker">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                            <div class="input-group log-event" id="finish_time" data-td-target-input="nearest"
+                                data-td-target-toggle="nearest">
+                                <input id="finish_time_input" name="finish_time" type="text" class="form-control"
+                                    data-td-target="#finish_time" />
+                                <span class="input-group-text" data-td-target="#finish_time"
+                                    data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span
+                                            class="path2"></span></i>
                                 </span>
                             </div>
                         </div>
@@ -84,30 +107,46 @@
                         <!--begin::Col-->
                         <div class="col-md-6 fv-row">
                             <label class="required fs-6 fw-semibold mb-2">Status</label>
-                            <select id="status" name="status" class="js-status form-control" placeholder="Enter / Select Status">
+                            <select id="status" name="status" class="js-status form-control"
+                                placeholder="Enter / Select Status">
                                 <option value="">=== Select Status ===</option>
                                 @foreach ($statusWorkOrder as $key => $value)
-                                    <option value="{{ $key }}">{{ $value }}</option>
+                                <option value="{{ $key }}">{{ $value }}</option>
                                 @endforeach
                             </select>
 
                         </div>
                         <!--end::Col-->
+
+                        <!--begin::Col-->
+                        <div class="col-md-6 fv-row">
+                            <label class="required fs-6 fw-semibold mb-2">Duration</label>
+                            <input type="number" class="form-control form-control-solid" name="duration" id="duration"
+                                required>
+                        </div>
+                        <!--end::Col-->
+
+
                     </div>
                     <!--end::Input group-->
 
                     <!--begin::Input group-->
                     <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
-                        <label class="required fs-6 fw-semibold mb-2">Description</label>
+                        <label class="required fs-6 fw-semibold mb-2">Resolution</label>
 
-                        <textarea class="form-control form-control-solid" rows="2" name="description_response" id="description_response"> </textarea>
-                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                        <textarea class="form-control form-control-solid" rows="2" name="description_response"
+                            id="description_response"> </textarea>
+                        <div
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                        </div>
+                    </div>
                     <!--end::Input group-->
 
 
                     <!--begin::Actions-->
                     <div class="text-center">
-                        <button type="reset" id="kt_modal_work_order_response_cancel" class="btn btn-light me-3" data-bs-dismiss="modal">
+                        <button type="reset" id="kt_modal_work_order_response_cancel" class="btn btn-light me-3"
+                            data-bs-dismiss="modal">
                             Cancel
                         </button>
 
@@ -131,8 +170,8 @@
 </div>
 
 @push('scripts')
-    {{-- <script>
-        $(document).ready(function() {
+{{-- <script>
+    $(document).ready(function() {
             // var reportTime = new Date();
             // var reportTime = new Date($(this).data('report-time'));
             // console.log(reportTime);
@@ -168,6 +207,6 @@
             //     });
             // });
         });
-    </script> --}}
+</script> --}}
 
 @endpush

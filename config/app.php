@@ -56,7 +56,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'asset_url' => env('ASSET_URL'),
+    'asset_url' => env('ASSET_URL', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -186,13 +186,9 @@ return [
          * Package Service Providers...
          */
 
-         InfyOm\GeneratorBuilder\GeneratorBuilderServiceProvider::class,
-         InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
          Barryvdh\Debugbar\ServiceProvider::class,
          App\Providers\BladeDirectivesServiceProvider::class,
          Jenssegers\Agent\AgentServiceProvider::class,
-         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-
 
 
         /*
@@ -204,7 +200,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\TelescopeServiceProvider::class,
 
     ],
 

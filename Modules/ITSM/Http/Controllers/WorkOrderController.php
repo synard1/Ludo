@@ -27,11 +27,11 @@ class WorkOrderController extends Controller
      */
     public function index(WorkOrderDataTable $dataTable)
     {
-        addVendors(['datatables','tinymce','tempus-dominus']);
+        addVendors(['datatables', 'tinymce', 'tempus-dominus']);
         addJavascriptFile('assets/js/custom/apps/itsm/workorder.js');
-        
+
         $user = auth()->user();
-        $sla = SLA::where('user_cid',$user->cid)->get();
+        $sla = SLA::where('user_cid', $user->cid)->get();
         $statusWorkOrder = config('itsm.workorder.status');
 
         // Check if the member level is 'Staff'
@@ -58,7 +58,7 @@ class WorkOrderController extends Controller
         // return view('itsm::incident.index', compact('incidentDataTable', 'categoryDataTable','canCreateIncident','services',));
 
 
-        return $dataTable->render('itsm::workorder.index',compact(['statusWorkOrder']));
+        return $dataTable->render('itsm::workorder.index', compact(['statusWorkOrder']));
         // return $dataTable->render('helpdesk::service-management.index',compact(['canCreateService','isSupervisor','services']));
         // return view('helpdesk::service-management.index',compact(['canCreateService','isSupervisor']));
     }
@@ -80,30 +80,29 @@ class WorkOrderController extends Controller
         $user = auth()->user();
         $currentYear = date('Y');
 
-        if($request->input('task') == 'WORK_ORDER_PRINT'){
+        if ($request->input('task') == 'WORK_ORDER_PRINT') {
             $workorder = WorkOrder::where('workorder_number', $request->input('number'))
-                                    // ->where('user_cid', $user->cid)
-                                    ->first();
+                // ->where('user_cid', $user->cid)
+                ->first();
 
             return $this->woPrint($workorder->id);
         }
 
         $maxNumber = WorkOrder::where('user_cid', $user->cid)->whereYear('created_at', $currentYear)->max('number');
         $prefix = config('itsm.workorder.series');
-        $newNumber = $maxNumber+1;
-        $formattedNumber = $prefix. $currentYear. str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+        $newNumber = $maxNumber + 1;
+        $formattedNumber = $prefix . $currentYear . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
         $due_date = $request->input('due_date');
         $sla = $request->input('sla');
-        $slaData = SLA::where('id',$sla)->first();
+        $slaData = SLA::where('id', $sla)->first();
         $type = strtolower($request->input('type'));
 
-        if($type == 'incident'){
+        if ($type == 'incident') {
             $module = 'ITSM/Incident';
             $data = Incident::where('id', $request->input('data_id'))->first();
-        }elseif($type == 'service'){
+        } elseif ($type == 'service') {
             $module = 'ITSM/Service';
             $data = Service::where('id', $request->input('data_id'))->first();
-
         }
 
         // dd($data);
@@ -130,8 +129,8 @@ class WorkOrderController extends Controller
             'response_time' => $data->reported->response_time,
         ]);
 
-        if($sla){
-            $slaData = SLA::where('id',$sla)->first();
+        if ($sla) {
+            $slaData = SLA::where('id', $sla)->first();
             // Create a Carbon instance from the original date
             $carbonDate = Carbon::parse($workorder->created_at);
 
@@ -139,15 +138,15 @@ class WorkOrderController extends Controller
             $newDate = $carbonDate->addMinutes($slaData->duration);
 
             WorkOrder::where('id', $workorder->id)
-                    ->update(['due_date' => $newDate]);
+                ->update(['due_date' => $newDate]);
         }
 
-        if($type == 'incident'){
+        if ($type == 'incident') {
             Incident::where('id', $request->input('data_id'))
-                    ->update(['work_order_id' => $workorder->id]);
-        }elseif($type == 'service'){
+                ->update(['work_order_id' => $workorder->id]);
+        } elseif ($type == 'service') {
             Service::where('id', $request->input('data_id'))
-                    ->update(['work_order_id' => $workorder->id]);
+                ->update(['work_order_id' => $workorder->id]);
         }
 
         // You can return a response, e.g., a success message
@@ -194,29 +193,46 @@ class WorkOrderController extends Controller
         $user = auth()->user();
         // $input = $request->all();
 
-        if($request->input('task') == 'WORK_ORDER_PRINT'){
-            $workorder = WorkOrder::where('id', $request->input('number'))
-                                    ->where('user_cid', $user->cid)
-                                    ->first();
+        // if ($request->input('task') == 'WORK_ORDER_PRINT') {
+        //     $workorder = WorkOrder::where('id', $request->input('number'))
+        //         ->where('user_cid', $user->cid)
+        //         ->first();
 
-            return $this->woPrint($workorder->id);
-        }
+        //     return $this->woPrint($workorder->id);
+        // }
 
-        if($request->input('task') == 'WORK_ORDER_RESPONSE'){
-            $workorder = WorkOrder::with(['respons' => function ($query) {
-                $query->select('id', 'workorder_id', 'status', 'start_time', 'end_time', 'description')
-                    ->where('publish', 1)
-                    ->take(1);
-            }])
+        // if ($request->input('task') == 'WORK_ORDER_RESPONSE') {
+        //     $workorder = WorkOrder::with(['respons' => function ($query) {
+        //         // $query->select('id', 'workorder_id', 'status', 'start_time', 'end_time', 'description')
+        //         //     ->where('publish', 1)
+        //         //     ->take(1);
+        //     }])
+        //         ->where('id', $request->input('id'))
+        //         // ->where('user_cid', $user->cid)
+        //         ->select('id', 'module', 'subject', 'report_time', 'response_time')
+        //         ->first();
+        // }
+
+        // $workorder = WorkOrder::with('respons')->where('id', $request->input('id'))
+        //     ->select('id', 'module', 'subject', 'report_time', 'response_time', 'data_details')
+        //     // ->where('user_cid', $user->cid)
+        //     ->first();
+
+        $workorder = WorkOrder::with(['respons' => function ($query) {
+            $query->select('id', 'workorder_id', 'status', 'start_time', 'end_time', 'description', 'duration')
+                ->where('publish', 1)
+                ->take(1);
+        }])
             ->where('id', $request->input('id'))
-            ->where('user_cid', $user->cid)
-            ->select('id', 'module', 'subject', 'report_time', 'response_time')
+            ->select('id', 'module', 'subject', 'report_time', 'response_time', 'data_details')
             ->first();
-        }
 
-        
-        if($workorder){
+        // dd($workorder);
+
+
+        if ($workorder) {
             $respons = $workorder->respons->first();
+            // dd($respons);
             $result = [
                 'id' => $workorder->id,
                 'module' => $workorder->module,
@@ -229,9 +245,10 @@ class WorkOrderController extends Controller
                 'start_time' => optional($respons)->start_time,
                 'end_time' => optional($respons)->end_time,
                 'description' => optional($respons)->description,
+                'duration' => optional($respons)->duration,
             ];
             return response()->json($result, 200);
-        }else{
+        } else {
             return response()->json($workorder, 404);
         }
         // return view('itsm::show');
@@ -279,9 +296,9 @@ class WorkOrderController extends Controller
     {
         $user = auth()->user();
 
-        $workorder = WorkOrder::where('id',$id)->first();
-        $company = Company::where('cid',$user->cid)->first();
-        
+        $workorder = WorkOrder::where('id', $id)->first();
+        $company = Company::where('cid', $user->cid)->first();
+
         // $ticket = Ticket::where('work_order_id',$id)->first();
         $module = strtolower($workorder->module);
 
@@ -290,15 +307,15 @@ class WorkOrderController extends Controller
         $woResponse = '';
 
         if (Str::contains($module, 'incident')) {
-            $data = Incident::where('id',$workorder->data_id)->first();
+            $data = Incident::where('id', $workorder->data_id)->first();
             // dd($data);
-            $reporteds = Reported::where('data_id',$data->id)->first();
+            $reporteds = Reported::where('data_id', $data->id)->first();
             // The string contains 'incident'
             // echo "String contains 'incident'";
         } else if (Str::contains($module, 'service')) {
-            $data = Service::where('id',$workorder->data_id)->first();
+            $data = Service::where('id', $workorder->data_id)->first();
             // dd($data);
-            $reporteds = Reported::where('data_id',$data->id)->first();
+            $reporteds = Reported::where('data_id', $data->id)->first();
             // dd($module);
             // The string does not contain 'incident'
             // echo "String does not contain 'incident'";
@@ -319,7 +336,7 @@ class WorkOrderController extends Controller
         File::makeDirectory($directoryPath, 0755, true, true);
 
         // Specify the file path
-        $filePath = $directoryPath . 'WorkOrder_'.$workorder->workorder_number.'.html';
+        $filePath = $directoryPath . 'WorkOrder_' . $workorder->workorder_number . '.html';
 
         // Delete the file if it already exists
         if (File::exists($filePath)) {
@@ -336,8 +353,6 @@ class WorkOrderController extends Controller
         File::put($filePath, $htmlContent);
 
         return '1';
-
-        
     }
 
     public function storeResponse(Request $request)
@@ -353,20 +368,21 @@ class WorkOrderController extends Controller
 
             $woResponse = WorkOrderResponse::updateOrCreate(
                 ['work_order_id' => $request->input('workorder_id'), 'user_cid' => $user->cid],
-                ['origin_unit' => $ticket->origin_unit,
-                'user' => $ticket->reporter_name,
-                'no' => $workorder->no,
-                'no_workorder' => $workorder->no_workorder,
-                'no_workorder_custom' => $workorder->no_workorder_custom,
-                'work_order_subject' => $workorder->subject,
-                'work_order_description' => $workorder->description ?? '',
-                'response' => $request->input('workorder_response'),
-                'status' => $request->input('status'),
-                'staff' => $user->name,
-                'ticket_payload' => json_encode($ticket),
-                'workorder_payload' => json_encode($workorder),
-                'start_time' => $request->input('start_date'),
-                'end_time' => $request->input('finish_date')
+                [
+                    'origin_unit' => $ticket->origin_unit,
+                    'user' => $ticket->reporter_name,
+                    'no' => $workorder->no,
+                    'no_workorder' => $workorder->no_workorder,
+                    'no_workorder_custom' => $workorder->no_workorder_custom,
+                    'work_order_subject' => $workorder->subject,
+                    'work_order_description' => $workorder->description ?? '',
+                    'response' => $request->input('workorder_response'),
+                    'status' => $request->input('status'),
+                    'staff' => $user->name,
+                    'ticket_payload' => json_encode($ticket),
+                    'workorder_payload' => json_encode($workorder),
+                    'start_time' => $request->input('start_date'),
+                    'end_time' => $request->input('finish_date')
                 ]
             );
 
@@ -410,7 +426,6 @@ class WorkOrderController extends Controller
             // You can log the error or return an error response
             return response()->json(['error' => 'Error saving Work Order Response'], 500);
         }
-
     }
 
     public function printWorkOrder($filename)
@@ -420,7 +435,7 @@ class WorkOrderController extends Controller
         if (file_exists($filePath)) {
             // You can add additional headers or modify the response as needed
             return response()->file($filePath);
-        }else{
+        } else {
 
             return 'aa';
         }

@@ -7,6 +7,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+use Modules\ITSM\Entities\Incident;
+use Modules\ITSM\Entities\WorkorderResponse;
+use Modules\ITSM\Entities\WorkOrder;
+
 class ITSMController extends Controller
 {
     /**
@@ -63,5 +67,42 @@ class ITSMController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function fixData()
+    {
+        $selectedMonth = '02';
+        $selectedYear = '2024';
+
+        try {
+            // $response = WorkorderResponse::where('status', 'Completed')
+            //     ->whereMonth('start_time', '=', $selectedMonth)
+            //     ->whereYear('start_time', '=', $selectedYear)
+            //     ->whereNull('start_time')
+            //     ->get();
+
+            $response = WorkOrder::where('status', 'Completed')
+                ->whereMonth('report_time', '=', $selectedMonth)
+                ->whereYear('report_time', '=', $selectedYear)
+                ->whereNull('start_time')
+                ->get();
+
+        foreach ($response as $r) {
+            $ro = WorkorderResponse::where('status', 'Completed')
+                ->where('workorder_id', $r->id)
+                ->first();
+
+            $wo = WorkOrder::where('id', $r->id)
+            ->update(['start_time' => $ro->start_time,'end_time' => $ro->end_time]);
+
+            
+        }
+
+        return response()->json(['message' => 'Data Fix Successfully' . now()]);
+
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Failed' . $th]);
+        }
+
     }
 }

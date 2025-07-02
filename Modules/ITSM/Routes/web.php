@@ -26,13 +26,17 @@ use Modules\ITSM\Http\Controllers\WorkorderResponseController;
 Route::prefix('apps/itsm')->name('itsm.')->middleware(config('onexolution.route.middleware'))->group(function () {
 
     // Main Routes
+    Route::get('/fix', [ITSMController::class, 'fixData'])->name('fix');
     Route::get('/incidents', [IncidentController::class, 'index'])->name('incidents');
     Route::get('/services', [ServiceController::class, 'index'])->name('services');
-    Route::get('/logbooks', [LogBookController::class, 'index'])->name('logbooks');
+    Route::get('/logbook', [LogBookController::class, 'index'])->name('logbook');
     Route::get('/workorder', [WorkOrderController::class, 'index'])->name('workorder');
+    // Route::get('/workorder', function () {
+    //     return view('itsm::workorder.index');
+    // });
     // Route::get('/print/wo/{id}', [WorkOrderController::class, 'woPrint'])->name('woPrint');
     Route::get('/print/wo/{filename}', [WorkOrderController::class, 'printWorkOrder'])->name('print.workorder');
-    
+
     // Route::get('/print/{filename}', 'WorkOrderController@printWorkOrder')->name('print.workorder');
 
 
@@ -52,10 +56,6 @@ Route::prefix('apps/itsm')->name('itsm.')->middleware(config('onexolution.route.
 
         Route::get('/incidents', [IncidentController::class, 'edit'])->name('incident.edit');
         Route::post('/incidents', [IncidentController::class, 'store'])->name('incident.store');
-
-        Route::get('/logbooks', [LogBookController::class, 'edit'])->name('logbook.edit');
-        Route::post('/logbooks', [LogBookController::class, 'store'])->name('logbook.store');
-        Route::delete('/logbooks', [LogBookController::class, 'deleteAjax'])->name('logbook.destroy');
 
         Route::get('/workorder/response/{id}', [WorkorderResponseController::class, 'show'])
             ->name('workorder.response.show');

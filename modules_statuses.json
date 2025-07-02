@@ -12,5 +12,8 @@
     "Dashboard": true,
     "SLA": true,
     "ITSM": true,
-    "Notification": true
+    "Notification": true,
+    "RegulatoryCompliance": true,
+    "ITAM": true,
+    "Reports": true
 }

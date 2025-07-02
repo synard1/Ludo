@@ -21,19 +21,19 @@
         <!--begin::Input group--->
         <div class="fv-row mb-8">
             <!--begin::Email-->
-            <input type="text" placeholder="Email" name="email" autocomplete="off" class="form-control bg-transparent" value="demo@demo.com"/>
+            <input type="text" placeholder="Email" name="email" autocomplete="off" class="form-control bg-transparent" value=""/>
             <!--end::Email-->
         </div>
 
         <!--end::Input group--->
         <div class="fv-row mb-3">
             <!--begin::Password-->
-            <input type="password" placeholder="Password" name="password" autocomplete="off" class="form-control bg-transparent" value="demo"/>
+            <input type="password" placeholder="Password" name="password" autocomplete="off" class="form-control bg-transparent" value=""/>
             <!--end::Password-->
         </div>
         <!--end::Input group--->
 
-        <!--begin::Wrapper-->
+        {{-- <!--begin::Wrapper-->
         <div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-8">
             <div></div>
 
@@ -43,7 +43,7 @@
             </a>
             <!--end::Link-->
         </div>
-        <!--end::Wrapper-->
+        <!--end::Wrapper--> --}}
 
         <!--begin::Submit button-->
         <div class="d-grid mb-10">
@@ -53,7 +53,7 @@
         </div>
         <!--end::Submit button-->
 
-        <!--begin::Sign up-->
+        {{-- <!--begin::Sign up-->
         <div class="text-gray-500 text-center fw-semibold fs-6">
             Not a Member yet?
 
@@ -61,7 +61,7 @@
                 Sign up
             </a>
         </div>
-        <!--end::Sign up-->
+        <!--end::Sign up--> --}}
     </form>
     <!--end::Form-->
 

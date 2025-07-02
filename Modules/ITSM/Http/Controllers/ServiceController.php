@@ -23,29 +23,31 @@ class ServiceController extends Controller
      */
     public function index(ServiceDataTable $dataTable)
     {
-        addVendors(['datatables','tinymce']);
+        addVendors(['datatables', 'tinymce']);
         addJavascriptFile('assets/js/custom/apps/itsm/service.js');
         // addJavascriptFile('assets/js/custom/apps/itsm/workorder.js');
-        
+
         $user = auth()->user();
-        $sla = SLA::where('user_cid',$user->cid)->get();
+        $sla = SLA::where('user_cid', $user->cid)->get();
         $priorities = config('itsm.workorder.priority');
         $canCreateService = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create itsm-service');
+        $isSupervisor = auth()->check() && auth()->user()->level_access === 'Supervisor';
+        // dd($canCreateService);
         $canCreateServiceCategory = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create itsm-service-category');
-        $services = Service::where('user_cid',$user->cid)->orderBy('title','asc')->get();
-        $serviceCategory = ServiceCategory::where('user_cid',$user->cid)->orderBy('name','asc')->get();
+        $services = Service::where('user_cid', $user->cid)->orderBy('title', 'asc')->get();
+        $serviceCategory = ServiceCategory::where('user_cid', $user->cid)->orderBy('name', 'asc')->get();
         // Retrieve distinct staff values from the database
         $distinctStaff = User::distinct('name')
-                                    ->pluck('name')
-                                    ->where('user_cid',$user->cid)
-                                    ->filter()
-                                    ->map(function ($staff) {
-                                        return $staff;
-                                    })->flatten()
-                                    ->unique()
-                                    ->values();
+            ->pluck('name')
+            ->where('user_cid', $user->cid)
+            ->filter()
+            ->map(function ($staff) {
+                return $staff;
+            })->flatten()
+            ->unique()
+            ->values();
 
-        return $dataTable->render('itsm::service.index',compact(['canCreateService','services','serviceCategory', 'distinctStaff', 'sla', 'priorities','canCreateServiceCategory']));
+        return $dataTable->render('itsm::service.index', compact(['canCreateService', 'services', 'serviceCategory', 'distinctStaff', 'sla', 'priorities', 'canCreateServiceCategory', 'isSupervisor']));
     }
 
     /**
@@ -61,15 +63,17 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
+
+        // dd($request->all());
         $user = auth()->user();
         $currentYear = date('Y');
         $maxNumber = Service::where('user_cid', $user->cid)->whereYear('created_at', $currentYear)->max('number');
         $newNumber = $maxNumber + 1;
-        $formattedNumber = 'SVC'. $currentYear. str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-        
+        $formattedNumber = 'SVC' . $currentYear . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+
         $serviceCategory = ServiceCategory::where('user_cid', $user->cid)
-                            ->where('id', $request->input('classification'))
-                            ->first(); // Use 'first' to get a single result or null if not found
+            ->where('id', $request->input('classification'))
+            ->first(); // Use 'first' to get a single result or null if not found
 
 
         // Tester
@@ -104,28 +108,27 @@ class ServiceController extends Controller
 
         try {
 
-            if($request->input('service_id')){
+            if ($request->input('service_id')) {
                 // Update the service with the new data
                 $reported = Reported::where('data_id', $request->input('service_id'))
-                        ->update([
-                    'user' => $request->input('reportedBy'),
-                    'location' => $request->input('location'),
-                    'source' => $request->input('source'),
-                    'report_time' => $request->input('report_time'),
-                    'response_time' => $request->input('response_time'),
-                    'category' => $request->input('category')
-                ]);
+                    ->update([
+                        'user' => $request->input('reportedBy'),
+                        'location' => $request->input('location'),
+                        'source' => $request->input('source'),
+                        'report_time' => $request->input('report_time'),
+                        'response_time' => $request->input('response_time'),
+                        'category' => $request->input('category')
+                    ]);
 
                 $service = Service::where('id', $request->input('service_id'))
-                ->update([
-                    'category_id' => $serviceCategory->id,
-                    'category_name' => $serviceCategory->name,
-                    'description' => $request->input('description'),
-                    'kpi' => $request->input('kpi'),
-                    // 'status' => 'Open',
-                ]);
-
-            }else{
+                    ->update([
+                        'category_id' => $serviceCategory->id,
+                        'category_name' => $serviceCategory->name,
+                        'description' => $request->input('description'),
+                        'kpi' => $request->input('kpi'),
+                        // 'status' => 'Open',
+                    ]);
+            } else {
                 $reported = Reported::create([
                     'user' => $request->input('reportedBy'),
                     'location' => $request->input('location'),
@@ -150,12 +153,11 @@ class ServiceController extends Controller
 
                 // Update the service with the new status
                 Reported::where('id', $reported->id)
-                        ->update([
-                            'data_id' => $service->id,
-                            'data_module' => 'ITSM\Service',
-                            'data_number' => $service->service_number,
-                        ]);
-
+                    ->update([
+                        'data_id' => $service->id,
+                        'data_module' => 'ITSM\Service',
+                        'data_number' => $service->service_number,
+                    ]);
             }
 
             // Commit the transaction
@@ -170,7 +172,6 @@ class ServiceController extends Controller
             //throw $th;
             return response()->json(['message' => 'Failed']);
         }
-
     }
 
     /**
@@ -187,7 +188,7 @@ class ServiceController extends Controller
     public function edit(Request $request)
     {
         $user = auth()->user(); // Get the authenticated user's ID
-        if($request->input('id')){
+        if ($request->input('id')) {
             $service = Service::where('id', $request->input('id'))->first();
             $data = [
                 'id' => $service->id,
@@ -206,7 +207,7 @@ class ServiceController extends Controller
         }
 
         // Retrieve the service data based on user_id and cid
-        $services = Service::where('user_cid', $user->cid)->orderBy('created_at','desc')
+        $services = Service::where('user_cid', $user->cid)->orderBy('created_at', 'desc')
             ->get(); // Use 'first' to get a single result or null if not found
 
         if ($services->isNotEmpty()) {
@@ -230,7 +231,7 @@ class ServiceController extends Controller
                 ];
             });
 
-                return response()->json(['data' => $formattedServices]);
+            return response()->json(['data' => $formattedServices]);
         } else {
             // Service not found
             return response()->json(['data' => '']);
@@ -289,27 +290,25 @@ class ServiceController extends Controller
     {
         $user = auth()->user();
 
-        if($request->input('task') == 'GET_SERVICE_CATEGORY'){
-            if($request->input('id') != null ){
+        if ($request->input('task') == 'GET_SERVICE_CATEGORY') {
+            if ($request->input('id') != null) {
                 $serviceCategory = ServiceCategory::where('user_cid', $user->cid)
-                                    ->where('id',$request->input('id'))
-                                    ->first();
-                                    // ->select(['id','name','description','created_at']);
+                    ->where('id', $request->input('id'))
+                    ->first();
+                // ->select(['id','name','description','created_at']);
                 // return response()->json(['data' => $serviceCategory]);
                 return response()->json($serviceCategory, 200);
-            }else{
+            } else {
                 $serviceCategory = ServiceCategory::where('user_cid', $user->cid)
-                                    ->select(['id','name','description','created_at']);
+                    ->select(['id', 'name', 'description', 'created_at']);
 
-            // return datatables()->of($serviceCategory)->toJson();
-            return datatables()->of($serviceCategory)
-            ->addColumn('action', function ($serviceCategory) {
-                return view('itsm::service._actionCategory', compact('serviceCategory'));
-            })
-            ->toJson();
-
+                // return datatables()->of($serviceCategory)->toJson();
+                return datatables()->of($serviceCategory)
+                    ->addColumn('action', function ($serviceCategory) {
+                        return view('itsm::service._actionCategory', compact('serviceCategory'));
+                    })
+                    ->toJson();
             }
-            
         }
     }
 
@@ -317,15 +316,15 @@ class ServiceController extends Controller
     {
         $user = auth()->user();
 
-        if($request->input('task') == 'SAVE_CATEGORY'){
-            if($request->input('id') != null ){
+        if ($request->input('task') == 'SAVE_CATEGORY') {
+            if ($request->input('id') != null) {
                 ServiceCategory::where('id', $request->input('id'))
-                                    ->update([
-                                        'name' => $request->input('name'),
-                                        'description' => $request->input('description')
-                                    ]);
+                    ->update([
+                        'name' => $request->input('name'),
+                        'description' => $request->input('description')
+                    ]);
                 return response()->json(['message' => 'Category saved or updated successfully'], 201);
-            }else{
+            } else {
                 ServiceCategory::create([
                     'name' => $request->input('name'),
                     'description' => $request->input('description'),
@@ -333,7 +332,6 @@ class ServiceController extends Controller
                 // You can return a success message or redirect back
                 return response()->json(['message' => 'Category create successfully'], 201);
             }
-            
         }
     }
 
@@ -345,7 +343,7 @@ class ServiceController extends Controller
         // Check if the user has permission to delete service
         if ($user->can('delete itsm-service-category')) {
             try {
-                if($request->input('task') == 'DELETE_CATEGORY'){
+                if ($request->input('task') == 'DELETE_CATEGORY') {
                     // Find the service by UUID
                     $category = ServiceCategory::where('id', $request->input('id'))->firstOrFail();
 
@@ -361,9 +359,6 @@ class ServiceController extends Controller
                     // You can return a success message or redirect back
                     return response()->json(['message' => 'Category deleted successfully']);
                 }
-                
-
-                
             } catch (\Exception $e) {
                 // Handle any exceptions that occur during deletion
                 return response()->json(['message' => 'An error occurred during category deletion'], 500);
@@ -373,5 +368,4 @@ class ServiceController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
     }
-
 }

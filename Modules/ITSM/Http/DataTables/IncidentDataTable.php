@@ -133,10 +133,10 @@ class IncidentDataTable extends DataTable
                 $isSuperAdmin = auth()->check() && auth()->user()->level_access === 'Super Admin';
                 if($isSuperAdmin){
                     $data = $company->where('cid',$incident->user_cid)->first();
-                    return $data->name ?? '';
+                    return $data->name;
                 }else{
                     $data = $user->where('id',$incident->user_id)->first();
-                    return $data->name ?? '';
+                    return $data->name;
 
                 }
                 

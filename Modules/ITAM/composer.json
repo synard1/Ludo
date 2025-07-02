@@ -1,0 +1,28 @@
+{
+    "name": "ludo.my.id/itam",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mhd Iqbal Syahputra",
+            "email": "synard1@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": []
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ITAM\\": "app/",
+            "Modules\\ITAM\\Database\\Factories\\": "database/factories/",
+            "Modules\\ITAM\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\ITAM\\Tests\\": "tests/"
+        }
+    }
+}

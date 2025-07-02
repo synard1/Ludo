@@ -36,6 +36,7 @@ class WorkorderResponse extends Model
         'publish',
         'start_time',
         'end_time',
+        'duration',
         'notes',
         'user_cid',
         'user_id',
@@ -45,7 +46,6 @@ class WorkorderResponse extends Model
 
     public function workorder()
     {
-        return $this->belongsTo(WorkOrder::class,'workorder_id','id');
+        return $this->belongsTo(WorkOrder::class, 'workorder_id', 'id');
     }
-    
 }

@@ -9,12 +9,6 @@
                         <!--begin::Title-->
                         <h1 class="mb-3">Create Work Order</h1>
                         <!--end::Title-->
-
-                        <!--begin::Description-->
-                        <div class="text-gray-500 fw-semibold fs-5">
-                            If you need more info, please check <a href="" class="fw-bold link-primary">Support Guidelines</a>.
-                        </div>
-                        <!--end::Description-->
                     </div>
                     <!--end::Heading-->
 
