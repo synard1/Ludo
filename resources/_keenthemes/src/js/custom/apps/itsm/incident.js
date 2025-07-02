@@ -840,7 +840,8 @@ var KTIncident = function () {
 
                         // Find the input element by its id
                         var incidentInput = document.getElementById('incident');
-                        incidentInput.setAttribute('readonly', false); // User Requested
+                        incidentInput.removeAttribute('readonly');
+                        // incidentInput.setAttribute('readonly', false); // User Requested
 
                         // Create a new hidden input element
                         var hiddenInput = document.createElement("input");

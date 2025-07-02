@@ -828,7 +828,8 @@ var KTService = function () {
 
                         // Find the input element by its id
                         var serviceInput = document.getElementById('service');
-                        serviceInput.setAttribute('readonly', false); // User Requested
+                        serviceInput.removeAttribute('readonly');
+                        // serviceInput.setAttribute('readonly', false); // User Requested
 
                         // Create a new hidden input element
                         var hiddenInput = document.createElement("input");
