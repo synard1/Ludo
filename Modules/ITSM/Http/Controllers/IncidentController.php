@@ -30,32 +30,35 @@ class IncidentController extends Controller
 
     public function index(IncidentDataTable $dataTable, IncidentCategoryDataTable $categoryDataTable)
     {
-        addVendors(['datatables','tinymce']);
+        addVendors(['datatables', 'tinymce']);
         addJavascriptFile('assets/js/custom/apps/itsm/incident.js');
         // addJavascriptFile('assets/js/custom/apps/itsm/workorder.js');
-        
+
         $user = auth()->user();
-        $sla = SLA::where('user_cid',$user->cid)->get();
+        $sla = SLA::where('user_cid', $user->cid)->get();
         $priorities = config('itsm.workorder.priority');
         $canCreateIncident = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create itsm-incident');
         $canCreateIncidentCategory = auth()->check() && auth()->user()->level_access === 'Supervisor' && $user->can('create itsm-incident-category');
-        $services = Service::where('user_cid',$user->cid)->orderBy('name','asc')->get();
-        $incidentCategory = IncidentCategory::where('user_cid',$user->cid)->orderBy('name','asc')->get();
+        $services = Service::where('user_cid', $user->cid)->orderBy('name', 'asc')->get();
+        $incidentCategory = IncidentCategory::where('user_cid', $user->cid)->orderBy('name', 'asc')->get();
         // Retrieve distinct staff values from the database
         $distinctStaff = User::distinct('name')
-                                    ->pluck('name')
-                                    ->where('user_cid',$user->cid)
-                                    ->filter()
-                                    ->map(function ($staff) {
-                                        return $staff;
-                                    })->flatten()
-                                    ->unique()
-                                    ->values();
+            ->pluck('name')
+            ->where('user_cid', $user->cid)
+            ->filter()
+            ->map(function ($staff) {
+                return $staff;
+            })->flatten()
+            ->unique()
+            ->values();
 
         // return view('itsm::incident.index', compact('incidentDataTable', 'categoryDataTable','canCreateIncident','services',));
 
 
-        return $dataTable->render('itsm::incident.index',compact(['canCreateIncident','services','incidentCategory', 'distinctStaff', 'sla', 'priorities','canCreateIncidentCategory']));
+        // Pass working hours config to view
+        $workingHours = config('itsm.working_hours');
+
+        return $dataTable->render('itsm::incident.index', compact(['canCreateIncident', 'services', 'incidentCategory', 'distinctStaff', 'sla', 'priorities', 'canCreateIncidentCategory', 'workingHours']));
         // return $dataTable->render('helpdesk::service-management.index',compact(['canCreateService','isSupervisor','services']));
         // return view('helpdesk::service-management.index',compact(['canCreateService','isSupervisor']));
     }
@@ -77,11 +80,11 @@ class IncidentController extends Controller
         $currentYear = date('Y');
         $maxNumber = Incident::where('user_cid', $user->cid)->whereYear('created_at', $currentYear)->max('number');
         $newNumber = $maxNumber + 1;
-        $formattedNumber = 'INC'. $currentYear. str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-        
+        $formattedNumber = 'INC' . $currentYear . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+
         $incidentCategory = IncidentCategory::where('user_cid', $user->cid)
-                            ->where('id', $request->input('classification'))
-                            ->first(); // Use 'first' to get a single result or null if not found
+            ->where('id', $request->input('classification'))
+            ->first(); // Use 'first' to get a single result or null if not found
 
         // dd($incidentCategory);
 
@@ -120,29 +123,28 @@ class IncidentController extends Controller
 
         try {
 
-            if($request->input('incident_id')){
+            if ($request->input('incident_id')) {
                 // Update the incident with the new data
                 $reported = Reported::where('data_id', $request->input('incident_id'))
-                        ->update([
-                    'user' => $request->input('reportedBy'),
-                    'location' => $request->input('location'),
-                    'source' => $request->input('source'),
-                    'report_time' => $request->input('report_time'),
-                    'response_time' => $request->input('response_time'),
-                    'category' => $request->input('category')
-                ]);
+                    ->update([
+                        'user' => $request->input('reportedBy'),
+                        'location' => $request->input('location'),
+                        'source' => $request->input('source'),
+                        'report_time' => $request->input('report_time'),
+                        'response_time' => $request->input('response_time'),
+                        'category' => $request->input('category')
+                    ]);
 
                 $incident = Incident::where('id', $request->input('incident_id'))
-                ->update([
-                    'category_id' => $incidentCategory->id,
-                    'category_name' => $incidentCategory->name,
-                    'description' => $request->input('description'),
-                    'severity' => $request->input('severity'),
-                    'kpi' => $request->input('kpi'),
-                    // 'status' => 'Open',
-                ]);
-
-            }else{
+                    ->update([
+                        'category_id' => $incidentCategory->id,
+                        'category_name' => $incidentCategory->name,
+                        'description' => $request->input('description'),
+                        'severity' => $request->input('severity'),
+                        'kpi' => $request->input('kpi'),
+                        // 'status' => 'Open',
+                    ]);
+            } else {
                 $reported = Reported::create([
                     'user' => $request->input('reportedBy'),
                     'location' => $request->input('location'),
@@ -173,12 +175,11 @@ class IncidentController extends Controller
 
                 // Update the incident with the new status
                 Reported::where('id', $reported->id)
-                        ->update([
-                            'data_id' => $incident->id,
-                            'data_module' => 'ITSM\Incident',
-                            'data_number' => $incident->incident_number,
-                        ]);
-
+                    ->update([
+                        'data_id' => $incident->id,
+                        'data_module' => 'ITSM\Incident',
+                        'data_number' => $incident->incident_number,
+                    ]);
             }
 
             // Commit the transaction
@@ -193,7 +194,6 @@ class IncidentController extends Controller
             //throw $th;
             return response()->json(['message' => 'Failed']);
         }
-
     }
 
     /**
@@ -218,7 +218,7 @@ class IncidentController extends Controller
         //     $incident = Incident::where('id', $id)->first();
         //     return response()->json(['data' => $incident]);
         // }
-        if($request->input('id')){
+        if ($request->input('id')) {
             $incident = Incident::where('id', $request->input('id'))->first();
             $data = [
                 'id' => $incident->id,
@@ -247,7 +247,7 @@ class IncidentController extends Controller
         }
 
         // Retrieve the incident data based on user_id and cid
-        $incidents = Incident::where('user_cid', $user->cid)->orderBy('created_at','desc')
+        $incidents = Incident::where('user_cid', $user->cid)->orderBy('created_at', 'desc')
             ->get(); // Use 'first' to get a single result or null if not found
 
         if ($incidents->isNotEmpty()) {
@@ -271,21 +271,13 @@ class IncidentController extends Controller
                 ];
             });
 
-                return response()->json(['data' => $formattedIncidents]);
+            return response()->json(['data' => $formattedIncidents]);
         } else {
             // Incident not found
             return response()->json(['data' => '']);
             // return response()->json(['message' => 'Incident not found'], 404);
         }
         // return view('itsm::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
     }
 
     /**
@@ -331,28 +323,26 @@ class IncidentController extends Controller
     {
         $user = auth()->user();
 
-        if($request->input('task') == 'GET_INCIDENT_CATEGORY'){
-            if($request->input('id') != null ){
+        if ($request->input('task') == 'GET_INCIDENT_CATEGORY') {
+            if ($request->input('id') != null) {
                 $incidentCategory = IncidentCategory::where('user_cid', $user->cid)
-                                    ->where('id',$request->input('id'))
-                                    ->first();
-                                    // ->select(['id','name','description','created_at']);
+                    ->where('id', $request->input('id'))
+                    ->first();
+                // ->select(['id','name','description','created_at']);
                 // dd($incidentCategory);
                 // return response()->json(['data' => $incidentCategory]);
                 return response()->json($incidentCategory, 200);
-            }else{
+            } else {
                 $incidentCategory = IncidentCategory::where('user_cid', $user->cid)
-                                    ->select(['id','name','description','created_at']);
+                    ->select(['id', 'name', 'description', 'created_at']);
 
-            // return datatables()->of($incidentCategory)->toJson();
-            return datatables()->of($incidentCategory)
-            ->addColumn('action', function ($incidentCategory) {
-                return view('itsm::incident._actionCategory', compact('incidentCategory'));
-            })
-            ->toJson();
-
+                // return datatables()->of($incidentCategory)->toJson();
+                return datatables()->of($incidentCategory)
+                    ->addColumn('action', function ($incidentCategory) {
+                        return view('itsm::incident._actionCategory', compact('incidentCategory'));
+                    })
+                    ->toJson();
             }
-            
         }
     }
 
@@ -361,15 +351,15 @@ class IncidentController extends Controller
     {
         $user = auth()->user();
 
-        if($request->input('task') == 'SAVE_CATEGORY'){
-            if($request->input('id') != null ){
+        if ($request->input('task') == 'SAVE_CATEGORY') {
+            if ($request->input('id') != null) {
                 IncidentCategory::where('id', $request->input('id'))
-                                    ->update([
-                                        'name' => $request->input('name'),
-                                        'description' => $request->input('description')
-                                    ]);
+                    ->update([
+                        'name' => $request->input('name'),
+                        'description' => $request->input('description')
+                    ]);
                 return response()->json(['message' => 'Category saved or updated successfully'], 201);
-            }else{
+            } else {
                 IncidentCategory::create([
                     'name' => $request->input('name'),
                     'description' => $request->input('description'),
@@ -377,7 +367,6 @@ class IncidentController extends Controller
                 // You can return a success message or redirect back
                 return response()->json(['message' => 'Category create successfully'], 201);
             }
-            
         }
     }
 
@@ -389,7 +378,7 @@ class IncidentController extends Controller
         // Check if the user has permission to delete incident
         if ($user->can('delete itsm-incident-category')) {
             try {
-                if($request->input('task') == 'DELETE_CATEGORY'){
+                if ($request->input('task') == 'DELETE_CATEGORY') {
                     // Find the incident by UUID
                     $category = IncidentCategory::where('id', $request->input('id'))->firstOrFail();
 
@@ -405,9 +394,6 @@ class IncidentController extends Controller
                     // You can return a success message or redirect back
                     return response()->json(['message' => 'Category deleted successfully']);
                 }
-                
-
-                
             } catch (\Exception $e) {
                 // Handle any exceptions that occur during deletion
                 return response()->json(['message' => 'An error occurred during category deletion'], 500);

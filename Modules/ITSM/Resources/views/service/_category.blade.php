@@ -14,19 +14,21 @@
     </div>
     <div id="kt_docs_card_ticket_list" class="collapse show">
         <div class="card-body">
-            <table id="serviceCategory-tables" class="display nowrap table table-striped table-row-bordered gy-5 gs-7"
-                style="width:100%">
-                <thead>
-                    <tr class="fw-semibold fs-6 text-gray-800">
-                        <th class="w-25px">#</th>
-                        <th class="min-w-100px">ID</th>
-                        <th class="min-w-140px">Title</th>
-                        <th class="min-w-120px">Description</th>
-                        <th class="min-w-100px">Created At</th>
-                        <th class="min-w-100px">Actions</th>
-                    </tr>
-                </thead>
-            </table>
+            <div id="" class="table-responsive">
+                <table id="serviceCategory-tables"
+                    class="display nowrap table table-striped table-row-bordered gy-5 gs-7" style="width:100%">
+                    <thead>
+                        <tr class="fw-semibold fs-6 text-gray-800">
+                            <th class="w-25px">#</th>
+                            <th class="min-w-100px">ID</th>
+                            <th class="min-w-140px">Title</th>
+                            <th class="min-w-120px">Description</th>
+                            <th class="min-w-100px">Created At</th>
+                            <th class="min-w-100px">Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -52,6 +54,7 @@
             };
 
             dtCategory = $("#serviceCategory-tables").DataTable({
+                responsive: true,
                 ajax: {
                     url: "/apps/itsm/api/serviceCategories",
                     data: {

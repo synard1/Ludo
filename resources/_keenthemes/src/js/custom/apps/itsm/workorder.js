@@ -297,6 +297,7 @@ var KTWorkorder = function () {
                         'workorder_subject': $('#workorder_subject').val(),
                         'module': $('#module').val(),
                         'status': $('#status').val(),
+                        'duration': $('#duration').val(),
                         'start_time': formattedStartTime,
                         'end_time': formattedEndTime,
                         // Add other form fields if needed
@@ -452,6 +453,9 @@ var KTWorkorder = function () {
                         }
                         if(response.end_time){
                             $('#finish_time_input').val(formatDateTime(response.end_time));
+                        }
+                        if(response.duration){
+                            $('#duration').val(response.duration);
                         }
                         
                         // $('#description').val(response.description);
@@ -702,11 +706,11 @@ var KTWorkorder = function () {
         $('#status').val(selectedStatus).trigger('change'); // Assuming you are using a library like Select2 for the dropdown
     }
 
-    // $("#due_date").flatpickr({
-    //     enableTime: true,
-    //     dateFormat: "Y-m-d H:i",
-    //     minuteIncrement: 1
-    // });
+    $("#due_date").flatpickr({
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minuteIncrement: 1
+    });
 
     // Public functions
     return {

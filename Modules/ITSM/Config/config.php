@@ -3,6 +3,42 @@
 return [
     'name' => 'ITSM',
 
+    'change' => [
+
+        'priority' => [
+            'high' => 'High',
+            'medium' => 'Medium',
+            'low' => 'Low',
+        ],
+
+        'status' => [
+            'open' => 'Open',
+            'rejected' => 'Rejected',
+            'pending' => 'Pending',
+            'in_progress' => 'In Progress',
+            'completed' => 'Completed',
+            'cancelled' => 'Cancelled',
+            'approved' => 'Approved',
+        ],
+
+        'series'   => 'CHG', // Default if not exist in db
+        'sequence' => 1,
+        'year' => date('Y'),
+
+        /*
+         * Sequence will be padded accordingly, for ex. 001
+         */
+        'sequence_padding' => 3,
+        'delimiter'        => '',
+
+        /*
+         * Supported tags {SERIES}, {YEAR}, {DELIMITER}, {SEQUENCE}
+         * Example: INC2024001
+         */
+        'format' => '{SERIES}{YEAR}{DELIMITER}{SEQUENCE}',
+
+    ],
+
     'incident' => [
         'series'   => 'INC', // Default if not exist in db
         'sequence' => 1,

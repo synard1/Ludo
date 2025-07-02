@@ -564,99 +564,50 @@ var KTIncident = function () {
         submitButton.addEventListener('click', function (e) {
             e.preventDefault();
 
-            validator.validate().then(function (status) {
-                if (status == 'Valid') {
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-
-                    // Show loading indication
-                    submitButton.setAttribute('data-kt-indicator', 'on');
-
-                    // Disable button to avoid multiple click
-                    submitButton.disabled = true;
-
-                    var formData = new FormData(document.getElementById('kt_new_incident_form'));
-
-                    // Check if formData has the 'ticket_id' input
-                    if (formData.has('incident_id')) {
-                        // Get the selected issuecategory options
-                        var issuecategoryOptions = [];
-                        $("input[name='category[]']:checked").each(function () {
-                            issuecategoryOptions.push($(this).val());
-                        });
-                        
-                    } else {
-
-                        // Get the selected issuecategory options
-                        var issuecategoryOptions = [];
-                        $("input[name='category[]']:checked").each(function () {
-                            issuecategoryOptions.push($(this).val());
+            // --- Tambahan validasi jam kerja ---
+            const reportTime = $('#report_time').val();
+            const responseTime = $('#response_time').val();
+            let outOfHours = false;
+            let msg = '';
+            let workingHours = window.workingHours || {start: '05:00', end: '18:00'};
+            
+            if (isOutsideWorkingHours(reportTime)) {
+                outOfHours = true;
+                let reportTimeObj = moment(reportTime, ["YYYY-MM-DD HH:mm", "YYYY-MM-DD HH:mm:ss"], true);
+                let timeStr = reportTimeObj.format('HH:mm');
+                msg += `- Report Time (${timeStr}) di luar jam kerja (${workingHours.start} - ${workingHours.end})\n`;
+            }
+            if (isOutsideWorkingHours(responseTime)) {
+                outOfHours = true;
+                let responseTimeObj = moment(responseTime, ["YYYY-MM-DD HH:mm", "YYYY-MM-DD HH:mm:ss"], true);
+                let timeStr = responseTimeObj.format('HH:mm');
+                msg += `- Response Time (${timeStr}) di luar jam kerja (${workingHours.start} - ${workingHours.end})\n`;
+            }
+            if (outOfHours) {
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Waktu input di luar jam kerja. Apakah Anda yakin ingin melanjutkan simpan?\n\n' + msg,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        validator.validate().then(function (status) {
+                            if (status == 'Valid') {
+                                doSubmitAjax();
+                            }
                         });
                     }
+                });
+                return;
+            }
+            // --- End tambahan validasi jam kerja ---
 
-                    $.ajax({
-                        url: '/apps/itsm/api/incidents',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,  // Important: Don't process the data
-                        contentType: false,  // Important: Set content type to false
-                        success: function (response) {
-                            // alert(response.message);
-                            // Hide loading indication
-                            submitButton.removeAttribute('data-kt-indicator');
-
-                            // Enable button
-                            submitButton.disabled = false;
-
-                            swal.fire({
-                                text: response.message,
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn font-weight-bold btn-light-primary"
-                                }
-                            }).then(function(){
-                                // settingCompanyForm.reset();
-                                // validation.resetForm(); // Reset formvalidation --- more info: https://formvalidation.io/guide/api/reset-form/
-                                // toggleChangeEmail();
-                                // Hide loading indication
-                                submitButton.removeAttribute('data-kt-indicator');
-
-                                // Enable button
-                                submitButton.disabled = false;
-                                $('#kt_docs_card_incident_list').collapse('show');
-                                $('#kt_docs_card_incident_new').collapse('hide');
-                                // dtIncident.ajax.reload();
-                                $('#incidents-table').DataTable().ajax.reload();
-                                form.reset();
-                            });
-                        },
-                        error: function (xhr) {
-                            // Handle errors here
-                            // Hide loading indication
-                            submitButton.removeAttribute('data-kt-indicator');
-
-                            // Enable button
-                            submitButton.disabled = false;
-
-                            Swal.fire({
-                                text: "Sorry, looks like there are some errors detected, please try again.",
-                                icon: "error",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
-                                }
-                            });
-                        }
-                    });
-
+            validator.validate().then(function (status) {
+                if (status == 'Valid') {
+                    doSubmitAjax();
                 } else {
-                    // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
                     Swal.fire({
                         text: "Sorry, looks like there are some errors detected, please try again.",
                         icon: "error",
@@ -669,6 +620,63 @@ var KTIncident = function () {
                 }
             });
         });
+
+        // Ekstrak submit ajax ke fungsi agar bisa dipanggil ulang
+        function doSubmitAjax() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            // Show loading indication
+            submitButton.setAttribute('data-kt-indicator', 'on');
+            // Disable button to avoid multiple click
+            submitButton.disabled = true;
+            var formData = new FormData(document.getElementById('kt_new_incident_form'));
+            // Get the selected issuecategory options
+            var issuecategoryOptions = [];
+            $("input[name='category[]']:checked").each(function () {
+                issuecategoryOptions.push($(this).val());
+            });
+            $.ajax({
+                url: '/apps/itsm/api/incidents',
+                type: 'POST',
+                data: formData,
+                processData: false,  // Important: Don't process the data
+                contentType: false,  // Important: Set content type to false
+                success: function (response) {
+                    submitButton.removeAttribute('data-kt-indicator');
+                    submitButton.disabled = false;
+                    swal.fire({
+                        text: response.message,
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    }).then(function(){
+                        $('#kt_docs_card_incident_list').collapse('show');
+                        $('#kt_docs_card_incident_new').collapse('hide');
+                        $('#incidents-table').DataTable().ajax.reload();
+                        form.reset();
+                    });
+                },
+                error: function (xhr) {
+                    submitButton.removeAttribute('data-kt-indicator');
+                    submitButton.disabled = false;
+                    Swal.fire({
+                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        }
 
         // Add a click event listener to the "New Incident" button
         newIncidentButton.addEventListener('click', function (e) {
@@ -832,7 +840,7 @@ var KTIncident = function () {
 
                         // Find the input element by its id
                         var incidentInput = document.getElementById('incident');
-                        incidentInput.setAttribute('readonly', true);
+                        incidentInput.setAttribute('readonly', false); // User Requested
 
                         // Create a new hidden input element
                         var hiddenInput = document.createElement("input");
@@ -1012,6 +1020,27 @@ var KTIncident = function () {
             }
 
             tinymce.init(options);
+    }
+
+    // Helper: Cek jam kerja
+    function isOutsideWorkingHours(timeStr) {
+        if (!timeStr) return false;
+        // Support format dari flatpickr: 'YYYY-MM-DD HH:mm' atau 'YYYY-MM-DD HH:mm:ss'
+        let input = moment(timeStr, ["YYYY-MM-DD HH:mm", "YYYY-MM-DD HH:mm:ss"], true);
+        if (!input.isValid()) return false;
+        const hours = input.hours();
+        const minutes = input.minutes();
+        const inputHM = hours * 60 + minutes;
+        let workingHours = window.workingHours || {start: '05:00', end: '18:00'};
+        const [startH, startM] = workingHours.start.split(':').map(Number);
+        const [endH, endM] = workingHours.end.split(':').map(Number);
+        const startHM = startH * 60 + startM;
+        const endHM = endH * 60 + endM;
+        if (startHM < endHM) {
+            return inputHM < startHM || inputHM > endHM;
+        } else {
+            return inputHM < startHM && inputHM > endHM;
+        }
     }
 
     // Public functions

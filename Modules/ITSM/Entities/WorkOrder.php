@@ -72,6 +72,13 @@ class WorkOrder extends Model
         return json_decode($value, true);
     }
 
+    // protected function staff(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn ($value) => implode(', ', $value),
+    //     );
+    // }
+
     public function respons()
     {
         return $this->hasMany(WorkorderResponse::class, 'workorder_id','id');

@@ -4,14 +4,15 @@ namespace Modules\ITSM\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Ramsey\Uuid\Uuid;
 use App\Traits\UserTrackingTrait;
 
-class WorkorderResponse extends Model
+class ChangeCategory extends Model
 {
-    use HasFactory, UserTrackingTrait;
+    use HasFactory, UserTrackingTrait, SoftDeletes;
 
-    public $table = 'itsm_workorder_responses';
+    public $table = 'itsm_change_categories';
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -29,23 +30,7 @@ class WorkorderResponse extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'workorder_id',
-        'description',
-        'module',
-        'status',
-        'publish',
-        'start_time',
-        'end_time',
-        'duration',
-        'notes',
-        'user_cid',
-        'user_id',
-        'created_by',
-        'created_by_level',
+        'title',
+        'description'
     ];
-
-    public function workorder()
-    {
-        return $this->belongsTo(WorkOrder::class, 'workorder_id', 'id');
-    }
 }

@@ -5,12 +5,14 @@
         <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-8">
             <!--begin:::Tab item-->
             <li class="nav-item">
-                <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_service_overview">Overview</a>
+                <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab"
+                    href="#kt_service_overview">Overview</a>
             </li>
             <!--end:::Tab item-->
             <!--begin:::Tab item-->
             <li class="nav-item">
-                <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_service_general">General Settings</a>
+                <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_service_general">General
+                    Settings</a>
             </li>
             <!--end:::Tab item-->
         </ul>
@@ -45,9 +47,9 @@
                             <!--begin::Table-->
                             {{-- {{ $serviceDataTable->table() }} --}}
                             <!-- For Service DataTable -->
-                    <div class="datatable-container">
-                        {{ $dataTable->table() }}
-                    </div>
+                            <div class="datatable-container">
+                                {{ $dataTable->table() }}
+                            </div>
                             <!--end::Table-->
                         </div>
                         <!--end::Card body-->
@@ -68,22 +70,26 @@
         <!--end:::Tab content-->
     </div>
     <!--end::Content-->
- 
+
     @include('itsm::workorder/_form')
 
     @push('scripts')
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.0.3/css/buttons.dataTables.min.css">
     <script src="https://cdn.datatables.net/buttons/1.0.3/js/dataTables.buttons.min.js"></script>
     <script src="/vendor/datatables/buttons.server-side.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     {{ $dataTable->scripts() }}
 
     <script>
         // Pass data to JavaScript
         var canCreateService = @json($canCreateService);
         var canCreateServiceCategory = @json($canCreateServiceCategory);
-        var slaExist = @json($sla);
-
+        var isSupervisor = @json($isSupervisor);
+        var slaExist = true;
+        
+        // Inisialisasi jam kerja dari config backend
+        window.workingHours = @json(config('itsm.working_hours'));
 
         $(document).ready(function () {
             // Attach a click event handler to the tab links
