@@ -124,6 +124,7 @@ class ServiceController extends Controller
                     ->update([
                         'category_id' => $serviceCategory->id,
                         'category_name' => $serviceCategory->name,
+                        'title' => Uc($request->input('service')),
                         'description' => $request->input('description'),
                         'kpi' => $request->input('kpi'),
                         // 'status' => 'Open',

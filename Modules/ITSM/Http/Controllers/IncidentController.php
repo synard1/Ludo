@@ -139,6 +139,7 @@ class IncidentController extends Controller
                     ->update([
                         'category_id' => $incidentCategory->id,
                         'category_name' => $incidentCategory->name,
+                        'title' => Uc($request->input('incident')),
                         'description' => $request->input('description'),
                         'severity' => $request->input('severity'),
                         'kpi' => $request->input('kpi'),
